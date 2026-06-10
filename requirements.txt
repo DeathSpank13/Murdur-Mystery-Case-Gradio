@@ -1,0 +1,6 @@
+# gradio 6.x: the Chatbot "messages" format (role/content dicts) is the default,
+# so the code does NOT pass type="messages". That argument was removed in gradio 6
+# and now raises: Chatbot.__init__() got an unexpected keyword argument 'type'.
+# (Developed and tested against gradio 6.17.3.)
+gradio>=6.0.0
+requests>=2.31.0

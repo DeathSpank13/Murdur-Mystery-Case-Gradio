@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NPC Interrogation — Browser Demo</title>
+  <meta name="description" content="A murder-mystery interrogation demo: static keyword, branching dialogue, and an in-browser AI suspect (Qwen2.5-0.5B-Instruct)." />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header>
+    <h1>Interrogation: The Whitmore Case</h1>
+    <p class="lede">
+      Eleanor Vance hosted last night's dinner party, where Charles Whitmore was
+      found dead in the study. You are the investigator — question her.
+    </p>
+    <p class="note">
+      Browser demo. The AI suspect runs <strong>Qwen2.5-0.5B-Instruct</strong>
+      entirely in your browser (no server). The full project runs a 12B model
+      locally — see the
+      <a href="https://github.com/DeathSpank13/npc-interrogation" id="repo-link" target="_blank" rel="noopener">GitHub repo</a>.
+    </p>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-tab="ai" role="tab">AI suspect (0.5B)</button>
+    <button class="tab" data-tab="branching" role="tab">Branching dialogue</button>
+    <button class="tab" data-tab="static" role="tab">Static (keyword)</button>
+  </nav>
+
+  <!-- ============ AI suspect ============ -->
+  <section class="panel active" id="panel-ai" role="tabpanel">
+    <p class="panel-intro">
+      A real (small) language model plays Eleanor. A finite state machine reads
+      how you question her and rewrites the model's persona — Calm, Suspicious,
+      or Defensive — turn by turn.
+    </p>
+
+    <div id="model-loader">
+      <button id="load-model-btn" class="primary">Load AI model</button>
+      <span id="model-status" class="status">Backend: <span id="backend-name">checking…</span></span>
+      <div id="progress-wrap" hidden>
+        <div id="progress-bar"></div>
+        <span id="progress-text"></span>
+      </div>
+    </div>
+
+    <div class="researcher-toggle">
+      <label><input type="checkbox" id="researcher-view" /> Researcher view (show state &amp; latency)</label>
+      <span id="state-readout" class="readout" hidden></span>
+      <span id="latency-readout" class="readout" hidden></span>
+    </div>
+
+    <div class="chat" id="ai-chat" aria-live="polite"></div>
+
+    <form class="composer" id="ai-form">
+      <input type="text" id="ai-input" placeholder="e.g. Where were you when Charles died?" autocomplete="off" disabled />
+      <button type="submit" id="ai-send" class="primary" disabled>Ask</button>
+      <button type="button" id="ai-reset" class="secondary">Reset</button>
+    </form>
+  </section>
+
+  <!-- ============ Branching dialogue ============ -->
+  <section class="panel" id="panel-branching" role="tabpanel">
+    <p class="panel-intro">
+      A choice-based interrogation. Some questions can be asked <strong>once</strong>,
+      and some choices are a <strong>fork</strong> — commit to one and the
+      alternatives vanish for this run. Topics open follow-ups; use ← Back to step out.
+    </p>
+    <div class="chat" id="branch-chat" aria-live="polite"></div>
+    <p class="choose-label">Choose your next line:</p>
+    <div class="options" id="branch-options"></div>
+    <button type="button" id="branch-reset" class="secondary">Restart conversation</button>
+  </section>
+
+  <!-- ============ Static keyword ============ -->
+  <section class="panel" id="panel-static" role="tabpanel">
+    <p class="panel-intro">
+      The model-free baseline: a fixed tree of pre-written lines chosen by
+      best-match keyword scoring. No AI, no memory beyond which topics you've
+      revisited.
+    </p>
+    <div class="chat" id="static-chat" aria-live="polite"></div>
+    <form class="composer" id="static-form">
+      <input type="text" id="static-input" placeholder="e.g. What is your name?" autocomplete="off" />
+      <button type="submit" class="primary">Ask</button>
+      <button type="button" id="static-reset" class="secondary">Reset</button>
+    </form>
+  </section>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
