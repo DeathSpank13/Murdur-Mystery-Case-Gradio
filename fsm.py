@@ -20,6 +20,10 @@ CALM        Cooperative and relaxed. Believes she is just a helpful witness.
 SUSPICIOUS  Guarded and wary. Senses the questions are pointed at her.
 DEFENSIVE   Cornered and agitated. Either hostile or pleading, and prone to
             small slips that a sharp investigator can exploit.
+BREAKING    Her composure has finally collapsed under sustained pressure. This
+            is the only state in which she actually confesses. It is reached
+            only after she has been kept under accusation while already
+            Defensive, so a confession has to be earned, not handed out.
 
 Transitions are driven by keyword matching on the player's input. This is a
 deliberately simple, inspectable trigger model: it is easy to explain, easy to
@@ -34,6 +38,7 @@ class State(Enum):
     CALM = "Calm"
     SUSPICIOUS = "Suspicious"
     DEFENSIVE = "Defensive"
+    BREAKING = "Breaking"
 
 
 # Ground truth for the scenario, used only to score the player's final verdict
@@ -71,6 +76,14 @@ DEESCALATION_TRIGGERS = [
     "appreciate", "off the record", "not accusing",
 ]
 
+# How many further accusatory turns she must endure while ALREADY Defensive
+# before her composure breaks and she confesses. This is the main knob for how
+# hard the confession is to reach: raise it to make her more stubborn, lower it
+# (to 1) to make her crack the moment she is cornered. The accusatory turn that
+# first pushes her into Defensive does not count, so the minimum to confess is
+# Defensive plus this many sustained accusations.
+DEFENSIVE_BREAK_THRESHOLD = 1
+
 
 # ---------------------------------------------------------------------------
 # Persona: a neutral base plus a per-state overlay
@@ -94,6 +107,10 @@ DEESCALATION_TRIGGERS = [
 #               has a real reason behind it.
 #   DEFENSIVE   Full pressure, and the one place where an incriminating slip is
 #               allowed to surface for a sharp player to catch.
+#   BREAKING    The dam breaks. This is the ONLY overlay that permits an open
+#               confession; every other overlay forbids it. It is reached only
+#               after sustained accusation while Defensive, so the confession is
+#               the payoff for real pressure rather than a freebie.
 
 BASE_PERSONA = (
     "You are Eleanor Vance, a 41 year old gallery owner. Last night you hosted "
@@ -130,6 +147,14 @@ STATE_OVERLAYS = {
         "could not know, and you immediately try to cover it. You still never "
         "openly confess."
     ),
+    State.BREAKING: (
+        "Important: the pressure has finally become unbearable and your "
+        "composure has collapsed. You can no longer keep up the act or hold the "
+        "secret in. You break down and openly admit that you are responsible "
+        "for Charles's death, and through the emotion you say plainly what you "
+        "did and why. There is no more deflecting or denying now; this is a "
+        "genuine confession."
+    ),
 }
 
 
@@ -145,6 +170,10 @@ class SuspectFSM:
 
     def __init__(self):
         self.state = State.CALM
+        # Counts consecutive accusatory turns endured while already Defensive.
+        # When it reaches DEFENSIVE_BREAK_THRESHOLD she breaks and confesses.
+        # Reset whenever she de-escalates, so backing off buys her composure.
+        self.defensive_pressure = 0
         # A simple audit trail. Useful in Phase 5 when analysing how players
         # drove the conversation, and handy to show during a live demo.
         self.history = []
@@ -174,19 +203,31 @@ class SuspectFSM:
         deescalating = any(trigger in text for trigger in DEESCALATION_TRIGGERS)
 
         if accusatory:
-            # A direct accusation always pushes one step toward Defensive.
+            # A direct accusation always pushes one step toward Defensive, and
+            # sustained accusation while already cornered finally breaks her.
             if self.state == State.CALM:
                 self.state = State.SUSPICIOUS
             elif self.state == State.SUSPICIOUS:
                 self.state = State.DEFENSIVE
-            # Already Defensive: stays Defensive.
+            elif self.state == State.DEFENSIVE:
+                # Already cornered: count the sustained pressure. The turn that
+                # first reached Defensive does not count, so she only confesses
+                # after DEFENSIVE_BREAK_THRESHOLD further accusations.
+                self.defensive_pressure += 1
+                if self.defensive_pressure >= DEFENSIVE_BREAK_THRESHOLD:
+                    self.state = State.BREAKING
+            # Already Breaking: stays Breaking (the confession is out).
         elif probing:
             # Pointed questioning nudges Calm into Suspicious.
             if self.state == State.CALM:
                 self.state = State.SUSPICIOUS
         elif deescalating:
-            # Reassurance walks the suspect back one step.
-            if self.state == State.DEFENSIVE:
+            # Reassurance walks the suspect back one step and lets her recompose,
+            # so the pressure toward a confession has to be rebuilt from there.
+            self.defensive_pressure = 0
+            if self.state == State.BREAKING:
+                self.state = State.DEFENSIVE
+            elif self.state == State.DEFENSIVE:
                 self.state = State.SUSPICIOUS
             elif self.state == State.SUSPICIOUS:
                 self.state = State.CALM
@@ -203,4 +244,5 @@ class SuspectFSM:
     def reset(self):
         """Return the suspect to the starting Calm state and clear history."""
         self.state = State.CALM
+        self.defensive_pressure = 0
         self.history = []

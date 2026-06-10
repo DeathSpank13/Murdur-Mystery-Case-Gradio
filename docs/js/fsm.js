@@ -12,6 +12,7 @@ export const State = {
   CALM: "Calm",
   SUSPICIOUS: "Suspicious",
   DEFENSIVE: "Defensive",
+  BREAKING: "Breaking",
 };
 
 // Ground truth for the scenario (used only if a verdict mechanic is added).
@@ -37,6 +38,12 @@ const DEESCALATION_TRIGGERS = [
   "take your time", "i understand", "i believe you", "thank you",
   "appreciate", "off the record", "not accusing",
 ];
+
+// How many further accusatory turns she must endure while ALREADY Defensive
+// before her composure breaks and she confesses. Main knob for how hard the
+// confession is to reach. The accusatory turn that first pushes her into
+// Defensive does not count.
+const DEFENSIVE_BREAK_THRESHOLD = 2;
 
 const BASE_PERSONA =
   "You are Eleanor Vance, a 41 year old gallery owner. Last night you hosted " +
@@ -69,11 +76,21 @@ const STATE_OVERLAYS = {
     "specific detail about the study or the timeline that an innocent person " +
     "could not know, and you immediately try to cover it. You still never " +
     "openly confess.",
+  [State.BREAKING]:
+    "Important: the pressure has finally become unbearable and your " +
+    "composure has collapsed. You can no longer keep up the act or hold the " +
+    "secret in. You break down and openly admit that you are responsible " +
+    "for Charles's death, and through the emotion you say plainly what you " +
+    "did and why. There is no more deflecting or denying now; this is a " +
+    "genuine confession.",
 };
 
 export class SuspectFSM {
   constructor() {
     this.state = State.CALM;
+    // Consecutive accusatory turns endured while already Defensive. Reaching
+    // DEFENSIVE_BREAK_THRESHOLD breaks her; de-escalation resets it.
+    this.defensivePressure = 0;
     this.history = [];
   }
 
@@ -100,11 +117,23 @@ export class SuspectFSM {
     if (accusatory) {
       if (this.state === State.CALM) this.state = State.SUSPICIOUS;
       else if (this.state === State.SUSPICIOUS) this.state = State.DEFENSIVE;
-      // Already Defensive: stays Defensive.
+      else if (this.state === State.DEFENSIVE) {
+        // Already cornered: count the sustained pressure. The turn that first
+        // reached Defensive does not count, so she only confesses after
+        // DEFENSIVE_BREAK_THRESHOLD further accusations.
+        this.defensivePressure += 1;
+        if (this.defensivePressure >= DEFENSIVE_BREAK_THRESHOLD) {
+          this.state = State.BREAKING;
+        }
+      }
+      // Already Breaking: stays Breaking (the confession is out).
     } else if (probing) {
       if (this.state === State.CALM) this.state = State.SUSPICIOUS;
     } else if (deescalating) {
-      if (this.state === State.DEFENSIVE) this.state = State.SUSPICIOUS;
+      // Backing off lets her recompose; rebuild the pressure to confess again.
+      this.defensivePressure = 0;
+      if (this.state === State.BREAKING) this.state = State.DEFENSIVE;
+      else if (this.state === State.DEFENSIVE) this.state = State.SUSPICIOUS;
       else if (this.state === State.SUSPICIOUS) this.state = State.CALM;
     }
 
@@ -114,6 +143,7 @@ export class SuspectFSM {
 
   reset() {
     this.state = State.CALM;
+    this.defensivePressure = 0;
     this.history = [];
   }
 }

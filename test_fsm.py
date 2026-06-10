@@ -51,6 +51,29 @@ def run():
     fsm2.transition("you killed him")
     results.append(check("one accusation from Calm -> Suspicious", fsm2.get_state() is State.SUSPICIOUS))
 
+    # Sustained accusation breaks her: Calm -> Suspicious -> Defensive -> Breaking.
+    fsm3 = SuspectFSM()
+    fsm3.transition("you killed him")        # Calm -> Suspicious
+    fsm3.transition("confess, you murdered him")  # Suspicious -> Defensive
+    results.append(check("not Breaking on reaching Defensive", fsm3.get_state() is State.DEFENSIVE))
+    fsm3.transition("the weapon has your fingerprints")  # pressure 1
+    results.append(check("one accusation in Defensive holds", fsm3.get_state() is State.DEFENSIVE))
+    fsm3.transition("you're guilty and you know it")      # pressure 2 -> Breaking
+    results.append(check("sustained accusation -> Breaking", fsm3.get_state() is State.BREAKING))
+
+    # Breaking prompt actually permits a confession (no "never confess" gag).
+    results.append(check(
+        "Breaking prompt allows confession",
+        "confession" in fsm3.get_system_prompt().lower(),
+    ))
+
+    # Backing off resets the pressure: a confession must be re-earned.
+    fsm3.transition("i'm sorry, take your time")  # Breaking -> Defensive, pressure reset
+    results.append(check("apology walks Breaking -> Defensive", fsm3.get_state() is State.DEFENSIVE))
+    results.append(check("de-escalation resets pressure", fsm3.defensive_pressure == 0))
+    fsm3.transition("you murdered him")  # pressure 1 again, not yet Breaking
+    results.append(check("pressure rebuilds from zero", fsm3.get_state() is State.DEFENSIVE))
+
     # History is recorded.
     results.append(check("transitions are logged", len(fsm.history) == 3))
 
