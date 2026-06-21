@@ -70,7 +70,7 @@ def new_label_mapping():
 
 def handle_turn(
     player_input, chat, detective_label, fsm, static_counts, llm_history,
-    label_mapping, session_logger, researcher_on,
+    label_mapping, session_logger, researcher_on, simulate_delay=True,
 ):
     """
     Process one player turn.
@@ -102,8 +102,9 @@ def handle_turn(
         reply = static_dialogue.get_response(player_input, static_counts)
         real_latency_ms = (time.perf_counter() - start) * 1000.0
         # Add a length-scaled artificial delay so the instant lookup doesn't
-        # give the static condition away (and confound the study).
-        simulated_latency_ms = static_dialogue.simulate_latency(reply)
+        # give the static condition away (and confound the study). A researcher
+        # can disable it via the dev toggle for fast iteration.
+        simulated_latency_ms = static_dialogue.simulate_latency(reply) if simulate_delay else 0.0
         latency_ms = real_latency_ms + simulated_latency_ms   # perceived total
         state_value = "n/a (static script)"
     else:
@@ -159,8 +160,8 @@ def submit_verdict(verdict_choice, confidence, detective_label, label_mapping, s
 
 
 def toggle_researcher(on):
-    """Show or hide the researcher only panels."""
-    return gr.update(visible=on), gr.update(visible=on)
+    """Show or hide the researcher only panels (and the dev delay toggle)."""
+    return gr.update(visible=on), gr.update(visible=on), gr.update(visible=on)
 
 
 def reset_session():
@@ -268,6 +269,11 @@ def build_app():
                         value=False,
                         label="Researcher view (show FSM state and latency)",
                     )
+                    simulate_delay_toggle = gr.Checkbox(
+                        value=True,                      # delay on by default
+                        label="Simulate static response delay (dev)",
+                        visible=False,                   # only shown in researcher view
+                    )
 
                 with gr.Row():
                     state_label = gr.Markdown("**Suspect state:** Calm", visible=False)
@@ -320,6 +326,7 @@ def build_app():
         turn_inputs = [
             msg, chatbot, detective, fsm_state, static_counts_state,
             llm_history_state, label_mapping_state, logger_state, researcher_view,
+            simulate_delay_toggle,
         ]
         turn_outputs = [
             chatbot, msg, state_label, latency_label, fsm_state,
@@ -330,7 +337,7 @@ def build_app():
 
         researcher_view.change(
             toggle_researcher, inputs=researcher_view,
-            outputs=[state_label, latency_label],
+            outputs=[state_label, latency_label, simulate_delay_toggle],
         )
 
         verdict_btn.click(
