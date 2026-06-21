@@ -38,8 +38,15 @@ class SessionLogger:
         self.verdicts = []
         os.makedirs(LOG_DIR, exist_ok=True)
 
-    def log_turn(self, condition, label_shown, player_input, reply, state, latency_ms):
-        """Record one question and answer exchange."""
+    def log_turn(self, condition, label_shown, player_input, reply, state, latency_ms, signal=None):
+        """
+        Record one question and answer exchange.
+
+        ``signal`` is the classified multi-axis reading of the player's turn for
+        the dynamic condition (a dict from Signal.as_dict()), or None for the
+        static script. It is logged so Phase 5 can analyse not just where the
+        suspect ended up but why the FSM moved her there.
+        """
         self.turns.append(
             {
                 "index": len(self.turns) + 1,
@@ -48,6 +55,7 @@ class SessionLogger:
                 "player_input": player_input,
                 "npc_reply": reply,
                 "fsm_state": state,                # "n/a (static script)" for static
+                "signal": signal,                  # classified axes, or None (static)
                 "latency_ms": round(latency_ms, 1),
             }
         )

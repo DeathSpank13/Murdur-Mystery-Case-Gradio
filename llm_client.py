@@ -24,7 +24,8 @@ SERVER_URL = "http://localhost:8080/v1/chat/completions"
 REQUEST_TIMEOUT = 120
 
 
-def get_response(system_prompt, messages, temperature=0.7, max_tokens=200):
+def get_response(system_prompt, messages, temperature=0.7, max_tokens=200,
+                 response_format=None):
     """
     Send one chat completion request to the local server and return the reply.
 
@@ -40,6 +41,14 @@ def get_response(system_prompt, messages, temperature=0.7, max_tokens=200):
         Sampling temperature. Lower is more consistent, higher more varied.
     max_tokens : int
         Upper bound on the reply length.
+    response_format : dict, optional
+        An OpenAI-style ``response_format`` (e.g. a ``json_schema``) passed
+        straight through to llama-server's constrained decoding. The intent
+        classifier uses this to force valid, on-spec JSON: the roleplay-tuned
+        suspect model otherwise ignores a "you are a classifier" instruction and
+        just stays in character, so a grammar constraint is what makes the
+        multi-axis classification actually work rather than silently falling back
+        to keywords. Left None for ordinary in-character replies.
 
     Returns
     -------
@@ -56,6 +65,8 @@ def get_response(system_prompt, messages, temperature=0.7, max_tokens=200):
         "max_tokens": max_tokens,
         "stream": False,
     }
+    if response_format is not None:
+        payload["response_format"] = response_format
 
     start = time.perf_counter()
     try:

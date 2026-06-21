@@ -26,6 +26,7 @@ import gradio as gr
 import static_dialogue
 import llm_client
 import logger
+import intent_classifier
 import branching_dialogue
 from branching_dialogue import DialogueEngine
 from fsm import SuspectFSM, SUSPECT_IS_GUILTY
@@ -95,13 +96,19 @@ def handle_turn(
 
     chat.append({"role": "user", "content": player_input})
 
+    signal_dict = None
     if condition == "static":
         start = time.perf_counter()
         reply = static_dialogue.get_response(player_input, static_counts)
         latency_ms = (time.perf_counter() - start) * 1000.0
         state_value = "n/a (static script)"
     else:
-        fsm.transition(player_input)
+        # Classify the turn on its multi-axis Signal first (using the history so
+        # far for context), then let the FSM move on the combination of axes. The
+        # classification is a separate model call, so it adds to the turn latency.
+        signal = intent_classifier.classify(player_input, llm_history)
+        signal_dict = signal.as_dict()
+        fsm.transition(signal)
         system_prompt = fsm.get_system_prompt()
         llm_history.append({"role": "user", "content": player_input})
         reply, latency_ms = llm_client.get_response(system_prompt, llm_history)
@@ -109,11 +116,23 @@ def handle_turn(
         state_value = fsm.get_state().value
 
     chat.append({"role": "assistant", "content": reply})
-    session_logger.log_turn(condition, detective_label, player_input, reply, state_value, latency_ms)
+    session_logger.log_turn(
+        condition, detective_label, player_input, reply, state_value, latency_ms,
+        signal=signal_dict,
+    )
+
+    # Researcher readout: the state, plus the axes that drove it for the dynamic
+    # condition so a demo can show *why* she moved, not just where she landed.
+    if signal_dict is None:
+        state_text = f"**Suspect state:** {state_value}"
+    else:
+        axes = ", ".join(f"{key}={value}" for key, value in signal_dict.items())
+        aware = " (aware)" if fsm.aware else ""
+        state_text = f"**Suspect state:** {state_value}{aware}  \n**Read:** {axes}"
 
     return (
         chat, "",
-        state_update(f"**Suspect state:** {state_value}"),
+        state_update(state_text),
         gr.update(value=f"**Last response latency:** {latency_ms:.0f} ms", visible=researcher_on),
         fsm, static_counts, llm_history, label_mapping, session_logger,
     )

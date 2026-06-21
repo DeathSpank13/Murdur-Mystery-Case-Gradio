@@ -8,6 +8,7 @@ import { SuspectFSM } from "./fsm.js";
 import * as staticDialogue from "./static_dialogue.js";
 import { DialogueEngine, BACK_ID } from "./branching_dialogue.js";
 import * as llm from "./llm.js";
+import { classifyIntent } from "./intent.js";
 
 // --- tiny DOM helpers -------------------------------------------------------
 const $ = (id) => document.getElementById(id);
@@ -105,20 +106,30 @@ $("ai-form").addEventListener("submit", async (e) => {
   aiInput.value = "";
   setAiEnabled(false);
 
-  fsm.transition(question);
-  const systemPrompt = fsm.getSystemPrompt();
-  aiHistory.push({ role: "user", content: question });
-
   const thinking = addMessage($("ai-chat"), "npc thinking", "…");
   const start = performance.now();
   try {
+    // Classify the turn on its multi-axis Signal first (using the history so far
+    // for context), then move the FSM on the combination of axes. This is a
+    // separate model call, so it adds to the turn latency on the small model.
+    const signal = await classifyIntent(question, aiHistory);
+    fsm.transition(signal);
+    const systemPrompt = fsm.getSystemPrompt();
+    aiHistory.push({ role: "user", content: question });
+
     const reply = await llm.generate(systemPrompt, aiHistory);
     const latency = performance.now() - start;
     thinking.classList.remove("thinking");
     thinking.textContent = reply;
     aiHistory.push({ role: "assistant", content: reply });
 
-    stateReadout.textContent = `State: ${fsm.getState()}`;
+    // Researcher readout: state plus the axes that drove it, so a demo can show
+    // why she moved, not just where she landed.
+    const axes = Object.entries(signal)
+      .map(([key, value]) => `${key}=${value}`)
+      .join(", ");
+    const awareTag = fsm.isAware() ? " (aware)" : "";
+    stateReadout.textContent = `State: ${fsm.getState()}${awareTag} — ${axes}`;
     latencyReadout.textContent = `Latency: ${latency.toFixed(0)} ms`;
   } catch (err) {
     console.error(err);
