@@ -100,7 +100,11 @@ def handle_turn(
     if condition == "static":
         start = time.perf_counter()
         reply = static_dialogue.get_response(player_input, static_counts)
-        latency_ms = (time.perf_counter() - start) * 1000.0
+        real_latency_ms = (time.perf_counter() - start) * 1000.0
+        # Add a length-scaled artificial delay so the instant lookup doesn't
+        # give the static condition away (and confound the study).
+        simulated_latency_ms = static_dialogue.simulate_latency(reply)
+        latency_ms = real_latency_ms + simulated_latency_ms   # perceived total
         state_value = "n/a (static script)"
     else:
         # Classify the turn on its multi-axis Signal first (using the history so
@@ -114,11 +118,15 @@ def handle_turn(
         reply, latency_ms = llm_client.get_response(system_prompt, llm_history)
         llm_history.append({"role": "assistant", "content": reply})
         state_value = fsm.get_state().value
+        real_latency_ms = latency_ms          # dynamic latency is already real
+        simulated_latency_ms = 0.0
 
     chat.append({"role": "assistant", "content": reply})
     session_logger.log_turn(
         condition, detective_label, player_input, reply, state_value, latency_ms,
         signal=signal_dict,
+        real_latency_ms=real_latency_ms,
+        simulated_latency_ms=simulated_latency_ms,
     )
 
     # Researcher readout: the state, plus the axes that drove it for the dynamic

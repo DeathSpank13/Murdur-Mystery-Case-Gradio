@@ -37,6 +37,8 @@ tiny deterministic stub and run offline.
 
 import json
 import os
+import random
+import time
 
 # Default Sentence Transformer used both here and (as its ONNX twin
 # "Xenova/all-MiniLM-L6-v2") in the browser mirror, so retrieval behaves the
@@ -50,6 +52,17 @@ EMBED_MODEL_NAME = "all-MiniLM-L6-v2"
 # around 0.2-0.4 and off-topic input around 0.7+, so 0.6 keeps a comfortable
 # margin on both sides (see the sweep used while authoring the dataset).
 MATCH_DISTANCE_THRESHOLD = 0.6
+
+# --- Simulated "thinking" latency for the static control ----------------------
+# The static lookup answers almost instantly, which would let testers spot the
+# pre-written condition by speed alone (and confounds the study). To match the
+# dynamic LLM's feel, we sleep for a delay that scales with reply length (like
+# real token generation) plus random jitter so it is never a constant tell.
+# Starting values; calibrate against observed dynamic latencies in logs/.
+SIM_LATENCY_BASE_S = 0.8       # fixed "thinking" floor before any text
+SIM_LATENCY_PER_CHAR_S = 0.015 # per-character "generation" time
+SIM_LATENCY_JITTER = 0.20      # +/- fraction applied to the total
+SIM_LATENCY_MAX_S = 6.0        # hard ceiling so a long reply can't stall forever
 
 # Path to the authored prompt -> response database.
 _DATA_PATH = os.path.join(os.path.dirname(__file__), "data", "suspect_qa.json")
@@ -176,6 +189,23 @@ def get_response(player_input, visit_counts=None):
         return _next_fallback(visit_counts)
 
     return metadatas[0][0]["response"]
+
+
+def simulate_latency(reply):
+    """
+    Sleep for a human/LLM-plausible delay derived from the reply length, then
+    return the actual time slept in milliseconds.
+
+    Used only by the static control so its perceived response time matches the
+    dynamic LLM condition. The delay is base + per-char * len(reply), scaled by
+    a random jitter factor and capped at SIM_LATENCY_MAX_S.
+    """
+    target = SIM_LATENCY_BASE_S + SIM_LATENCY_PER_CHAR_S * len(reply or "")
+    target *= random.uniform(1.0 - SIM_LATENCY_JITTER, 1.0 + SIM_LATENCY_JITTER)
+    target = min(target, SIM_LATENCY_MAX_S)
+    start = time.perf_counter()
+    time.sleep(target)
+    return (time.perf_counter() - start) * 1000.0
 
 
 def _next_fallback(visit_counts):
