@@ -12,8 +12,13 @@
 const BACK_ID = "__back__";
 const BACK_TEXT = "← Back";
 
+// How many substantive questions the player must ask before the accusation
+// options (guilty / innocent) unlock at the root menu.
+const ACCUSE_AFTER = 3;
+
 // Each node has an "intro" (what Eleanor says on arrival) and ordered "options".
-// An option: { id, text, response?, once?, exclusiveGroup?, goto? }
+// An option: { id, text, response?, once?, exclusiveGroup?, goto?, minQuestions?,
+// accusation? }
 // (Python used snake_case "exclusive_group"; here it is exclusiveGroup.)
 export const DIALOGUE_TREE = {
   main: {
@@ -71,6 +76,33 @@ export const DIALOGUE_TREE = {
           "kindness. Ask me anything; I want him found out as much as you do.",
         exclusiveGroup: "approach",
         goto: "reassure",
+      },
+      // The verdict. Hidden until the player has asked a few questions, then
+      // offered as two mutually exclusive accusations. Choosing one locks the
+      // other and reveals whether the call was right; the conversation may
+      // continue afterwards.
+      {
+        id: "verdict_guilty",
+        text: "Eleanor Vance, I'm arresting you for Charles's murder.",
+        response:
+          "Her composure finally cracks. \"You have no idea what he meant to " +
+          "take from me.\" She was, in fact, responsible for Charles's death. " +
+          "Your accusation was correct.",
+        minQuestions: ACCUSE_AFTER,
+        once: true,
+        exclusiveGroup: "verdict",
+        accusation: "guilty",
+      },
+      {
+        id: "verdict_innocent",
+        text: "I don't believe you did it. You're free to go.",
+        response:
+          "\"Thank you, Inspector. You're wiser than you look.\" She was, in " +
+          "fact, responsible for Charles's death. Your accusation was incorrect.",
+        minQuestions: ACCUSE_AFTER,
+        once: true,
+        exclusiveGroup: "verdict",
+        accusation: "innocent",
       },
     ],
   },
@@ -247,6 +279,7 @@ export class DialogueEngine {
     this.chosen = new Set();        // every option ever picked (for UI dimming)
     this.stack = [];                // node ids to climb back through
     this.transcript = [];
+    this.questionsAsked = 0;        // substantive questions asked (gates verdicts)
 
     const intro = this.tree[start].intro;
     if (intro) this.transcript.push({ speaker: "npc", text: intro });
@@ -260,6 +293,7 @@ export class DialogueEngine {
     for (const opt of this.tree[this.current].options) {
       if (opt.once && this.consumed.has(opt.id)) continue;
       if (opt.exclusiveGroup && this.lockedGroups.has(opt.exclusiveGroup)) continue;
+      if (opt.minQuestions && this.questionsAsked < opt.minQuestions) continue;
       options.push(opt);
     }
     if (this.stack.length > 0) options.push({ id: BACK_ID, text: BACK_TEXT });
@@ -288,6 +322,9 @@ export class DialogueEngine {
     this.chosen.add(optionId);
     if (option.once) this.consumed.add(optionId);
     if (option.exclusiveGroup) this.lockedGroups.add(option.exclusiveGroup);
+    // Real questions advance the counter that unlocks the accusations; the
+    // accusations themselves don't, so one can never satisfy its own gate.
+    if (!option.accusation) this.questionsAsked += 1;
 
     if (option.goto) {
       this.stack.push(this.current);

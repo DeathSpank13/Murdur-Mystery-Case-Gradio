@@ -1,0 +1,171 @@
+// static_qa_data.js
+// =================
+// Hand-kept mirror of data/suspect_qa.json (the Python file is canonical). Each
+// entry pairs one canonical NPC response with several natural-language example
+// questions that should map to it. static_dialogue.js embeds these questions
+// once and matches the player's input to the nearest one by meaning.
+//
+// Keep this in sync with data/suspect_qa.json whenever the scenario data changes.
+
+export const SUSPECT_QA = [
+  {
+    id: "identity",
+    response: "Eleanor Vance. Though I rather think you knew that before you sat down, Inspector.",
+    questions: [
+      "What is your name?",
+      "Who are you?",
+      "What should I call you?",
+      "Could you state your name for the record?",
+      "Remind me what you're called.",
+      "Introduce yourself.",
+    ],
+  },
+  {
+    id: "occupation",
+    response: "I own a gallery in town. Paintings, mostly, and the occasional piece of sculpture when something fine comes along.",
+    questions: [
+      "What do you do for a living?",
+      "What is your occupation?",
+      "Tell me about your work.",
+      "What line of business are you in?",
+      "How do you make your money?",
+      "What is the gallery you run?",
+    ],
+  },
+  {
+    id: "greeting",
+    response: "Good evening, Inspector. Forgive me if I'm not at my brightest; it has been a dreadful day.",
+    questions: [
+      "Good evening.",
+      "Hello there.",
+      "How are you doing?",
+      "How are you feeling tonight?",
+      "It's nice to meet you.",
+      "Good evening, how do you do?",
+    ],
+  },
+  {
+    id: "alibi",
+    response: "I was in the drawing room with the other guests for most of the evening. You can ask any of them.",
+    questions: [
+      "Where were you when Charles died?",
+      "What is your alibi?",
+      "Account for your whereabouts that night.",
+      "Where were you at the time of the murder?",
+      "Tell me where you were when it happened.",
+      "Can anyone vouch for where you were?",
+    ],
+  },
+  {
+    id: "lastseen",
+    response: "A little after ten, by the study door. He was telling some long story about Venice, as he always did.",
+    questions: [
+      "When did you last see Charles alive?",
+      "When was the last time you saw him?",
+      "What time did you last speak to the victim?",
+      "When did you last lay eyes on Charles?",
+      "Where did you last see him?",
+    ],
+  },
+  {
+    id: "party",
+    response: "A small gathering. Old friends, a little wine, far too much talk of business. Charles was in good spirits when he arrived.",
+    questions: [
+      "Tell me about the party.",
+      "What happened that evening?",
+      "Describe the dinner last night.",
+      "What was the gathering like?",
+      "Walk me through the night.",
+      "What sort of evening was it?",
+    ],
+  },
+  {
+    id: "guests",
+    response: "The Harringtons, my business partner Vivian, Charles, and young Daniel who keeps my books. Seven of us, with the staff.",
+    questions: [
+      "Who else was there?",
+      "Who were the other guests?",
+      "Who attended the dinner?",
+      "Who was present that night?",
+      "Was anyone else in the house?",
+      "List the people who were there.",
+    ],
+  },
+  {
+    id: "argument",
+    response: "Daniel and Charles had words over money near the end. Quiet, but I saw Daniel's face.",
+    questions: [
+      "Did anyone argue that night?",
+      "Was there a quarrel?",
+      "Did anyone have a row with Charles?",
+      "Was anyone angry at the victim?",
+      "Did you see any fights or disagreements?",
+      "Did Charles exchange words with anyone?",
+    ],
+  },
+  {
+    id: "relationship",
+    response: "Charles was an old friend. We went back twenty years, and did business together on and off for most of them.",
+    questions: [
+      "How did you know Charles?",
+      "What was your relationship with the victim?",
+      "Were you and Charles close?",
+      "Were you on good terms with him?",
+      "Did you get along with Charles?",
+      "How long had you known the dead man?",
+      "Tell me about you and Charles.",
+      "Were you friends with him?",
+    ],
+  },
+  {
+    id: "motive",
+    response: "He owed me, in fact. A great deal, and he was slow about it. A debt is a reason to keep a man paying, not to harm him.",
+    questions: [
+      "Did you have a motive?",
+      "Did Charles owe you money?",
+      "Did you stand to gain from his death?",
+      "Was there any insurance or inheritance?",
+      "Did he owe you a debt?",
+      "What did you have to gain by killing him?",
+    ],
+  },
+  {
+    id: "weapon",
+    response: "The letter opener from the study, I'm told. It sat on the desk in plain view of anyone who passed.",
+    questions: [
+      "What was the murder weapon?",
+      "How was he killed?",
+      "What was he stabbed with?",
+      "Tell me about the letter opener.",
+      "What did the killer use?",
+      "What weapon was used on Charles?",
+    ],
+  },
+  {
+    id: "study_door",
+    response: "The study door was shut, which was odd; it's always left open. I noticed it and thought nothing of it.",
+    questions: [
+      "Did you notice anything unusual?",
+      "Was anything out of place?",
+      "Did anything seem wrong that night?",
+      "Was there anything strange about the study?",
+      "Did you see anything odd?",
+      "Was the study door normally closed?",
+    ],
+  },
+  {
+    id: "deny",
+    response: "That is an outrageous suggestion. I invited the man into my home.",
+    questions: [
+      "Did you kill Charles?",
+      "Did you do it?",
+      "Was it you?",
+      "Are you the murderer?",
+      "I think you're guilty.",
+      "You murdered him, didn't you?",
+      "I accuse you of the crime.",
+      "You're lying to me.",
+      "Confess to what you did.",
+    ],
+  },
+];

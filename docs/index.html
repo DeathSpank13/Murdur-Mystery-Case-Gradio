@@ -25,7 +25,7 @@
   <nav class="tabs" role="tablist">
     <button class="tab active" data-tab="ai" role="tab">AI suspect (0.5B)</button>
     <button class="tab" data-tab="branching" role="tab">Branching dialogue</button>
-    <button class="tab" data-tab="static" role="tab">Static (keyword)</button>
+    <button class="tab" data-tab="static" role="tab">Static (retrieval)</button>
   </nav>
 
   <!-- ============ AI suspect ============ -->
@@ -76,9 +76,11 @@
   <!-- ============ Static keyword ============ -->
   <section class="panel" id="panel-static" role="tabpanel">
     <p class="panel-intro">
-      The model-free baseline: a fixed tree of pre-written lines chosen by
-      best-match keyword scoring. No AI, no memory beyond which topics you've
-      revisited.
+      The model-free baseline: a fixed database of pre-written lines, matched to
+      your question by <strong>meaning</strong> rather than keywords. Your input
+      is embedded with a small sentence model and the nearest stored question's
+      reply is returned verbatim — nothing is generated. The first question loads
+      a small model (~25 MB, then cached).
     </p>
     <div class="chat" id="static-chat" aria-live="polite"></div>
     <form class="composer" id="static-form">

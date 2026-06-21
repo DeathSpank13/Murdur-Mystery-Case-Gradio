@@ -13,6 +13,7 @@ Then open the local URL Gradio prints (usually http://127.0.0.1:7860).
 """
 
 import llm_client
+import static_dialogue
 from ui import build_app, BRANCHING_CSS
 
 
@@ -26,6 +27,12 @@ def main():
             "server in another terminal, for example:\n"
             "    llama-server -hf bartowski/Wayfarer-12B-GGUF:Q4_K_M\n"
         )
+
+    # Build the Static-mode embedding model and retrieval index up front (it
+    # downloads the model on first ever run) so the first study turn isn't slow.
+    print("Preparing Static mode (loading embedding model and building index)...")
+    static_dialogue.warm_up()
+    print("Static mode ready.")
 
     app = build_app()
     # share=False keeps the demo local. Set share=True only if you need a

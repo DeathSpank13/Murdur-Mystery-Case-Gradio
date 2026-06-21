@@ -29,6 +29,10 @@ unit-tested without launching Gradio (see test_dialogue.py).
 BACK_ID = "__back__"
 BACK_TEXT = "← Back"
 
+# How many substantive questions the player must ask before the accusation
+# options (guilty / innocent) unlock at the root menu.
+ACCUSE_AFTER = 3
+
 
 # ---------------------------------------------------------------------------
 # The dialogue tree
@@ -41,6 +45,10 @@ BACK_TEXT = "← Back"
 #   once             True -> consumed after first use (a one-time question)
 #   exclusive_group  name -> choosing it locks every option sharing that name
 #   goto             node id -> descend into that node (a nested follow-up)
+#   min_questions    int -> hidden until that many questions have been asked
+#   accusation       "guilty"/"innocent" -> a verdict option; picking it does
+#                    not count toward the question total, so it can't unlock
+#                    itself, and it reveals whether the accusation was correct
 #
 # The scenario matches the rest of the project: the player questions Eleanor
 # Vance about Charles Whitmore's death at her dinner party.
@@ -117,6 +125,36 @@ DIALOGUE_TREE = {
                 ),
                 "exclusive_group": "approach",
                 "goto": "reassure",
+            },
+            # The verdict. Hidden until the player has asked a few questions, then
+            # offered as two mutually exclusive accusations. Choosing one locks
+            # the other and reveals whether the call was right; the conversation
+            # may continue afterwards.
+            {
+                "id": "verdict_guilty",
+                "text": "Eleanor Vance, I'm arresting you for Charles's murder.",
+                "response": (
+                    "Her composure finally cracks. \"You have no idea what he "
+                    "meant to take from me.\" She was, in fact, responsible for "
+                    "Charles's death. Your accusation was correct."
+                ),
+                "min_questions": ACCUSE_AFTER,
+                "once": True,
+                "exclusive_group": "verdict",
+                "accusation": "guilty",
+            },
+            {
+                "id": "verdict_innocent",
+                "text": "I don't believe you did it. You're free to go.",
+                "response": (
+                    "\"Thank you, Inspector. You're wiser than you look.\" She "
+                    "was, in fact, responsible for Charles's death. Your "
+                    "accusation was incorrect."
+                ),
+                "min_questions": ACCUSE_AFTER,
+                "once": True,
+                "exclusive_group": "verdict",
+                "accusation": "innocent",
             },
         ],
     },
@@ -337,6 +375,7 @@ class DialogueEngine:
                                      # UI to dim repeatable options already used)
         self.stack = []              # node ids to climb back through
         self.transcript = []         # [(speaker, text), ...]
+        self.questions_asked = 0     # substantive questions asked (gates verdicts)
 
         intro = self.tree[start].get("intro")
         if intro:
@@ -356,6 +395,8 @@ class DialogueEngine:
                 continue
             group = opt.get("exclusive_group")
             if group and group in self.locked_groups:
+                continue
+            if opt.get("min_questions") and self.questions_asked < opt["min_questions"]:
                 continue
             options.append(opt)
 
@@ -394,6 +435,10 @@ class DialogueEngine:
         group = option.get("exclusive_group")
         if group:
             self.locked_groups.add(group)
+        # Real questions advance the counter that unlocks the accusations; the
+        # accusations themselves don't, so one can never satisfy its own gate.
+        if not option.get("accusation"):
+            self.questions_asked += 1
 
         target = option.get("goto")
         if target:

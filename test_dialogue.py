@@ -13,7 +13,7 @@ a later edit to DIALOGUE_TREE or the engine cannot silently break them:
                      across navigation
 """
 
-from branching_dialogue import DialogueEngine, BACK_ID
+from branching_dialogue import DialogueEngine, BACK_ID, ACCUSE_AFTER
 
 
 def check(name, condition):
@@ -94,6 +94,34 @@ def run():
     results.append(check(
         "repeatable pick stays available after use",
         "who_handled" in ids(fresh),
+    ))
+
+    # VERDICT: the accusations are gated behind ACCUSE_AFTER questions, then
+    # offered as a mutually exclusive pair that does not advance the counter.
+    verdict = DialogueEngine()
+    results.append(check(
+        "accusations hidden before any questions",
+        "verdict_guilty" not in ids(verdict) and "verdict_innocent" not in ids(verdict),
+    ))
+    # Ask exactly ACCUSE_AFTER questions, returning to the root each time so the
+    # verdict options (which live on the root menu) become reachable. "weapon" is
+    # a repeatable topic, so this works whatever ACCUSE_AFTER is set to.
+    for _ in range(ACCUSE_AFTER):
+        verdict.choose("weapon")
+        verdict.choose(BACK_ID)
+    results.append(check(
+        "accusations appear once the threshold is reached",
+        verdict.questions_asked == ACCUSE_AFTER
+        and {"verdict_guilty", "verdict_innocent"} <= ids(verdict),
+    ))
+    verdict.choose("verdict_guilty")
+    results.append(check(
+        "choosing one accusation locks the other",
+        "verdict_innocent" not in ids(verdict) and "verdict_guilty" not in ids(verdict),
+    ))
+    results.append(check(
+        "an accusation does not advance the question counter",
+        verdict.questions_asked == ACCUSE_AFTER,
     ))
 
     # Choosing an unavailable id is a loud error, not a silent no-op.

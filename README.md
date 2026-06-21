@@ -11,9 +11,10 @@ with Wayfarer-12B (see [Two ways to run](#two-ways-to-run)).
 A prototype comparing two ways of running a non player character (NPC) in a
 murder mystery interrogation, built as the apparatus for a small user study:
 
-1. **static** a model-free, scripted baseline, in two flavours: a best-match
-   keyword tree the player types at, and a standalone **branching dialogue** of
-   clickable choices (see below).
+1. **static** a model-free, scripted baseline, in two flavours: a **semantic
+   retrieval** lookup the player types at (the input is embedded and matched to
+   the nearest pre-written line by meaning), and a standalone **branching
+   dialogue** of clickable choices (see below).
 2. **dynamic** a Finite State Machine that rewrites a local language model's
    system prompt in real time, so the suspect's persona shifts from Calm to
    Suspicious to Defensive depending on how the player questions her.
@@ -33,7 +34,7 @@ away); see the design note below for what it demonstrates.
 | File | Responsibility |
 |------|----------------|
 | `fsm.py` | The Finite State Machine: states, transition triggers, the per state system prompts, and the scenario ground truth. |
-| `static_dialogue.py` | The hardcoded control condition. Best-match keyword scoring over a fixed set of topic branches, scripted replies. No model. |
+| `static_dialogue.py` | The control condition. Semantic retrieval (ChromaDB + a Sentence Transformer) over a fixed Q&A database (`data/suspect_qa.json`): the player's input is embedded and the nearest stored question's scripted reply is returned verbatim. No generation. |
 | `branching_dialogue.py` | Standalone choice-based dialogue tree: a menu of clickable options with one-time questions, mutually exclusive forks, and nested follow-ups. |
 | `llm_client.py` | Talks to the local llama.cpp server; returns each reply together with its measured latency. |
 | `logger.py` | Writes each session (transcript, condition, FSM state, latency, verdicts) to a JSON file under `logs/`. |
@@ -63,21 +64,22 @@ verdict (guilty or innocent) plus a confidence rating. This is logged and scored
 against the ground truth, giving a measurable dependent variable: did players
 judge correctly more often, and more confidently, in one condition?
 
-**The static baseline is a fixed tree, but a fair one.** It is the kind of
-keyword-matched script games have traditionally used: a finite set of topic
-branches (identity, the party, the guests, the alibi, money, the weapon, and so
-on), each delivering an ordered list of pre-written lines that the suspect walks
-down on repeat visits. Two refinements keep it from being a strawman without
-turning it into anything adaptive: the branch set is broad enough to answer
-obvious questions like "what is your name?" instead of falling through to a
-generic line, and matching is *best-match* rather than first-match, so each
-branch is scored by how many and how specific its keywords are and the highest
-scorer wins (a long question like "where were you when Charles died?" routes to
-the alibi rather than being captured by whichever branch was defined first).
-There is still no model and no memory beyond per-topic line counters; the guilt
-fact lives only in the dynamic FSM overlays. If a reviewer worries the
-comparison is unfair, that is the framing to give: a representative, reasonable
-scripted baseline, not a deliberately broken one.
+**The static baseline is a fixed database, but a fair one.** It is the kind of
+scripted suspect games have traditionally used, with the matching done by
+*meaning* rather than literal keywords: a fixed Q&A database
+(`data/suspect_qa.json`) of topic entries (identity, the party, the guests, the
+alibi, money, the weapon, and so on), each holding one canonical pre-written
+reply plus several example questions. The player's input is embedded with a
+Sentence Transformer (all-MiniLM-L6-v2) and the nearest stored question's reply
+is returned verbatim; if nothing is close enough, a generic fallback is used.
+This keeps it from being a strawman without turning it into anything adaptive:
+it answers obvious questions like "what is your name?" and tolerates paraphrases
+the script never anticipated ("remind me what you're called"), yet it still
+generates nothing and has no memory of the conversation. The guilt fact lives
+only in the dynamic FSM overlays, never in the database. If a reviewer worries
+the comparison is unfair, that is the framing to give: a representative,
+reasonable scripted baseline, retrieval-matched so wording mismatches don't make
+it look worse than it is, not a deliberately broken one.
 
 **The branching dialogue is a separate mode, not part of the study.** The second
 tab is a fuller, menu-driven dialogue tree, the kind a real game ships: the
@@ -118,6 +120,11 @@ real apparatus, with the full-size model and the study instrumentation.
    pip install -r requirements.txt
    ```
 
+   Note: Static mode now uses semantic retrieval (`chromadb` +
+   `sentence-transformers`), which pull in `torch` — a large (~GB) install. The
+   embedding model (all-MiniLM-L6-v2, ~80 MB) downloads once on first run;
+   `main.py` warms it up at startup so the first study turn isn't slow.
+
 3. Install and start the local model server (in a separate terminal):
 
    ```powershell
@@ -137,7 +144,8 @@ python main.py
 Open the local URL Gradio prints (usually http://127.0.0.1:7860). The app has
 two tabs: **Interrogation (study)** (the blinded A/B comparison) and **Branching
 dialogue** (the standalone choice-based mode). Static mode and the branching tab
-work even if the model server is not running; dynamic mode needs it up.
+work even if the llama.cpp model server is not running (Static mode uses its own
+local embedding model, not the server); dynamic mode needs the server up.
 
 ## The web demo
 
@@ -147,7 +155,7 @@ published to GitHub Pages. It re-implements the three modes in plain JavaScript:
 | File | Mirrors |
 |------|---------|
 | `docs/js/fsm.js` | `fsm.py` (states, triggers, persona overlays) |
-| `docs/js/static_dialogue.js` | `static_dialogue.py` (keyword branches) |
+| `docs/js/static_dialogue.js` | `static_dialogue.py` (retrieval; transformers.js embeddings + cosine instead of ChromaDB, over `docs/js/static_qa_data.js`) |
 | `docs/js/branching_dialogue.js` | `branching_dialogue.py` (choice tree + engine) |
 | `docs/js/llm.js` | `llm_client.py`, but loads Qwen2.5-0.5B-Instruct in-browser via transformers.js |
 | `docs/js/app.js`, `docs/index.html`, `docs/css/style.css` | the UI (a JS counterpart to `ui.py`) |
@@ -204,4 +212,9 @@ the raw material for the comparative analysis.
 ```powershell
 python test_fsm.py
 python test_dialogue.py
+python test_retrieval.py
 ```
+
+`test_retrieval.py`'s fast checks use a stub embedder (only `chromadb` needed, no
+model download); its final integration check uses the real model and is skipped
+automatically if `sentence-transformers` isn't installed.

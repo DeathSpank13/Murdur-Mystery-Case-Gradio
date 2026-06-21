@@ -143,20 +143,33 @@ $("ai-reset").addEventListener("click", () => {
 });
 
 // ===========================================================================
-// Static keyword tab
+// Static retrieval tab
 // ===========================================================================
+// Retrieval embeds the question with a small model, so the first reply waits on
+// a ~25 MB model download (then browser-cached). getResponse() is async; we show
+// a "thinking…" bubble while it resolves, like the AI tab does.
 let staticCounts = {};
 
-$("static-form").addEventListener("submit", (e) => {
+$("static-form").addEventListener("submit", async (e) => {
   e.preventDefault();
   const input = $("static-input");
   const question = input.value.trim();
   if (!question) return;
   addMessage($("static-chat"), "player", question);
   input.value = "";
-  const reply = staticDialogue.getResponse(question, staticCounts);
-  addMessage($("static-chat"), "npc", reply);
-  input.focus();
+
+  const thinking = addMessage($("static-chat"), "npc thinking", "…");
+  try {
+    const reply = await staticDialogue.getResponse(question, staticCounts);
+    thinking.classList.remove("thinking");
+    thinking.textContent = reply;
+  } catch (err) {
+    console.error(err);
+    thinking.classList.remove("thinking");
+    thinking.textContent = "[The suspect says nothing. The retrieval model failed to load — see console.]";
+  } finally {
+    input.focus();
+  }
 });
 
 $("static-reset").addEventListener("click", () => {

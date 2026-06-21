@@ -4,3 +4,10 @@
 # (Developed and tested against gradio 6.17.3.)
 gradio>=6.0.0
 requests>=2.31.0
+
+# Static mode is a semantic retrieval lookup (see static_dialogue.py): the
+# player's question is embedded with a Sentence Transformer and matched against
+# a fixed Q&A database stored in ChromaDB. These two pull in torch and are a
+# large (~GB) first install, and the embedding model downloads once on first use.
+chromadb>=0.5
+sentence-transformers>=2.2
