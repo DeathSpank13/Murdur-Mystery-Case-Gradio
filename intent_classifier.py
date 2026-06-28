@@ -240,9 +240,101 @@ CLASSIFIER_SYSTEM_PROMPT = (
     "(true = explicitly urges her to confess, come clean, or do the right thing)\n"
     '  "probing": true | false   '
     "(true = a pointed investigative question about alibi, timeline, or motive)\n"
-    'Example: {"evidence":"strong","accusation":"direct","aggression":"low",'
-    '"warmth":"neutral","conscience":false,"probing":false}'
+    "Worked examples are shown in the messages that follow; score the final "
+    "Investigator line the same way."
 )
+
+
+# ---------------------------------------------------------------------------
+# Few-shot examples
+# ---------------------------------------------------------------------------
+# Constrained decoding (RESPONSE_FORMAT) already forces *valid* JSON, so the
+# failure mode is never malformed output -- it is the model picking the wrong
+# value (reading a hard evidence reveal as "none", or scoring an angry but
+# proofless accusation as "strong" evidence and wrongly crossing the awareness
+# boundary). A handful of demonstrations teaches the input->label mapping the
+# grammar cannot. They are sent as alternating user/assistant turns because
+# instruct models follow a shown request->response pattern far more reliably
+# than the same examples pasted into the system string.
+#
+# Each entry is (last_npc_line, investigator_line, signal_dict). Keep them terse:
+# every example is a fixed prefix on every (per-turn, temperature 0) classifier
+# call. They are deliberately chosen to span the axes and pin the hard cases;
+# the held-out eval set in eval_classifier.py uses different lines so accuracy is
+# never measured on these.
+FEW_SHOT_EXAMPLES = [
+    # Concrete physical proof -> strong evidence (presenting it implies guilt).
+    (
+        "",
+        "Forensics matched your fingerprints to the letter opener that killed Charles.",
+        {"evidence": "strong", "accusation": "implied", "aggression": "low",
+         "warmth": "neutral", "conscience": False, "probing": False},
+    ),
+    # Catching her in a contradiction is also strong evidence, asked pointedly.
+    (
+        "I was in the drawing room the entire evening.",
+        "But a minute ago you said you stepped out to the study around nine. Which is it?",
+        {"evidence": "strong", "accusation": "implied", "aggression": "low",
+         "warmth": "neutral", "conscience": False, "probing": True},
+    ),
+    # Anger with no proof: high aggression, direct accusation, but evidence none.
+    # This is the line that must NOT cross the awareness boundary (Offensive, not Guilty).
+    (
+        "",
+        "Stop lying to me, you killed him and we both know it! Just confess!",
+        {"evidence": "none", "accusation": "direct", "aggression": "high",
+         "warmth": "cold", "conscience": False, "probing": False},
+    ),
+    # A vague, unsupported claim is weak evidence, not strong.
+    (
+        "",
+        "I think maybe someone might have seen you near the study, though I'm not certain.",
+        {"evidence": "weak", "accusation": "implied", "aggression": "low",
+         "warmth": "neutral", "conscience": False, "probing": False},
+    ),
+    # Insinuation with no proof and no heat -> implied accusation only.
+    (
+        "",
+        "It's rather convenient that you were the one to find the body.",
+        {"evidence": "none", "accusation": "implied", "aggression": "low",
+         "warmth": "neutral", "conscience": False, "probing": False},
+    ),
+    # Reassurance / patience -> warm, nothing else.
+    (
+        "",
+        "Take your time, there's no rush at all. I only want to understand what happened.",
+        {"evidence": "none", "accusation": "none", "aggression": "low",
+         "warmth": "warm", "conscience": False, "probing": False},
+    ),
+    # Warm appeal to conscience -> warmth warm AND conscience true.
+    (
+        "",
+        "I can see this is weighing on you. His family deserves the truth -- come clean and you'll feel better.",
+        {"evidence": "none", "accusation": "none", "aggression": "low",
+         "warmth": "warm", "conscience": True, "probing": False},
+    ),
+    # Pointed investigative question about the timeline -> probing.
+    (
+        "",
+        "Walk me through exactly where you were between eight and nine o'clock.",
+        {"evidence": "none", "accusation": "none", "aggression": "low",
+         "warmth": "neutral", "conscience": False, "probing": True},
+    ),
+    # Flat, routine opener -> everything neutral/default.
+    (
+        "",
+        "I just have a few routine questions about last night.",
+        {"evidence": "none", "accusation": "none", "aggression": "low",
+         "warmth": "neutral", "conscience": False, "probing": False},
+    ),
+    # Context matters: a bare "yes" is a direct accusation here because of what it answers.
+    (
+        "Are you actually accusing me of something?",
+        "Yes. I think you know exactly what happened to Charles.",
+        {"evidence": "none", "accusation": "direct", "aggression": "low",
+         "warmth": "neutral", "conscience": False, "probing": False},
+    ),
+]
 
 
 def _extract_json(text):
@@ -254,7 +346,31 @@ def _extract_json(text):
     return json.loads(text[start:end + 1])
 
 
-def classify(player_input, recent_context=None):
+def _user_block(last_npc, player_input):
+    """Format one turn for the classifier. Shared by the live query and the
+    few-shot examples so the model sees identical shapes for both."""
+    return (
+        (f"Suspect's previous line: {last_npc}\n" if last_npc else "")
+        + f"Investigator's latest line: {player_input}"
+    )
+
+
+def _few_shot_messages():
+    """Turn FEW_SHOT_EXAMPLES into alternating user/assistant chat turns: the
+    investigator line as the user message, the correct Signal JSON as the
+    assistant reply. The JSON is compact to keep the fixed prefix small."""
+    messages = []
+    for last_npc, investigator_line, signal in FEW_SHOT_EXAMPLES:
+        messages.append(
+            {"role": "user", "content": _user_block(last_npc, investigator_line)}
+        )
+        messages.append(
+            {"role": "assistant", "content": json.dumps(signal, separators=(",", ":"))}
+        )
+    return messages
+
+
+def classify(player_input, recent_context=None, use_few_shot=True):
     """
     Ask the local model to score the player's turn, returning a ``Signal``.
 
@@ -266,6 +382,10 @@ def classify(player_input, recent_context=None):
         Prior turns as [{"role": "user"|"assistant", "content": str}, ...]. The
         last assistant line is included so tone is judged in context (e.g. "yes"
         means something different after a question than after a denial).
+    use_few_shot : bool
+        Whether to prepend the FEW_SHOT_EXAMPLES demonstrations. True in normal
+        play; the eval harness toggles it off to measure the few-shot lift on the
+        same cases.
 
     Returns
     -------
@@ -281,17 +401,19 @@ def classify(player_input, recent_context=None):
                 last_npc = message.get("content", "")
                 break
 
-    user_block = (
-        (f"Suspect's previous line: {last_npc}\n" if last_npc else "")
-        + f"Investigator's latest line: {player_input}"
-    )
+    user_block = _user_block(last_npc, player_input)
+
+    # The demonstrations go before the live turn so the model has seen the
+    # request->response pattern by the time it scores the real line.
+    messages = _few_shot_messages() if use_few_shot else []
+    messages.append({"role": "user", "content": user_block})
 
     # temperature 0 for a stable, repeatable judgement; the reply is tiny JSON.
     # RESPONSE_FORMAT constrains decoding to the schema so even a roleplay-tuned
     # model returns a valid Signal instead of staying in character.
     reply, _ = llm_client.get_response(
         CLASSIFIER_SYSTEM_PROMPT,
-        [{"role": "user", "content": user_block}],
+        messages,
         temperature=0.0,
         max_tokens=80,
         response_format=RESPONSE_FORMAT,
