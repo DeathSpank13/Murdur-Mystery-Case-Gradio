@@ -185,9 +185,9 @@ DIALOGUE_TREE = {
                 "id": "lastseen",
                 "text": "When did you last see Charles alive?",
                 "response": (
-                    "A little after ten, by the study door, telling some long "
-                    "story about Venice. I went to see to the wine and never "
-                    "spoke to him again."
+                    "When he left the drawing room to take a telephone call, "
+                    "half past nine or so. I went to see to the wine a little "
+                    "later and never spoke to him again."
                 ),
                 "once": True,
             },

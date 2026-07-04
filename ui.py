@@ -30,6 +30,7 @@ import intent_classifier
 import branching_dialogue
 from branching_dialogue import DialogueEngine
 from fsm import SuspectFSM, SUSPECT_IS_GUILTY
+from nuggets import NUGGETS_FOR_CONFESSION
 
 
 # Number of option-button slots to pre-create for the branching dialogue tab.
@@ -52,6 +53,18 @@ INTRO = (
     "You are the investigator. Eleanor Vance hosted last night's dinner party, "
     "where Charles Whitmore was found dead in the study. Question her, then "
     "decide: is she guilty?\n\n"
+    "**What the case file tells you:**\n"
+    "1. Charles was found dead in the study at 10:15 pm by Daniel Reeve, sent "
+    "to fetch him for dessert. Guests were kept out of the room, and details "
+    "of the wound have not been released to anyone in the house.\n"
+    "2. The coroner puts the time of death between 9:30 and 10:00 pm.\n"
+    "3. The study sits at the end of the east corridor; the kitchen, back "
+    "stairs and wine cellar are at the west end of the house.\n"
+    "4. Forensics found a fresh smear of blood on the inside knob of the study "
+    "door -- not Charles's type. The letter opener that killed him was wiped "
+    "clean.\n\n"
+    "Listen closely: a suspect's own words are worth more than any accusation. "
+    "If something she says does not fit, put it to her.\n\n"
     "You can question two detectives' suspects, **Detective A** and "
     "**Detective B**. Interview each as you like, then submit a verdict for "
     "the one you are judging."
@@ -97,6 +110,7 @@ def handle_turn(
     chat.append({"role": "user", "content": player_input})
 
     signal_dict = None
+    nugget_event = None
     if condition == "static":
         start = time.perf_counter()
         reply = static_dialogue.get_response(player_input, static_counts)
@@ -115,9 +129,19 @@ def handle_turn(
         signal_dict = signal.as_dict()
         fsm.transition(signal)
         system_prompt = fsm.get_system_prompt()
+        attempted_drop = fsm.pending_drop
         llm_history.append({"role": "user", "content": player_input})
         reply, latency_ms = llm_client.get_response(system_prompt, llm_history)
         llm_history.append({"role": "assistant", "content": reply})
+        # Confirm whether the slip planned for this reply was actually said;
+        # the nugget only becomes confrontable once it is in the transcript.
+        dropped = fsm.commit_reply(reply)
+        if fsm.last_confront:
+            nugget_event = f"confront:{fsm.last_confront}"
+        elif dropped:
+            nugget_event = f"drop:{dropped}"
+        elif attempted_drop:
+            nugget_event = f"drop_failed:{attempted_drop}"
         state_value = fsm.get_state().value
         real_latency_ms = latency_ms          # dynamic latency is already real
         simulated_latency_ms = 0.0
@@ -128,6 +152,9 @@ def handle_turn(
         signal=signal_dict,
         real_latency_ms=real_latency_ms,
         simulated_latency_ms=simulated_latency_ms,
+        nuggets_dropped=sorted(fsm.nuggets_dropped) if signal_dict else None,
+        nuggets_confronted=sorted(fsm.nuggets_confronted) if signal_dict else None,
+        nugget_event=nugget_event,
     )
 
     # Researcher readout: the state, plus the axes that drove it for the dynamic
@@ -137,7 +164,18 @@ def handle_turn(
     else:
         axes = ", ".join(f"{key}={value}" for key, value in signal_dict.items())
         aware = " (aware)" if fsm.aware else ""
-        state_text = f"**Suspect state:** {state_value}{aware}  \n**Read:** {axes}"
+        dropped_list = ", ".join(sorted(fsm.nuggets_dropped)) or "-"
+        confronted_list = ", ".join(sorted(fsm.nuggets_confronted)) or "-"
+        nugget_text = (
+            f"**Nuggets:** dropped [{dropped_list}] / confronted "
+            f"[{confronted_list}] ({NUGGETS_FOR_CONFESSION} needed)"
+        )
+        if nugget_event:
+            nugget_text += f" / {nugget_event}"
+        state_text = (
+            f"**Suspect state:** {state_value}{aware}  \n**Read:** {axes}  \n"
+            + nugget_text
+        )
 
     return (
         chat, "",

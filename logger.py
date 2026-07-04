@@ -39,7 +39,8 @@ class SessionLogger:
         os.makedirs(LOG_DIR, exist_ok=True)
 
     def log_turn(self, condition, label_shown, player_input, reply, state, latency_ms,
-                 signal=None, real_latency_ms=None, simulated_latency_ms=None):
+                 signal=None, real_latency_ms=None, simulated_latency_ms=None,
+                 nuggets_dropped=None, nuggets_confronted=None, nugget_event=None):
         """
         Record one question and answer exchange.
 
@@ -47,6 +48,12 @@ class SessionLogger:
         the dynamic condition (a dict from Signal.as_dict()), or None for the
         static script. It is logged so Phase 5 can analyse not just where the
         suspect ended up but why the FSM moved her there.
+
+        ``nuggets_dropped`` / ``nuggets_confronted`` are the cumulative nugget
+        sets after the turn (dynamic only; None for static), and ``nugget_event``
+        marks what happened this turn: "drop:<id>", "drop_failed:<id>",
+        "confront:<id>", or None. Together they let Phase 5 reconstruct how a
+        player found (or missed) the path to a confession.
 
         ``latency_ms`` is the *perceived* response time the participant felt. For
         the static condition this includes an artificial delay; ``real_latency_ms``
@@ -62,6 +69,9 @@ class SessionLogger:
                 "npc_reply": reply,
                 "fsm_state": state,                # "n/a (static script)" for static
                 "signal": signal,                  # classified axes, or None (static)
+                "nuggets_dropped": nuggets_dropped,
+                "nuggets_confronted": nuggets_confronted,
+                "nugget_event": nugget_event,
                 "latency_ms": round(latency_ms, 1),  # perceived total
                 "real_latency_ms": round(real_latency_ms, 1) if real_latency_ms is not None else None,
                 "simulated_latency_ms": round(simulated_latency_ms, 1) if simulated_latency_ms is not None else None,

@@ -25,7 +25,7 @@ REQUEST_TIMEOUT = 120
 
 
 def get_response(system_prompt, messages, temperature=0.7, max_tokens=200,
-                 response_format=None):
+                 response_format=None, repeat_penalty=1.1):
     """
     Send one chat completion request to the local server and return the reply.
 
@@ -49,6 +49,12 @@ def get_response(system_prompt, messages, temperature=0.7, max_tokens=200,
         just stays in character, so a grammar constraint is what makes the
         multi-axis classification actually work rather than silently falling back
         to keywords. Left None for ordinary in-character replies.
+    repeat_penalty : float
+        llama.cpp repetition penalty for in-character replies; without it the
+        suspect can lock into repeating one sentence when cornered. Applied only
+        when ``response_format`` is None: penalising repeats during constrained
+        JSON decoding would bias the classifier against giving several axes the
+        same (correct) value such as "none".
 
     Returns
     -------
@@ -67,6 +73,8 @@ def get_response(system_prompt, messages, temperature=0.7, max_tokens=200,
     }
     if response_format is not None:
         payload["response_format"] = response_format
+    else:
+        payload["repeat_penalty"] = repeat_penalty
 
     start = time.perf_counter()
     try:

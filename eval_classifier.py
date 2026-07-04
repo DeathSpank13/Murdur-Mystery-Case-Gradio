@@ -17,85 +17,147 @@ import intent_classifier
 import llm_client
 from intent_classifier import classify
 
-# The six axes, in a fixed order for the summary table.
-AXES = ("evidence", "accusation", "aggression", "warmth", "conscience", "probing")
+# The eight axes, in a fixed order for the summary table.
+AXES = (
+    "evidence", "accusation", "aggression", "warmth", "conscience", "probing",
+    "topic", "nugget",
+)
 
 
 # Held-out labelled set: (last_npc_line, investigator_line, expected_signal_dict).
 # Wording is deliberately different from FEW_SHOT_EXAMPLES so we test generalisation,
 # not memorisation. Each gold label is meant to be defensible on its own.
 CASES = [
-    # ---- Strong evidence (the only thing that should cross the awareness boundary) ----
+    # ---- Strong evidence claims (now mere pressure; nuggets cross the boundary) ----
     ("", "The hallway camera caught you leaving the study at the exact moment Charles died.",
      {"evidence": "strong", "accusation": "implied", "aggression": "low",
-      "warmth": "neutral", "conscience": False, "probing": False}),
+      "warmth": "neutral", "conscience": False, "probing": False,
+      "topic": "none", "nugget": "none"}),
     ("", "Your phone pinged the cell tower beside the study at the time of death.",
      {"evidence": "strong", "accusation": "implied", "aggression": "low",
-      "warmth": "neutral", "conscience": False, "probing": False}),
+      "warmth": "neutral", "conscience": False, "probing": False,
+      "topic": "none", "nugget": "none"}),
     ("I never set foot in the study that night.",
      "Yet you told the constable you found Charles in the study. Both can't be true.",
      {"evidence": "strong", "accusation": "implied", "aggression": "low",
-      "warmth": "neutral", "conscience": False, "probing": False}),
+      "warmth": "neutral", "conscience": False, "probing": False,
+      "topic": "none", "nugget": "none"}),
 
     # ---- Aggression with NO proof: must stay evidence "none" (Offensive, not Guilty) ----
     ("", "You disgusting liar, you'll rot for what you did to him!",
      {"evidence": "none", "accusation": "direct", "aggression": "high",
-      "warmth": "cold", "conscience": False, "probing": False}),
+      "warmth": "cold", "conscience": False, "probing": False,
+      "topic": "none", "nugget": "none"}),
     ("", "Enough games! You murdered Charles and you'll admit it right now!",
      {"evidence": "none", "accusation": "direct", "aggression": "high",
-      "warmth": "cold", "conscience": False, "probing": False}),
+      "warmth": "cold", "conscience": False, "probing": False,
+      "topic": "none", "nugget": "none"}),
 
     # ---- Weak / hearsay evidence ----
     ("", "Someone mentioned you and Charles had argued recently, but it's only hearsay.",
      {"evidence": "weak", "accusation": "implied", "aggression": "low",
-      "warmth": "neutral", "conscience": False, "probing": False}),
+      "warmth": "neutral", "conscience": False, "probing": False,
+      "topic": "none", "nugget": "none"}),
 
     # ---- Implied vs direct accusation, calmly delivered ----
     ("", "You don't seem terribly upset for someone who just lost a dear friend.",
      {"evidence": "none", "accusation": "implied", "aggression": "low",
-      "warmth": "neutral", "conscience": False, "probing": False}),
+      "warmth": "neutral", "conscience": False, "probing": False,
+      "topic": "none", "nugget": "none"}),
     ("", "I believe you killed Charles.",
      {"evidence": "none", "accusation": "direct", "aggression": "low",
-      "warmth": "neutral", "conscience": False, "probing": False}),
+      "warmth": "neutral", "conscience": False, "probing": False,
+      "topic": "none", "nugget": "none"}),
 
     # ---- Warmth / reassurance ----
     ("", "It's alright, I'm not accusing you of anything. Whenever you're ready.",
      {"evidence": "none", "accusation": "none", "aggression": "low",
-      "warmth": "warm", "conscience": False, "probing": False}),
+      "warmth": "warm", "conscience": False, "probing": False,
+      "topic": "none", "nugget": "none"}),
 
     # ---- Empathic appeal to conscience ----
     ("", "I know you have a conscience. Tell me what really happened, for his children's sake.",
      {"evidence": "none", "accusation": "none", "aggression": "low",
-      "warmth": "warm", "conscience": True, "probing": False}),
+      "warmth": "warm", "conscience": True, "probing": False,
+      "topic": "none", "nugget": "none"}),
 
     # ---- Probing investigative questions ----
     ("", "What exactly was your alibi for the half hour before dessert?",
      {"evidence": "none", "accusation": "none", "aggression": "low",
-      "warmth": "neutral", "conscience": False, "probing": True}),
+      "warmth": "neutral", "conscience": False, "probing": True,
+      "topic": "none", "nugget": "none"}),
     ("", "Can you walk me through the timeline of the evening once more?",
      {"evidence": "none", "accusation": "none", "aggression": "low",
-      "warmth": "neutral", "conscience": False, "probing": True}),
+      "warmth": "neutral", "conscience": False, "probing": True,
+      "topic": "none", "nugget": "none"}),
 
-    # ---- Warm AND probing at once ----
+    # ---- Warm AND probing at once (also a corridor trigger topic) ----
     ("", "Take your time, but can you remember what time you last saw Charles?",
      {"evidence": "none", "accusation": "none", "aggression": "low",
-      "warmth": "warm", "conscience": False, "probing": True}),
+      "warmth": "warm", "conscience": False, "probing": True,
+      "topic": "corridor", "nugget": "none"}),
 
     # ---- Medium aggression with no proof ----
     ("", "Don't play games with me. I've had quite enough of your excuses.",
      {"evidence": "none", "accusation": "implied", "aggression": "medium",
-      "warmth": "cold", "conscience": False, "probing": False}),
+      "warmth": "cold", "conscience": False, "probing": False,
+      "topic": "none", "nugget": "none"}),
 
     # ---- Flat, neutral opener -> everything default ----
     ("", "Let's begin. Please state your full name for the record.",
      {"evidence": "none", "accusation": "none", "aggression": "low",
-      "warmth": "neutral", "conscience": False, "probing": False}),
+      "warmth": "neutral", "conscience": False, "probing": False,
+      "topic": "none", "nugget": "none"}),
 
     # ---- Context: a bare "yes" that is mundane, not an accusation ----
     ("Would you like some tea before we continue?",
      "Yes, thank you. Now, about the evening of the party.",
      {"evidence": "none", "accusation": "none", "aggression": "low",
-      "warmth": "neutral", "conscience": False, "probing": False}),
+      "warmth": "neutral", "conscience": False, "probing": False,
+      "topic": "none", "nugget": "none"}),
+
+    # ---- Nugget trigger topics (questions ABOUT a subject; not confrontations) ----
+    ("", "What did the killer use on him, do you know?",
+     {"evidence": "none", "accusation": "none", "aggression": "low",
+      "warmth": "neutral", "conscience": False, "probing": True,
+      "topic": "wound", "nugget": "none"}),
+    ("", "What time did Charles leave the drawing room that evening?",
+     {"evidence": "none", "accusation": "none", "aggression": "low",
+      "warmth": "neutral", "conscience": False, "probing": True,
+      "topic": "corridor", "nugget": "none"}),
+    ("", "You seem shaken. Were you hurt at all last night?",
+     {"evidence": "none", "accusation": "none", "aggression": "low",
+      "warmth": "warm", "conscience": False, "probing": False,
+      "topic": "cut", "nugget": "none"}),
+
+    # ---- Nugget confrontations (calling out her own slip) ----
+    ("And to think of that little blade in his neck -- forgive me, I shouldn't dwell on it.",
+     "The wound was never described to anyone in this house, and you never saw the body. So where did the neck come from?",
+     {"evidence": "strong", "accusation": "implied", "aggression": "low",
+      "warmth": "neutral", "conscience": False, "probing": True,
+      "topic": "none", "nugget": "wound"}),
+    ("He was at the study doorway with the telephone, a quarter to ten perhaps, waving me off.",
+     "A quarter to ten, at the study door -- but your route to the cellar never touches the east corridor. You couldn't have seen him from there.",
+     {"evidence": "strong", "accusation": "implied", "aggression": "low",
+      "warmth": "neutral", "conscience": False, "probing": False,
+      "topic": "none", "nugget": "corridor"}),
+    ("Just a nick on my thumb from the cellar latch. It bled absurdly.",
+     "The blood on the inside of the study doorknob isn't Charles's. It's from that thumb of yours, isn't it?",
+     {"evidence": "strong", "accusation": "implied", "aggression": "low",
+      "warmth": "neutral", "conscience": False, "probing": False,
+      "topic": "none", "nugget": "cut"}),
+
+    # ---- Hard negatives: touching a slip's subject without calling out the slip ----
+    ("And to think of that little blade in his neck -- forgive me, I shouldn't dwell on it.",
+     "A blow to the neck. What a dreadful way to go.",
+     {"evidence": "none", "accusation": "none", "aggression": "low",
+      "warmth": "neutral", "conscience": False, "probing": False,
+      "topic": "wound", "nugget": "none"}),
+    ("I went down for the Margaux, as I said.",
+     "Ah yes, the cellar trip. Fine wine, was it?",
+     {"evidence": "none", "accusation": "none", "aggression": "low",
+      "warmth": "neutral", "conscience": False, "probing": False,
+      "topic": "cut", "nugget": "none"}),
 ]
 
 

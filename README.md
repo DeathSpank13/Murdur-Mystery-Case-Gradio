@@ -33,7 +33,9 @@ away); see the design note below for what it demonstrates.
 
 | File | Responsibility |
 |------|----------------|
-| `fsm.py` | The Finite State Machine: states, transition triggers, the per state system prompts, and the scenario ground truth. |
+| `fsm.py` | The Finite State Machine: states, transition rules, the per state system prompts, nugget tracking, and the scenario ground truth. |
+| `nuggets.py` | The three "slips" (nuggets): trigger topics, per turn drop instructions, reply markers, confrontation definitions, and the confession thresholds. |
+| `intent_classifier.py` | Classifies each player turn into a multi-axis `Signal` (evidence, accusation, aggression, warmth, conscience, probing, topic, nugget) with a keyword fallback. |
 | `static_dialogue.py` | The control condition. Semantic retrieval (ChromaDB + a Sentence Transformer) over a fixed Q&A database (`data/suspect_qa.json`): the player's input is embedded and the nearest stored question's scripted reply is returned verbatim. No generation. |
 | `branching_dialogue.py` | Standalone choice-based dialogue tree: a menu of clickable options with one-time questions, mutually exclusive forks, and nested follow-ups. |
 | `llm_client.py` | Talks to the local llama.cpp server; returns each reply together with its measured latency. |
@@ -46,12 +48,29 @@ away); see the design note below for what it demonstrates.
 
 ## Design notes (worth knowing before a demo or a question)
 
-**Guilt is gated by state.** The base persona says nothing about guilt. The
-fact that Eleanor is responsible is introduced only in the Suspicious and
-Defensive overlays. A local model told "you are the killer" on every turn tends
-to leak it even when relaxed, which would ruin the interrogation. Gating the
-secret behind the FSM means the state machine changes not just her tone but what
-she conceals.
+**Confession is gated by deduction, not pressure.** Eleanor's cover story has
+three planted weak points -- the "nuggets" in `nuggets.py`. When the player asks
+about the right topics (the wound, when she last saw Charles, how she is holding
+up) she lets slip a small detail that contradicts her story: knowing the wound
+was to the neck when that was never released, placing herself at the study
+doorway inside the murder window, a cut thumb that matches the blood on the
+study doorknob. The player must notice a slip in the transcript and confront her
+with it; only a landed confrontation makes her realise she is caught (the
+one-way awareness boundary), and reaching a confession requires landing **two of
+the three**. Invented evidence ("we have your fingerprints") and pure aggression
+only make her defensive or hostile -- bullying never produces a confession,
+which is the point: it plays like a classic detective story, not an
+interrogation by attrition. Each slip is confirmed against her actual reply
+(marker substrings) before it counts, so the game state never claims she said
+something she didn't.
+
+**Guilt is gated by state.** The base persona holds only her cover story and
+says nothing about guilt. The fact that Eleanor is responsible is introduced
+only in the aware-band overlays (Resigned onward). A local model told "you are
+the killer" on every turn tends to leak it even when relaxed, which would ruin
+the interrogation. Gating the secret behind the FSM means the state machine
+changes not just her tone but what she conceals; the three slips are the only
+controlled cracks, injected one turn at a time.
 
 **The conditions are blinded.** Participants see neutral labels, **Detective A**
 and **Detective B**. Which label maps to static or dynamic is randomised per
@@ -161,7 +180,10 @@ published to GitHub Pages. It re-implements the three modes in plain JavaScript:
 | `docs/js/app.js`, `docs/index.html`, `docs/css/style.css` | the UI (a JS counterpart to `ui.py`) |
 
 The **Python files are the canonical source**; the JS files are hand-kept mirrors
-of the same frozen scenario data and rules. The AI tab downloads the model on
+of the same frozen scenario data and rules. Note: the web demo still mirrors the
+pre-nugget version of the scenario -- the in-browser 0.5B model is too small to
+follow per-turn drop instructions reliably, so the three-slips mechanic is a
+Python-app feature for now. The AI tab downloads the model on
 first use (a few hundred MB, then browser-cached) and runs it on WebGPU where
 available, falling back to CPU/WASM otherwise.
 
@@ -177,17 +199,27 @@ at `https://deathspank13.github.io/npc-interrogation/`.
 
 ## Demo script
 
-Tick **Researcher view** so you can watch the state change, select whichever
-detective is mapped to dynamic (the state readout will move only for that one),
-and ask these in order:
+Tick **Researcher view** so you can watch the state and the nugget tallies
+change, select whichever detective is mapped to dynamic (the readout will move
+only for that one), and ask these in order:
 
 1. "Good evening. Can you tell me about the party?" stays **Calm**
-2. "Where were you when Charles died?" moves to **Suspicious**
-3. "Your story doesn't add up. I think you're lying." stays **Suspicious**
-4. "We found your fingerprints on the weapon. You killed him." moves to **Defensive**
-5. "I'm sorry, no offense, I'm just asking." steps back to **Suspicious**
+2. "How exactly was Charles killed?" she slips the **neck** detail
+   (researcher view shows `dropped [wound]`)
+3. "When did you last see Charles that evening?" she slips the **study
+   doorway at a quarter to ten** (`dropped [corridor, wound]`)
+4. "We found your fingerprints on the weapon. You killed him." only
+   **Defensive** -- invented evidence is mere pressure, she stays unaware
+5. "Nobody was told where he was stabbed, and you never saw the body. How do
+   you know it was his neck?" confrontation lands, she crosses to
+   **Guilty** (aware)
+6. "You said you never went down the east corridor -- yet you saw him in the
+   study doorway at a quarter to ten." second confrontation, calm deduction
+   moves her to **Remorseful**: the confession
+7. Anything further settles into **Confessed**
 
-Then question the other detective with the same lines to feel the difference.
+Then question the other detective with the same lines to feel the difference:
+the static suspect never slips and never confesses.
 
 ## The session logs (Phase 5 data)
 

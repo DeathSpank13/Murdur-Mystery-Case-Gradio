@@ -37,7 +37,7 @@
   },
   {
     "id": "alibi",
-    "response": "I was in the drawing room with the other guests for most of the evening. You can ask any of them.",
+    "response": "I was in the drawing room with the other guests, apart from five minutes around twenty to ten when I went down the back stairs to the cellar for more wine. You can ask any of them.",
     "questions": [
       "Where were you when Charles died?",
       "What is your alibi?",
@@ -49,7 +49,7 @@
   },
   {
     "id": "lastseen",
-    "response": "A little after ten, by the study door. He was telling some long story about Venice, as he always did.",
+    "response": "When he left the drawing room to take a telephone call, half past nine or so. I never spoke to him again.",
     "questions": [
       "When did you last see Charles alive?",
       "When was the last time you saw him?",
@@ -142,6 +142,18 @@
       "Was there anything strange about the study?",
       "Did you see anything odd?",
       "Was the study door normally closed?"
+    ]
+  },
+  {
+    "id": "wellbeing",
+    "response": "Tired, Inspector, nothing worse. It is not every day one's dinner party ends with a body in the study.",
+    "questions": [
+      "How are you holding up?",
+      "Are you hurt?",
+      "Were you injured last night?",
+      "You look exhausted.",
+      "Is everything alright with you?",
+      "Did anything happen to you that night?"
     ]
   },
   {
