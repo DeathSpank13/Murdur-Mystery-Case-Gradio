@@ -25,7 +25,7 @@ REQUEST_TIMEOUT = 120
 
 
 def get_response(system_prompt, messages, temperature=0.7, max_tokens=200,
-                 response_format=None, repeat_penalty=1.1):
+                 response_format=None, repeat_penalty=1.2):
     """
     Send one chat completion request to the local server and return the reply.
 
@@ -51,7 +51,9 @@ def get_response(system_prompt, messages, temperature=0.7, max_tokens=200,
         to keywords. Left None for ordinary in-character replies.
     repeat_penalty : float
         llama.cpp repetition penalty for in-character replies; without it the
-        suspect can lock into repeating one sentence when cornered. Applied only
+        suspect can lock into repeating one sentence when cornered (1.1 still
+        allowed a wall of "I was in the wine cellar" in the Guilty state, hence
+        1.2). Applied only
         when ``response_format`` is None: penalising repeats during constrained
         JSON decoding would bias the classifier against giving several axes the
         same (correct) value such as "none".

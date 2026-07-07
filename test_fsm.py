@@ -130,6 +130,17 @@ def run():
     fsm3.transition(ask_topic("wound"))
     results.append(check("a slip is only dropped once", fsm3.pending_drop is None))
 
+    # A slip is never planned when the player's own line contains its marker:
+    # she would only be echoing the investigator's words, and a lucky guess
+    # must not masquerade as forbidden knowledge.
+    fsm3b = SuspectFSM()
+    fsm3b.transition(ask_topic("wound"), "Was he stabbed in the neck?")
+    results.append(check("player-fed detail plans no drop", fsm3b.pending_drop is None))
+    fsm3b.transition(ask_topic("wound"), "How exactly did Charles die?")
+    results.append(check(
+        "clean topic question still plans the drop", fsm3b.pending_drop == "wound",
+    ))
+
     # ---- Confronting nuggets --------------------------------------------------
     # Guessing a slip she never made does nothing but pressure her.
     fsm4 = SuspectFSM()

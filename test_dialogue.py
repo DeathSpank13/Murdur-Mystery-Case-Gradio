@@ -98,23 +98,29 @@ def run():
 
     # VERDICT: the accusations are gated behind ACCUSE_AFTER questions, then
     # offered as a mutually exclusive pair that does not advance the counter.
+    # Once unlocked they appear at every node, so the player can accuse from
+    # inside a sub-topic without climbing back to the root menu.
     verdict = DialogueEngine()
     results.append(check(
         "accusations hidden before any questions",
         "verdict_guilty" not in ids(verdict) and "verdict_innocent" not in ids(verdict),
     ))
-    # Ask exactly ACCUSE_AFTER questions, returning to the root each time so the
-    # verdict options (which live on the root menu) become reachable. "weapon" is
-    # a repeatable topic, so this works whatever ACCUSE_AFTER is set to.
-    for _ in range(ACCUSE_AFTER):
-        verdict.choose("weapon")
-        verdict.choose(BACK_ID)
+    verdict.choose("weapon")            # question 1, descends into the topic
     results.append(check(
-        "accusations appear once the threshold is reached",
-        verdict.questions_asked == ACCUSE_AFTER
-        and {"verdict_guilty", "verdict_innocent"} <= ids(verdict),
+        "accusations still hidden below the threshold in a sub-node",
+        "verdict_guilty" not in ids(verdict) and "verdict_innocent" not in ids(verdict),
     ))
-    verdict.choose("verdict_guilty")
+    # "who_handled" is a repeatable leaf on the weapon node, so the threshold
+    # can be reached without ever leaving it, whatever ACCUSE_AFTER is set to.
+    while verdict.questions_asked < ACCUSE_AFTER:
+        verdict.choose("who_handled")
+    results.append(check(
+        "accusations appear in the sub-node once the threshold is reached",
+        verdict.questions_asked == ACCUSE_AFTER
+        and {"verdict_guilty", "verdict_innocent"} <= ids(verdict)
+        and BACK_ID in ids(verdict),
+    ))
+    verdict.choose("verdict_guilty")    # accuse from inside the sub-node
     results.append(check(
         "choosing one accusation locks the other",
         "verdict_innocent" not in ids(verdict) and "verdict_guilty" not in ids(verdict),
@@ -122,6 +128,11 @@ def run():
     results.append(check(
         "an accusation does not advance the question counter",
         verdict.questions_asked == ACCUSE_AFTER,
+    ))
+    verdict.choose(BACK_ID)             # the lock follows the player around
+    results.append(check(
+        "accusation lock persists after navigating back to the root",
+        "verdict_innocent" not in ids(verdict) and "verdict_guilty" not in ids(verdict),
     ))
 
     # Choosing an unavailable id is a loud error, not a silent no-op.

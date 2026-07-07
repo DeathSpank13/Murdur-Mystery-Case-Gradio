@@ -12,7 +12,8 @@ Detective B) so participants are not primed toward "the clever AI one":
 
 Which label maps to which condition is randomised per session and kept only in
 the logs. A "Researcher view" toggle (off for participants, on for demos)
-reveals the live FSM state and the last response latency.
+reveals the label-to-condition mapping, the live FSM state and the last
+response latency.
 
 The per turn logic lives in handle_turn(), kept separate from the UI layout so
 it can be exercised without launching Gradio.
@@ -30,16 +31,16 @@ import intent_classifier
 import branching_dialogue
 from branching_dialogue import DialogueEngine
 from fsm import SuspectFSM, SUSPECT_IS_GUILTY
-from nuggets import NUGGETS_FOR_CONFESSION
+from nuggets import NUGGETS, NUGGETS_FOR_CONFESSION
 
 
 # Number of option-button slots to pre-create for the branching dialogue tab.
-# Gradio needs a fixed set of components, so we make enough for the largest node
-# (the root menu) plus one for the synthetic Back option, and hide the unused
-# slots each turn.
+# Gradio needs a fixed set of components, so we make enough for the largest
+# node plus the synthetic Back option and the verdict options (offered at
+# every node once unlocked), and hide the unused slots each turn.
 MAX_OPTIONS = max(
     len(node["options"]) for node in branching_dialogue.DIALOGUE_TREE.values()
-) + 1
+) + 1 + len(branching_dialogue.VERDICT_OPTIONS)
 
 # Styling for the branching tab: dim the buttons for options the player has
 # already chosen. Buttons get the "option-used" class via gr.update; this rule
@@ -64,7 +65,10 @@ INTRO = (
     "door -- not Charles's type. The letter opener that killed him was wiped "
     "clean.\n\n"
     "Listen closely: a suspect's own words are worth more than any accusation. "
-    "If something she says does not fit, put it to her.\n\n"
+    "Accusing her outright, or waving evidence you cannot actually show, will "
+    "only put her on her guard. Ask her about the case instead, compare her "
+    "answers against the file, and when something she has said does not fit, "
+    "put her own words to her.\n\n"
     "You can question two detectives' suspects, **Detective A** and "
     "**Detective B**. Interview each as you like, then submit a verdict for "
     "the one you are judging."
@@ -79,6 +83,30 @@ def new_label_mapping():
     conditions = ["static", "dynamic"]
     random.shuffle(conditions)
     return {"Detective A": conditions[0], "Detective B": conditions[1]}
+
+
+# Researcher-facing names for the hidden conditions, used by mapping_text.
+CONDITION_NAMES = {
+    "dynamic": "dynamic (FSM + LLM)",
+    "static": "static (scripted)",
+}
+
+
+def mapping_text(label_mapping):
+    """Researcher-only readout of which neutral label hides which condition."""
+    parts = " · ".join(
+        f"{label} → {CONDITION_NAMES.get(condition, condition)}"
+        for label, condition in label_mapping.items()
+    )
+    return f"**Condition mapping:** {parts}"
+
+
+def _marker_in_reply(nugget_id, reply):
+    """True if the reply actually contains one of the slip's marker phrases.
+    Mirrors the check in SuspectFSM.commit_reply, used here to decide whether
+    a planned drop needs its one retry before the reply is committed."""
+    text = (reply or "").lower()
+    return any(marker in text for marker in NUGGETS[nugget_id]["drop_markers"])
 
 
 def handle_turn(
@@ -127,11 +155,22 @@ def handle_turn(
         # classification is a separate model call, so it adds to the turn latency.
         signal = intent_classifier.classify(player_input, llm_history)
         signal_dict = signal.as_dict()
-        fsm.transition(signal)
+        fsm.transition(signal, player_input)
         system_prompt = fsm.get_system_prompt()
         attempted_drop = fsm.pending_drop
         llm_history.append({"role": "user", "content": player_input})
         reply, latency_ms = llm_client.get_response(system_prompt, llm_history)
+        # One retry when a planned slip was not actually said: the drop
+        # instruction is still in the prompt, and a fresh sample usually
+        # complies. The retry is kept only if it contains the marker, so a
+        # second miss never replaces an otherwise fine reply.
+        retried_drop = False
+        if attempted_drop and not _marker_in_reply(attempted_drop, reply):
+            retry_reply, retry_latency = llm_client.get_response(system_prompt, llm_history)
+            latency_ms += retry_latency
+            if _marker_in_reply(attempted_drop, retry_reply):
+                reply = retry_reply
+                retried_drop = True
         llm_history.append({"role": "assistant", "content": reply})
         # Confirm whether the slip planned for this reply was actually said;
         # the nugget only becomes confrontable once it is in the transcript.
@@ -139,7 +178,7 @@ def handle_turn(
         if fsm.last_confront:
             nugget_event = f"confront:{fsm.last_confront}"
         elif dropped:
-            nugget_event = f"drop:{dropped}"
+            nugget_event = f"drop_retry:{dropped}" if retried_drop else f"drop:{dropped}"
         elif attempted_drop:
             nugget_event = f"drop_failed:{attempted_drop}"
         state_value = fsm.get_state().value
@@ -197,22 +236,32 @@ def submit_verdict(verdict_choice, confidence, detective_label, label_mapping, s
     return f"**{head}** {truth} (Recorded for {detective_label}.)", session_logger
 
 
-def toggle_researcher(on):
-    """Show or hide the researcher only panels (and the dev delay toggle)."""
-    return gr.update(visible=on), gr.update(visible=on), gr.update(visible=on)
+def toggle_researcher(on, label_mapping):
+    """Show or hide the researcher only panels (and the dev delay toggle),
+    including the readout of which detective label hides which condition."""
+    return (
+        gr.update(visible=on),
+        gr.update(visible=on),
+        gr.update(visible=on),
+        gr.update(value=mapping_text(label_mapping), visible=on),
+    )
 
 
-def reset_session():
-    """Clear the conversation and start a fresh, freshly randomised session."""
+def reset_session(researcher_on):
+    """Clear the conversation and start a fresh, freshly randomised session.
+    The researcher panels keep their visibility, and the mapping readout is
+    refreshed for the newly randomised labels."""
+    mapping = new_label_mapping()
     return (
         [],                                  # chatbot
         "",                                  # msg
-        gr.update(value="**Suspect state:** Calm", visible=False),
-        gr.update(value="", visible=False),  # latency
+        gr.update(value="**Suspect state:** Calm", visible=researcher_on),
+        gr.update(value="", visible=researcher_on),  # latency
+        gr.update(value=mapping_text(mapping), visible=researcher_on),
         SuspectFSM(),                        # fresh FSM
         {},                                  # fresh static counts
         [],                                  # fresh llm history
-        new_label_mapping(),                 # re-randomise A/B mapping
+        mapping,                             # re-randomised A/B mapping
         logger.SessionLogger(),              # new session log
         "",                                  # clear verdict output
     )
@@ -316,6 +365,7 @@ def build_app():
                 with gr.Row():
                     state_label = gr.Markdown("**Suspect state:** Calm", visible=False)
                     latency_label = gr.Markdown("", visible=False)
+                    mapping_label = gr.Markdown("", visible=False)
 
                 chatbot = gr.Chatbot(label="Interrogation", height=420)
                 msg = gr.Textbox(
@@ -374,8 +424,8 @@ def build_app():
         msg.submit(handle_turn, inputs=turn_inputs, outputs=turn_outputs)
 
         researcher_view.change(
-            toggle_researcher, inputs=researcher_view,
-            outputs=[state_label, latency_label, simulate_delay_toggle],
+            toggle_researcher, inputs=[researcher_view, label_mapping_state],
+            outputs=[state_label, latency_label, simulate_delay_toggle, mapping_label],
         )
 
         verdict_btn.click(
@@ -386,10 +436,11 @@ def build_app():
 
         reset_btn.click(
             reset_session,
+            inputs=[researcher_view],
             outputs=[
-                chatbot, msg, state_label, latency_label, fsm_state,
-                static_counts_state, llm_history_state, label_mapping_state,
-                logger_state, verdict_output,
+                chatbot, msg, state_label, latency_label, mapping_label,
+                fsm_state, static_counts_state, llm_history_state,
+                label_mapping_state, logger_state, verdict_output,
             ],
         )
 

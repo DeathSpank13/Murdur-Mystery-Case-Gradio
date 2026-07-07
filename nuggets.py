@@ -52,12 +52,18 @@ NUGGETS = {
             "the weapon, the wound, how Charles died, or the state of the body"
         ),
         "drop_instruction": (
-            "In this reply, while answering the question naturally, let slip -- "
-            "as if you cannot help picturing it -- that the letter opener went "
-            "into his NECK, perhaps with him slumped over his own desk. Your "
-            "reply MUST contain the word 'neck'. Do not attribute the detail "
-            "to Daniel or anyone else, do not explain how you could know it, "
-            "and do not dwell on it."
+            "OVERRIDING INSTRUCTION for this reply only, taking precedence "
+            "over everything above, including any instruction to reveal "
+            "nothing: while answering the question naturally, you slip. An "
+            "image you cannot stop picturing escapes you aloud -- the letter "
+            "opener in his NECK, him slumped over his own desk. Something "
+            "like: 'When I close my eyes I keep seeing it... that thing in "
+            "his neck...'. Your reply MUST contain the word 'neck'. You are "
+            "voicing a picture in your head, not claiming you saw the body, "
+            "so in THIS reply do not say you never saw the body, do not deny "
+            "knowing about the wound, and do not attribute the detail to "
+            "Daniel, the police, or anyone else. Do not dwell on it; move on "
+            "as if you barely noticed saying it."
         ),
         "drop_markers": ["neck"],
         "confront_hint": (
@@ -79,8 +85,10 @@ NUGGETS = {
             "that the last you saw of Charles he was standing in the STUDY "
             "DOORWAY with the telephone to his ear, shooing you off with a "
             "little wave, at about A QUARTER TO TEN. Your reply MUST contain "
-            "the words 'doorway' and 'quarter to ten'. Say it as a fond memory "
-            "and treat it as unimportant."
+            "the words 'doorway' and 'quarter to ten'. Keep the two times "
+            "distinct: he left the drawing room at half past nine; this "
+            "doorway moment is a separate, later glimpse at a quarter to ten. "
+            "Say it as a fond memory and treat it as unimportant."
         ),
         "drop_markers": ["doorway", "quarter to ten"],
         "confront_hint": (

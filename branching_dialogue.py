@@ -30,7 +30,9 @@ BACK_ID = "__back__"
 BACK_TEXT = "← Back"
 
 # How many substantive questions the player must ask before the accusation
-# options (guilty / innocent) unlock at the root menu.
+# options (guilty / innocent) unlock. Once unlocked they are offered at every
+# node, like the synthetic Back option, so the player can deliver a verdict
+# without climbing back to the root menu.
 ACCUSE_AFTER = 3
 
 
@@ -125,36 +127,6 @@ DIALOGUE_TREE = {
                 ),
                 "exclusive_group": "approach",
                 "goto": "reassure",
-            },
-            # The verdict. Hidden until the player has asked a few questions, then
-            # offered as two mutually exclusive accusations. Choosing one locks
-            # the other and reveals whether the call was right; the conversation
-            # may continue afterwards.
-            {
-                "id": "verdict_guilty",
-                "text": "Eleanor Vance, I'm arresting you for Charles's murder.",
-                "response": (
-                    "Her composure finally cracks. \"You have no idea what he "
-                    "meant to take from me.\" She was, in fact, responsible for "
-                    "Charles's death. Your accusation was correct."
-                ),
-                "min_questions": ACCUSE_AFTER,
-                "once": True,
-                "exclusive_group": "verdict",
-                "accusation": "guilty",
-            },
-            {
-                "id": "verdict_innocent",
-                "text": "I don't believe you did it. You're free to go.",
-                "response": (
-                    "\"Thank you, Inspector. You're wiser than you look.\" She "
-                    "was, in fact, responsible for Charles's death. Your "
-                    "accusation was incorrect."
-                ),
-                "min_questions": ACCUSE_AFTER,
-                "once": True,
-                "exclusive_group": "verdict",
-                "accusation": "innocent",
             },
         ],
     },
@@ -353,6 +325,40 @@ DIALOGUE_TREE = {
 }
 
 
+# The verdict. Hidden until the player has asked a few questions, then offered
+# as two mutually exclusive accusations at every node, so the player never has
+# to backtrack to deliver it. Choosing one locks the other and reveals whether
+# the call was right; the conversation may continue afterwards.
+VERDICT_OPTIONS = [
+    {
+        "id": "verdict_guilty",
+        "text": "Eleanor Vance, I'm arresting you for Charles's murder.",
+        "response": (
+            "Her composure finally cracks. \"You have no idea what he "
+            "meant to take from me.\" She was, in fact, responsible for "
+            "Charles's death. Your accusation was correct."
+        ),
+        "min_questions": ACCUSE_AFTER,
+        "once": True,
+        "exclusive_group": "verdict",
+        "accusation": "guilty",
+    },
+    {
+        "id": "verdict_innocent",
+        "text": "I don't believe you did it. You're free to go.",
+        "response": (
+            "\"Thank you, Inspector. You're wiser than you look.\" She "
+            "was, in fact, responsible for Charles's death. Your "
+            "accusation was incorrect."
+        ),
+        "min_questions": ACCUSE_AFTER,
+        "once": True,
+        "exclusive_group": "verdict",
+        "accusation": "innocent",
+    },
+]
+
+
 class DialogueEngine:
     """
     Walks DIALOGUE_TREE for one run and tracks the consequence state.
@@ -366,8 +372,11 @@ class DialogueEngine:
     "npc" or "player", seeded with the start node's intro line.
     """
 
-    def __init__(self, tree=None, start="main"):
+    def __init__(self, tree=None, start="main", verdict_options=None):
         self.tree = tree if tree is not None else DIALOGUE_TREE
+        self.verdict_options = (
+            verdict_options if verdict_options is not None else VERDICT_OPTIONS
+        )
         self.current = start
         self.consumed = set()        # ids of one-time options already used
         self.locked_groups = set()   # exclusive groups already committed to
@@ -381,27 +390,34 @@ class DialogueEngine:
         if intro:
             self.transcript.append(("npc", intro))
 
+    def _eligible(self, opt):
+        """True if the option passes the consequence rules right now: not a
+        used one-time question, not in a locked exclusive group, and past its
+        min_questions gate."""
+        if opt.get("once") and opt["id"] in self.consumed:
+            return False
+        group = opt.get("exclusive_group")
+        if group and group in self.locked_groups:
+            return False
+        if opt.get("min_questions") and self.questions_asked < opt["min_questions"]:
+            return False
+        return True
+
     def available_options(self):
         """
         Return the ordered options visible at the current node right now.
 
         Drops one-time options that have been used and options whose exclusive
         group is already locked. Appends a synthetic Back option when there is
-        somewhere to climb back to.
+        somewhere to climb back to, then the verdict options once they have
+        unlocked -- those are offered at every node so the player can accuse
+        without backtracking.
         """
-        options = []
-        for opt in self.tree[self.current]["options"]:
-            if opt.get("once") and opt["id"] in self.consumed:
-                continue
-            group = opt.get("exclusive_group")
-            if group and group in self.locked_groups:
-                continue
-            if opt.get("min_questions") and self.questions_asked < opt["min_questions"]:
-                continue
-            options.append(opt)
+        options = [opt for opt in self.tree[self.current]["options"] if self._eligible(opt)]
 
         if self.stack:
             options.append({"id": BACK_ID, "text": BACK_TEXT})
+        options.extend(opt for opt in self.verdict_options if self._eligible(opt))
         return options
 
     def choose(self, option_id):

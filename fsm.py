@@ -249,7 +249,7 @@ class SuspectFSM:
             parts.append(NUGGETS[self.pending_drop]["drop_instruction"])
         return "\n\n".join(parts)
 
-    def transition(self, signal):
+    def transition(self, signal, player_text=""):
         """
         Update the state from a classified ``Signal`` and return the new State.
 
@@ -257,6 +257,11 @@ class SuspectFSM:
         signal). They read as plain comparisons so the behaviour is fully
         inspectable; all the fuzzy judgement lives in the classifier that built
         the signal.
+
+        ``player_text`` is the investigator's raw line. It is used for one
+        guard only: a slip is never planned when the player's own words already
+        contain its marker ("was he stabbed in the neck?"), because a detail
+        she merely echoes back proves nothing and would poison the deduction.
         """
         old_state = self.state
 
@@ -296,13 +301,21 @@ class SuspectFSM:
 
         # Plan a slip for the reply now being generated. Never on a turn where
         # the player is calling out a slip (landed or guessed) -- she is
-        # defending herself, not reminiscing -- and never once the truth is out.
+        # defending herself, not reminiscing -- never once the truth is out,
+        # and never when the player's own line already contains the slip's
+        # marker: echoing a detail the investigator just said is not a slip,
+        # and it would let a lucky guess masquerade as forbidden knowledge.
         self.pending_drop = None
+        text = (player_text or "").lower()
+        player_fed = signal.topic != "none" and any(
+            marker in text for marker in NUGGETS[signal.topic]["drop_markers"]
+        )
         if (
             signal.nugget == "none"
             and signal.topic != "none"
             and signal.topic not in self.nuggets_dropped
             and self.state not in (State.REMORSEFUL, State.CONFESSED)
+            and not player_fed
         ):
             self.pending_drop = signal.topic
 
