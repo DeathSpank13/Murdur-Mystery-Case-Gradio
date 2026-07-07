@@ -6,7 +6,8 @@ Gradio interface for the interrogation prototype.
 Two suspect implementations sit behind neutral labels (Detective A and
 Detective B) so participants are not primed toward "the clever AI one":
 
-    static   Uses static_dialogue.get_response(). A fixed dialogue tree.
+    static   Uses static_dialogue.get_response(). Semantic retrieval over a
+             fixed scripted database, rotating pre-written variants per topic.
     dynamic  Uses SuspectFSM to pick a persona, then llm_client to generate the
              reply with the local model.
 

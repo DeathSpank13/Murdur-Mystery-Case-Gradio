@@ -36,7 +36,7 @@ away); see the design note below for what it demonstrates.
 | `fsm.py` | The Finite State Machine: states, transition rules, the per state system prompts, nugget tracking, and the scenario ground truth. |
 | `nuggets.py` | The three "slips" (nuggets): trigger topics, per turn drop instructions, reply markers, confrontation definitions, and the confession thresholds. |
 | `intent_classifier.py` | Classifies each player turn into a multi-axis `Signal` (evidence, accusation, aggression, warmth, conscience, probing, topic, nugget) with a keyword fallback. |
-| `static_dialogue.py` | The control condition. Semantic retrieval (ChromaDB + a Sentence Transformer) over a fixed Q&A database (`data/suspect_qa.json`): the player's input is embedded and the nearest stored question's scripted reply is returned verbatim. No generation. |
+| `static_dialogue.py` | The control condition. Semantic retrieval (ChromaDB + a Sentence Transformer) over a fixed Q&A database (`data/suspect_qa.json`): the player's input is embedded and the nearest topic's next pre-written variant is returned (repeat questions get "asked and answered" lines). No generation. |
 | `branching_dialogue.py` | Standalone choice-based dialogue tree: a menu of clickable options with one-time questions, mutually exclusive forks, and nested follow-ups. |
 | `llm_client.py` | Talks to the local llama.cpp server; returns each reply together with its measured latency. |
 | `logger.py` | Writes each session (transcript, condition, FSM state, latency, verdicts) to a JSON file under `logs/`. |
@@ -87,18 +87,29 @@ judge correctly more often, and more confidently, in one condition?
 scripted suspect games have traditionally used, with the matching done by
 *meaning* rather than literal keywords: a fixed Q&A database
 (`data/suspect_qa.json`) of topic entries (identity, the party, the guests, the
-alibi, money, the weapon, and so on), each holding one canonical pre-written
-reply plus several example questions. The player's input is embedded with a
-Sentence Transformer (all-MiniLM-L6-v2) and the nearest stored question's reply
-is returned verbatim; if nothing is close enough, a generic fallback is used.
-This keeps it from being a strawman without turning it into anything adaptive:
-it answers obvious questions like "what is your name?" and tolerates paraphrases
-the script never anticipated ("remind me what you're called"), yet it still
-generates nothing and has no memory of the conversation. The guilt fact lives
-only in the dynamic FSM overlays, never in the database. If a reviewer worries
-the comparison is unfair, that is the framing to give: a representative,
-reasonable scripted baseline, retrieval-matched so wording mismatches don't make
-it look worse than it is, not a deliberately broken one.
+alibi, money, the weapon, the cellar trip, the blood on the doorknob, and so
+on), each holding an ordered list of pre-written reply variants, optional
+"asked and answered" repeat lines, and several example questions. The player's
+input is embedded with a Sentence Transformer (all-MiniLM-L6-v2) and the
+nearest topic's next unspoken variant is returned: the first ask gets the
+canonical answer, repeat asks get rephrasings and then pointed
+you've-asked-me-this lines, and off-script input gets generic fallbacks that
+cycle from polite to testy. The rotation is a deterministic per-session
+counter, not a model. This keeps it from being a strawman without turning it
+into anything adaptive: it answers obvious questions, tolerates paraphrases the
+script never anticipated ("remind me what you're called"), and doesn't parrot
+one line forever -- yet it still generates nothing and adapts to nothing. The
+three slips are baked into the script as fixed text (the neck detail in the
+weapon answer, the doorway at a quarter to ten in the last-seen answer, the cut
+thumb in the wellbeing answer -- each spoken once, on the first ask), so the
+mystery is technically solvable in both conditions; but the static suspect
+never reacts to being confronted, and the guilt fact itself lives only in the
+dynamic FSM overlays, never in the database. If a reviewer worries the
+comparison is unfair, that is the framing to give: a representative, reasonable
+scripted baseline, retrieval-matched and repetition-aware so surface polish
+doesn't confound the comparison, not a deliberately broken one. What the
+dynamic condition uniquely adds is *reaction*: pressure changes her state, and
+a landed confrontation is the only road to a confession.
 
 **The branching dialogue is a separate mode, not part of the study.** The second
 tab is a fuller, menu-driven dialogue tree, the kind a real game ships: the
@@ -180,12 +191,14 @@ published to GitHub Pages. It re-implements the three modes in plain JavaScript:
 | `docs/js/app.js`, `docs/index.html`, `docs/css/style.css` | the UI (a JS counterpart to `ui.py`) |
 
 The **Python files are the canonical source**; the JS files are hand-kept mirrors
-of the same frozen scenario data and rules. Note: the web demo still mirrors the
-pre-nugget version of the scenario -- the in-browser 0.5B model is too small to
-follow per-turn drop instructions reliably, so the three-slips mechanic is a
-Python-app feature for now. The AI tab downloads the model on
-first use (a few hundred MB, then browser-cached) and runs it on WebGPU where
-available, falling back to CPU/WASM otherwise.
+of the same frozen scenario data and rules (`docs/js/static_qa_data.js` is a
+paste of `data/suspect_qa.json`, so the static tab has the same variants,
+repeat lines and baked-in slips as the Python app). Note: the web demo's *AI*
+tab still mirrors the pre-nugget version of the scenario -- the in-browser 0.5B
+model is too small to follow per-turn drop instructions reliably, so the
+three-slips confrontation mechanic is a Python-app feature for now. The AI tab
+downloads the model on first use (a few hundred MB, then browser-cached) and
+runs it on WebGPU where available, falling back to CPU/WASM otherwise.
 
 Preview it locally before publishing:
 
@@ -219,7 +232,10 @@ only for that one), and ask these in order:
 7. Anything further settles into **Confessed**
 
 Then question the other detective with the same lines to feel the difference:
-the static suspect never slips and never confesses.
+the static suspect recites the same fixed lines every session (the three slip
+details are baked into its script, spoken once each on the first ask), but it
+never registers a confrontation and never confesses -- catching it in a
+contradiction changes nothing.
 
 ## The session logs (Phase 5 data)
 
@@ -248,5 +264,9 @@ python test_retrieval.py
 ```
 
 `test_retrieval.py`'s fast checks use a stub embedder (only `chromadb` needed, no
-model download); its final integration check uses the real model and is skipped
-automatically if `sentence-transformers` isn't installed.
+model download) and validate the real database offline (schema rules, and the
+three slip markers from `nuggets.py` present exactly once in their carrier
+entries); its final integration checks use the real model -- including a sweep
+that routes every entry's own example questions back to their entry to catch
+cross-topic collisions -- and are skipped automatically if
+`sentence-transformers` isn't installed.

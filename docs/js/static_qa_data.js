@@ -1,112 +1,188 @@
 // static_qa_data.js
 // =================
 // Hand-kept mirror of data/suspect_qa.json (the Python file is canonical). Each
-// entry pairs one canonical NPC response with several natural-language example
-// questions that should map to it. static_dialogue.js embeds these questions
-// once and matches the player's input to the nearest one by meaning.
+// entry pairs an ordered list of pre-written response variants (plus optional
+// repeat_responses spoken once the variants run out) with several
+// natural-language example questions that should map to it. static_dialogue.js
+// embeds these questions once and matches the player's input to the nearest one
+// by meaning, then walks the variants with the per-session visit counts.
 //
-// Keep this in sync with data/suspect_qa.json whenever the scenario data changes.
+// Keys are kept identical to the JSON (responses, repeat_responses, questions)
+// so this file body is literally the JSON pasted below the export line. Keep it
+// in sync with data/suspect_qa.json whenever the scenario data changes.
 
 export const SUSPECT_QA = [
   {
-    id: "identity",
-    response: "Eleanor Vance. Though I rather think you knew that before you sat down, Inspector.",
-    questions: [
+    "id": "identity",
+    "responses": [
+      "Eleanor Vance. Though I rather think you knew that before you sat down, Inspector.",
+      "Still Eleanor Vance, Inspector. That much of the evening has not changed.",
+      "Eleanor Margaret Vance, if the record wants it in full."
+    ],
+    "repeat_responses": [
+      "We have established my name twice now, Inspector. It has not changed in between.",
+      "If you keep asking my name I shall begin to worry about your notes."
+    ],
+    "questions": [
       "What is your name?",
       "Who are you?",
       "What should I call you?",
       "Could you state your name for the record?",
       "Remind me what you're called.",
-      "Introduce yourself.",
-    ],
+      "Introduce yourself."
+    ]
   },
   {
-    id: "occupation",
-    response: "I own a gallery in town. Paintings, mostly, and the occasional piece of sculpture when something fine comes along.",
-    questions: [
+    "id": "occupation",
+    "responses": [
+      "I own a gallery in town. Paintings, mostly, and the occasional piece of sculpture when something fine comes along.",
+      "Art, Inspector. I keep a gallery in town; I find pictures for people with more money than walls.",
+      "I deal in paintings. It is a respectable trade, whatever tonight suggests."
+    ],
+    "repeat_responses": [
+      "Still the gallery, Inspector. Trade has not picked a new profession for me since you last asked.",
+      "As before: paintings. I'd offer you a viewing if the circumstances were less grim."
+    ],
+    "questions": [
       "What do you do for a living?",
       "What is your occupation?",
       "Tell me about your work.",
       "What line of business are you in?",
       "How do you make your money?",
-      "What is the gallery you run?",
-    ],
+      "What is the gallery you run?"
+    ]
   },
   {
-    id: "greeting",
-    response: "Good evening, Inspector. Forgive me if I'm not at my brightest; it has been a dreadful day.",
-    questions: [
+    "id": "greeting",
+    "responses": [
+      "Good evening, Inspector. Forgive me if I'm not at my brightest; it has been a dreadful day.",
+      "Good evening. You'll forgive the state of the house; none of us slept.",
+      "Inspector. Do sit; the tea is cold but the chairs are honest."
+    ],
+    "repeat_responses": [
+      "We've said our good evenings, Inspector. Perhaps we might get to your questions.",
+      "Yes, yes, good evening again. Shall we go on?"
+    ],
+    "questions": [
       "Good evening.",
       "Hello there.",
       "How are you doing?",
       "How are you feeling tonight?",
       "It's nice to meet you.",
-      "Good evening, how do you do?",
-    ],
+      "Good evening, how do you do?"
+    ]
   },
   {
-    id: "alibi",
-    response: "I was in the drawing room with the other guests for most of the evening. You can ask any of them.",
-    questions: [
+    "id": "alibi",
+    "responses": [
+      "I was in the drawing room with the other guests, apart from five minutes around twenty to ten when I went down the back stairs to the cellar for more wine. You can ask any of them.",
+      "As I said: the drawing room, the whole evening, save five minutes fetching wine from the cellar at about twenty to ten. Hardly time to do anything dreadful.",
+      "You keep circling my whereabouts, Inspector. Drawing room, five minutes to the cellar for the Margaux, drawing room again. My guests will say the same."
+    ],
+    "repeat_responses": [
+      "We have been over my whereabouts twice now. My answer has not improved with age, and it will not.",
+      "Asked and answered, Inspector: the drawing room, and five minutes in the cellar. Shall I have it embroidered for you?"
+    ],
+    "questions": [
       "Where were you when Charles died?",
       "What is your alibi?",
       "Account for your whereabouts that night.",
       "Where were you at the time of the murder?",
       "Tell me where you were when it happened.",
-      "Can anyone vouch for where you were?",
-    ],
+      "Did you leave the drawing room at any point?"
+    ]
   },
   {
-    id: "lastseen",
-    response: "A little after ten, by the study door. He was telling some long story about Venice, as he always did.",
-    questions: [
+    "id": "lastseen",
+    "responses": [
+      "When he left the drawing room to take his telephone call, half past nine or so. Though the last I actually laid eyes on him, he was in the study doorway with the telephone to his ear, shooing me off with a little wave; a quarter to ten, I suppose. I never spoke to him again.",
+      "Half past nine, or near enough, when he left the drawing room for his telephone call. That was the last we spoke.",
+      "I've told you: he left the drawing room at half past nine to take a call. After that the evening simply went on without him."
+    ],
+    "repeat_responses": [
+      "You've had this answer, Inspector. Half past nine, the telephone call. Nothing about it changes with repetition.",
+      "Again? Half past nine, and off to his call. I can't give you a later hour I don't have."
+    ],
+    "questions": [
       "When did you last see Charles alive?",
       "When was the last time you saw him?",
       "What time did you last speak to the victim?",
       "When did you last lay eyes on Charles?",
-      "Where did you last see him?",
-    ],
+      "Where did you last see him?"
+    ]
   },
   {
-    id: "party",
-    response: "A small gathering. Old friends, a little wine, far too much talk of business. Charles was in good spirits when he arrived.",
-    questions: [
+    "id": "party",
+    "responses": [
+      "A small gathering. Old friends, a little wine, far too much talk of business. Charles was in good spirits when he arrived.",
+      "Dinner ended at a quarter past nine and we all moved through to the drawing room. An entirely ordinary evening, until it wasn't.",
+      "What is there to tell? Good food, decent wine, the usual gossip. If anything ugly was brewing, it kept itself well hidden."
+    ],
+    "repeat_responses": [
+      "The party was as I described it, Inspector: small, pleasant, unremarkable, right up until Daniel started shouting.",
+      "I've painted the evening for you once already. It does not gain colour on a second sitting."
+    ],
+    "questions": [
       "Tell me about the party.",
       "What happened that evening?",
       "Describe the dinner last night.",
       "What was the gathering like?",
       "Walk me through the night.",
-      "What sort of evening was it?",
-    ],
+      "What sort of evening was it?"
+    ]
   },
   {
-    id: "guests",
-    response: "The Harringtons, my business partner Vivian, Charles, and young Daniel who keeps my books. Seven of us, with the staff.",
-    questions: [
+    "id": "guests",
+    "responses": [
+      "The Harringtons, my business partner Vivian, Charles, and young Daniel who keeps my books. Seven of us, with the staff.",
+      "A short list: the Harringtons, Vivian, Daniel, Charles, and myself. The staff make it seven under the roof.",
+      "No strangers, if that's what you're hoping for. Old friends and business, every one of them known to me for years."
+    ],
+    "repeat_responses": [
+      "The guest list hasn't grown since you last asked, Inspector. The same names, the same faces.",
+      "As before: the Harringtons, Vivian, Daniel, and poor Charles. I can write it out if that helps."
+    ],
+    "questions": [
       "Who else was there?",
       "Who were the other guests?",
       "Who attended the dinner?",
       "Who was present that night?",
       "Was anyone else in the house?",
-      "List the people who were there.",
-    ],
+      "List the people who were there."
+    ]
   },
   {
-    id: "argument",
-    response: "Daniel and Charles had words over money near the end. Quiet, but I saw Daniel's face.",
-    questions: [
+    "id": "argument",
+    "responses": [
+      "Daniel and Charles had words over money near the end. Quiet, but I saw Daniel's face.",
+      "Only the one worth the name: Daniel and Charles, over money, near the end of dinner. I'd not make too much of it; he is a gentle boy.",
+      "There was a little heat between Charles and Daniel about money. Voices low, faces less so. Nothing you'd call a scene."
+    ],
+    "repeat_responses": [
+      "I've told you about Daniel and Charles already. It was a murmur, not a brawl, and I'll not embellish it into one.",
+      "Still just the one disagreement, Inspector, and I've described it twice now."
+    ],
+    "questions": [
       "Did anyone argue that night?",
       "Was there a quarrel?",
       "Did anyone have a row with Charles?",
       "Was anyone angry at the victim?",
       "Did you see any fights or disagreements?",
-      "Did Charles exchange words with anyone?",
-    ],
+      "Did Charles exchange words with anyone?"
+    ]
   },
   {
-    id: "relationship",
-    response: "Charles was an old friend. We went back twenty years, and did business together on and off for most of them.",
-    questions: [
+    "id": "relationship",
+    "responses": [
+      "Charles was an old friend. We went back twenty years, and did business together on and off for most of them.",
+      "Twenty years of friendship, and business woven through most of them. Friendship like that has its weather, Inspector.",
+      "We were close, in the way of people who have made and lost money together. I was fond of him, exasperated by him, and never once wished him ill."
+    ],
+    "repeat_responses": [
+      "As I said: twenty years, friends and partners. A history that long doesn't summarise any tidier the second time.",
+      "You have my answer on Charles and me, Inspector. It hasn't changed in the last quarter of an hour."
+    ],
+    "questions": [
       "How did you know Charles?",
       "What was your relationship with the victim?",
       "Were you and Charles close?",
@@ -114,49 +190,103 @@ export const SUSPECT_QA = [
       "Did you get along with Charles?",
       "How long had you known the dead man?",
       "Tell me about you and Charles.",
-      "Were you friends with him?",
-    ],
+      "Were you friends with him?"
+    ]
   },
   {
-    id: "motive",
-    response: "He owed me, in fact. A great deal, and he was slow about it. A debt is a reason to keep a man paying, not to harm him.",
-    questions: [
+    "id": "motive",
+    "responses": [
+      "He owed me, in fact. A great deal, and he was slow about it. A debt is a reason to keep a man paying, not to harm him.",
+      "A debt is a reason to keep a man alive and paying, Inspector, not to put a blade in him. Do think it through.",
+      "He owed me a great deal and was slow about it, yes. I'd have been paid eventually; I am not a fool about these things."
+    ],
+    "repeat_responses": [
+      "We've done the arithmetic already, Inspector: dead men repay nothing. Some motive.",
+      "You keep returning to the money. My answer keeps being that his death costs me; it does not pay me."
+    ],
+    "questions": [
       "Did you have a motive?",
       "Did Charles owe you money?",
       "Did you stand to gain from his death?",
-      "Was there any insurance or inheritance?",
       "Did he owe you a debt?",
       "What did you have to gain by killing him?",
-    ],
+      "Why would anyone say you had reason to hurt him?"
+    ]
   },
   {
-    id: "weapon",
-    response: "The letter opener from the study, I'm told. It sat on the desk in plain view of anyone who passed.",
-    questions: [
+    "id": "weapon",
+    "responses": [
+      "The letter opener from the study, I'm told. It sat on the desk in plain view, and now when I close my eyes I keep seeing it, that thing in his neck, him slumped over his own desk. Forgive me. You were asking about the opener.",
+      "The letter opener, Inspector, as your people no doubt told you before I did. It lived on the study desk in plain view of anyone who passed.",
+      "A dreadful thing to imagine. It was decorative more than useful; I'd not touched it in weeks."
+    ],
+    "repeat_responses": [
+      "I can't tell you more about the opener than I have, Inspector. It sat on the desk; anyone could have taken it up.",
+      "We've been over the weapon. I'd rather not keep it in my mind's eye longer than I must."
+    ],
+    "questions": [
       "What was the murder weapon?",
       "How was he killed?",
+      "How was Charles killed?",
+      "How did Charles die?",
       "What was he stabbed with?",
       "Tell me about the letter opener.",
       "What did the killer use?",
-      "What weapon was used on Charles?",
-    ],
+      "What weapon was used on Charles?"
+    ]
   },
   {
-    id: "study_door",
-    response: "The study door was shut, which was odd; it's always left open. I noticed it and thought nothing of it.",
-    questions: [
+    "id": "study_door",
+    "responses": [
+      "The study door was shut, which was odd; it's always left open. I noticed it and thought nothing of it.",
+      "Only the study door, shut when it's always left open. I noticed it in passing and thought nothing of it. Perhaps I should have.",
+      "Nothing that struck me at the time. The house was as it always is, save the study door being closed, which I only remembered afterwards."
+    ],
+    "repeat_responses": [
+      "Just the door, Inspector, as I said. If there was anything else, it escaped me then and escapes me still.",
+      "I've given you the one odd thing I noticed. Repetition won't conjure a second."
+    ],
+    "questions": [
       "Did you notice anything unusual?",
       "Was anything out of place?",
       "Did anything seem wrong that night?",
       "Was there anything strange about the study?",
       "Did you see anything odd?",
-      "Was the study door normally closed?",
-    ],
+      "Was the study door normally closed?"
+    ]
   },
   {
-    id: "deny",
-    response: "That is an outrageous suggestion. I invited the man into my home.",
-    questions: [
+    "id": "wellbeing",
+    "responses": [
+      "Tired, Inspector, nothing worse. Though I did catch my thumb on the cellar door latch last night, and it bled terribly for such a small cut. Clumsy of me. It is not every day one's dinner party ends with a body in the study.",
+      "As well as can be expected. I shan't pretend I slept.",
+      "Bearing up. One does, in front of the staff, whatever one does in private."
+    ],
+    "repeat_responses": [
+      "Still standing, Inspector, which is as much as I'll claim twice in one evening.",
+      "You've asked after me already. I'm tired, and I'd sooner you caught whoever did this than fussed over my health."
+    ],
+    "questions": [
+      "How are you holding up?",
+      "Are you hurt?",
+      "Were you injured last night?",
+      "You look exhausted.",
+      "Is everything alright with you?",
+      "Did anything happen to you that night?"
+    ]
+  },
+  {
+    "id": "deny",
+    "responses": [
+      "That is an outrageous suggestion. I invited the man into my home.",
+      "No, Inspector. I did not harm Charles. Twenty years of friendship, and you'd have me end it over a dinner I cooked for him.",
+      "How dare you. I have opened my home, lost a friend, and am rewarded with accusations. Tread carefully, Inspector."
+    ],
+    "repeat_responses": [
+      "I have denied it as many ways as I know how. If you have evidence, produce it; if not, I want my solicitor, and I want this conversation noted.",
+      "We are going in circles, Inspector. No, and each time you ask, the word will be the same."
+    ],
+    "questions": [
       "Did you kill Charles?",
       "Did you do it?",
       "Was it you?",
@@ -165,7 +295,247 @@ export const SUSPECT_QA = [
       "You murdered him, didn't you?",
       "I accuse you of the crime.",
       "You're lying to me.",
-      "Confess to what you did.",
-    ],
+      "Confess to what you did."
+    ]
   },
+  {
+    "id": "wine_cellar",
+    "responses": [
+      "Down the back stairs, two bottles of the Margaux, back up. Five minutes, perhaps seven; the cellar is cold, one doesn't linger. I caught my thumb on the door latch coming out, clumsy of me.",
+      "West through the kitchen and down the back stairs, as I said. Two bottles of Margaux and straight back to my guests.",
+      "There is nothing to the cellar trip, Inspector. Wine down there, wine brought up. If that is our best mystery, the case is thin."
+    ],
+    "repeat_responses": [
+      "The cellar again? Five minutes among dusty bottles. I've nothing to add to that, however often you ask.",
+      "As before: down, two bottles, up. The Margaux was the most dramatic thing about it."
+    ],
+    "questions": [
+      "Tell me about the trip to the cellar.",
+      "What did you do in the wine cellar?",
+      "Walk me through fetching the wine.",
+      "How long were you in the cellar?",
+      "Which way did you go to the cellar?",
+      "What wine did you fetch that night?"
+    ]
+  },
+  {
+    "id": "east_corridor",
+    "responses": [
+      "I never went down the east corridor that night, Inspector. The cellar is at the west end, through the kitchen; the study end of the house had no business for me.",
+      "No. The east corridor leads to the study, and I had no reason to be anywhere near it.",
+      "I have said I wasn't there. West to the kitchen, down to the cellar, back. The east side of the house saw nothing of me."
+    ],
+    "repeat_responses": [
+      "However many times you ask, I was not in the east corridor. You cannot wear a fact thin, Inspector.",
+      "Still no. If someone claims to have seen me there, I should very much like to hear them say it to my face."
+    ],
+    "questions": [
+      "Did you go near the study that night?",
+      "Were you in the east corridor?",
+      "Did you go down the east corridor at any point?",
+      "Were you anywhere near the study around the time he died?",
+      "Did you pass by the study?",
+      "How close did you get to the study that evening?"
+    ]
+  },
+  {
+    "id": "discovery",
+    "responses": [
+      "It was Daniel who found him, at a quarter past ten; he'd been sent to fetch Charles for dessert. We heard him cry out. The guests were kept out of the study, so I never saw the body.",
+      "Daniel found him and cried out, and after that the evening was police and waiting. None of us were allowed into the study.",
+      "I know only what the shout told us: Charles was dead in the study. I did not go in, and I did not look."
+    ],
+    "repeat_responses": [
+      "As I've said: Daniel found him, and I saw nothing. I'm rather glad of that, if you want the truth.",
+      "You have this already, Inspector. A quarter past ten, Daniel's cry, and the door kept shut to the rest of us."
+    ],
+    "questions": [
+      "Who found the body?",
+      "Did you see the body?",
+      "How did you learn Charles was dead?",
+      "When was the body discovered?",
+      "Did you go into the study after he was found?",
+      "What happened when the body was discovered?"
+    ]
+  },
+  {
+    "id": "witness_vivian",
+    "responses": [
+      "Vivian, certainly. She and I were thick as thieves on the settee most of the night. Though she did step out for some air around then, now I think of it.",
+      "Ask Vivian; she barely left my side. Or the Harringtons; the drawing room is not a large place to disappear from.",
+      "Any of them will vouch for me. Whether they were watching the door or the wine at any given minute, I couldn't say."
+    ],
+    "repeat_responses": [
+      "I've given you my witnesses, Inspector. Interview them rather than re-interviewing me about them.",
+      "The same names as before. They were there; ask them."
+    ],
+    "questions": [
+      "Can anyone confirm you were in the drawing room?",
+      "Can anyone vouch for where you were?",
+      "Who can vouch for you?",
+      "Did anyone see you during the evening?",
+      "Tell me about Vivian.",
+      "Was Vivian with you the whole night?"
+    ]
+  },
+  {
+    "id": "business",
+    "responses": [
+      "Three galleries over the years, Charles and I. The last one did poorly, and money has a way of souring even old affection.",
+      "We were partners more than once. Some ventures did well; the last did not. That is business, not a grievance.",
+      "It's no secret the last gallery ended badly, Inspector. Ledgers make poor love letters."
+    ],
+    "repeat_responses": [
+      "The business is as I described it: three galleries, one bad ending, no mystery.",
+      "We've been through the partnership already. The accounts are duller than you hope."
+    ],
+    "questions": [
+      "You did business together?",
+      "Tell me about your business with Charles.",
+      "What ventures did you share with the victim?",
+      "How did the gallery partnership go?",
+      "Did your business with Charles end badly?",
+      "What was your professional relationship?"
+    ]
+  },
+  {
+    "id": "insurance",
+    "responses": [
+      "On the gallery partnership, yes, a modest one. Standard between partners. I'd hardly call it a fortune.",
+      "There is a partnership policy, as there is in half the businesses in town. Modest, and slow to pay, no doubt.",
+      "If you're imagining I'd trade Charles for an insurance cheque, Inspector, you have both the sum and me quite wrong."
+    ],
+    "repeat_responses": [
+      "Still the same modest policy, Inspector. It hasn't grown since you last asked after it.",
+      "Asked and answered: a standard partners' policy. Speak to the underwriters if you doubt me."
+    ],
+    "questions": [
+      "Was there any insurance or inheritance?",
+      "Was there a payout tied to his death?",
+      "Did you have a policy on Charles?",
+      "Tell me about the insurance.",
+      "Was there life insurance involved?",
+      "Did the partnership carry insurance?"
+    ]
+  },
+  {
+    "id": "victim_character",
+    "responses": [
+      "Charles? Charming, stubborn, generous when it suited him and impossible when it didn't. He thought me reckless with the accounts; I thought him a coward with them. We were both a little right.",
+      "A good man, on balance, though he'd sit on a debt like a hen on an egg. One forgave him things one shouldn't have.",
+      "He was in good spirits that night, which is how I choose to remember him. The rest, the stubbornness, the delays, hardly matters now."
+    ],
+    "repeat_responses": [
+      "I've given you my portrait of Charles, Inspector. It doesn't flatter either of us to keep repainting it.",
+      "The same man as before: charming, maddening, and now gone. What more would you have me say?"
+    ],
+    "questions": [
+      "What was Charles like?",
+      "Tell me about the victim.",
+      "Describe Charles Whitmore.",
+      "What sort of man was he?",
+      "Did people like Charles?",
+      "How would you describe his character?"
+    ]
+  },
+  {
+    "id": "who_suspect",
+    "responses": [
+      "If I had to point a finger, and I hate to do it, I would look at Daniel and that quarrel over money. But I may be wronging the boy.",
+      "It's not for me to do your work, Inspector. But you might ask where everyone was between half past nine and ten; the drawing room was not as full as it might have been.",
+      "I honestly don't know. That is the most dreadful part: it was a room full of friends."
+    ],
+    "repeat_responses": [
+      "My guess hasn't improved since you last asked for it, Inspector. Daniel's quarrel is all I can offer, and I offer it reluctantly.",
+      "I've speculated once and disliked the taste of it. I'd rather leave the accusing to you."
+    ],
+    "questions": [
+      "Who do you think did it?",
+      "Who do you suspect?",
+      "Who could have killed Charles?",
+      "Who would want him dead?",
+      "Do you have any theories about the killer?",
+      "If not you, then who?"
+    ]
+  },
+  {
+    "id": "daniel",
+    "responses": [
+      "Young Daniel Reeve; he keeps my books, and Charles was fond of him in his way. It was Daniel they sent to fetch Charles for dessert, poor boy. I shan't forget his cry.",
+      "A gentle boy, whatever that quarrel over money looked like. Wound tight that night, yes, but bookkeepers usually are.",
+      "Daniel has been with me three years and I trust him with every ledger I own. Make of the argument what you will; I make little of it."
+    ],
+    "repeat_responses": [
+      "I've told you what I know of Daniel. He is my bookkeeper, not my confession, Inspector.",
+      "The same answer as before: a good boy, a bad night, an unfortunate quarrel."
+    ],
+    "questions": [
+      "Tell me about Daniel.",
+      "Who is Daniel Reeve?",
+      "What can you tell me about your bookkeeper?",
+      "What was Daniel's relationship with Charles?",
+      "Do you trust Daniel?",
+      "Why was Daniel arguing with Charles?"
+    ]
+  },
+  {
+    "id": "fingerprints",
+    "responses": [
+      "Mine, I suppose, from dusting the desk. And half the county's, for all I know; it's hardly under lock and key.",
+      "Whoever passed through the study might have handled it. It lived on the desk; it was decorative more than useful.",
+      "If my prints are on it, Inspector, it is because I own the house and dust the desk. I'd not touched the thing in weeks."
+    ],
+    "repeat_responses": [
+      "We've done the fingerprints. Mine from housekeeping, and anyone else's you may find; the study was never locked.",
+      "The same answer, Inspector: test the thing and see. I've nothing to fear from powder."
+    ],
+    "questions": [
+      "Whose fingerprints would we find on the weapon?",
+      "Who could have handled the letter opener?",
+      "Would your prints be on it?",
+      "Who had access to the letter opener?",
+      "Did you ever touch the letter opener?",
+      "Whose prints are on the murder weapon?"
+    ]
+  },
+  {
+    "id": "phone_call",
+    "responses": [
+      "The telephone call? I haven't the faintest idea who rang him. Business, I assumed; with Charles it was usually business.",
+      "He didn't say, and I didn't ask. One doesn't interrogate a guest over a telephone call, though I grant the evening has rather changed the rules.",
+      "Whoever it was kept him from dessert, Inspector. Your exchange records will know better than I."
+    ],
+    "repeat_responses": [
+      "Still no idea, Inspector. The call was his business, and it stayed his business.",
+      "I can't invent a caller for you, however useful one would be."
+    ],
+    "questions": [
+      "Who called Charles that night?",
+      "What was the telephone call about?",
+      "Do you know who rang him?",
+      "Tell me about the phone call.",
+      "Why did Charles leave to take a call?",
+      "Who was on the telephone?"
+    ]
+  },
+  {
+    "id": "blood_doorknob",
+    "responses": [
+      "I read nothing into a smear on a doorknob, Inspector. Half the household touches that door in a day; I can't account for what your forensics people scraped off it.",
+      "If it isn't Charles's blood, then it belongs to whoever you should be hunting. I'd start there rather than here.",
+      "You'd have to ask your laboratory, not me. Doors are handled; people are careless; the world is full of small cuts."
+    ],
+    "repeat_responses": [
+      "The doorknob again. My answer is unchanged: I cannot explain other people's blood on my doors.",
+      "We've circled this smear twice now, Inspector. If you think it mine, say so plainly and test it."
+    ],
+    "questions": [
+      "Can you explain the blood on the study doorknob?",
+      "Whose blood is on the door?",
+      "There was blood on the inside doorknob. Any thoughts?",
+      "How did blood get on the study door?",
+      "The blood on the knob wasn't Charles's. Explain that.",
+      "What do you make of the blood evidence?"
+    ]
+  }
 ];
