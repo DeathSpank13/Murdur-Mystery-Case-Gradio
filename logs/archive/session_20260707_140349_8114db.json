@@ -1,0 +1,219 @@
+{
+  "session_id": "20260707_140349_8114db",
+  "started_at": "2026-07-07T14:03:49",
+  "turns": [
+    {
+      "index": 1,
+      "condition": "static",
+      "label_shown": "Detective B",
+      "player_input": "hey, what's your name?",
+      "npc_reply": "Eleanor Vance. Though I rather think you knew that before you sat down, Inspector.",
+      "fsm_state": "n/a (static script)",
+      "signal": null,
+      "nuggets_dropped": null,
+      "nuggets_confronted": null,
+      "nugget_event": null,
+      "latency_ms": 1922.8,
+      "real_latency_ms": 74.6,
+      "simulated_latency_ms": 1848.2
+    },
+    {
+      "index": 2,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "hey, nice talking to you, can you introduce yourself",
+      "npc_reply": "I'm Eleanor Vance, 41 years old, owner of a local art gallery here in town. I hosted the dinner party last night where poor Charles Whitmore was found dead after dessert. You're an investigator? How may I help understand what happened?\n\nMy account is clear and straightforward - we finished dining at about quarter past nine...",
+      "fsm_state": "Calm",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 9112.3,
+      "real_latency_ms": 9112.3,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 3,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "where were you between 9pm and 10pm",
+      "npc_reply": "I was hosting the dinner party, which ended at approximately a quarter to ten. After that, everyone moved into the drawing room where drinks were served.\n\nAt around half-past nine, Charles left for his phone call - I remember because he stepped out just as we'd all gathered in there. The last time I saw him alive was when he stood in the study doorway with the telephone to his ear, shooing me off with a little wave at about quarter to ten.\n\nI went down once during this period, for five minutes or so, to fetch wine from the cellar as mentioned earlier...",
+      "fsm_state": "Defensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": true,
+        "topic": "corridor",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [
+        "corridor"
+      ],
+      "nuggets_confronted": [],
+      "nugget_event": "drop:corridor",
+      "latency_ms": 12991.0,
+      "real_latency_ms": 12991.0,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 4,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "but you just told me the dinner ended a quarter past 9, and you just say you were dining until a quarter to ten now?",
+      "npc_reply": "My apologies - I must have gotten confused. The main course was cleared at about twenty-five minutes after nine.\n\nAfter that we had coffee in the drawing room for perhaps another five or six minutes before Charles went off on his phone call and everyone else moved into drinks... There were some delays, as you might expect with a dinner party of this size. I'm sorry if my recollection wasn't perfectly precise - it's been quite an ordeal, after all.",
+      "fsm_state": "Guilty",
+      "signal": {
+        "evidence": "strong",
+        "accusation": "implied",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": true,
+        "topic": "none",
+        "nugget": "corridor"
+      },
+      "nuggets_dropped": [
+        "corridor"
+      ],
+      "nuggets_confronted": [
+        "corridor"
+      ],
+      "nugget_event": "confront:corridor",
+      "latency_ms": 12610.8,
+      "real_latency_ms": 12610.8,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 5,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "do you have any injuries or scars?",
+      "npc_reply": "I caught the edge of that old cellar door latch last night as I went for wine; it cut me rather badly on the thumb and bled terribly given how small a wound it was.\n\nIt's still quite tender today, though nothing to be concerned about. Thankfully we always keep some bandages in stock at home...",
+      "fsm_state": "Guilty",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": true,
+        "topic": "cut",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [
+        "corridor",
+        "cut"
+      ],
+      "nuggets_confronted": [
+        "corridor"
+      ],
+      "nugget_event": "drop:cut",
+      "latency_ms": 8675.9,
+      "real_latency_ms": 8675.9,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 6,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "it is quite interesting since the killer had a deep wound in their hand as well",
+      "npc_reply": "Oh my word - I didn't know that! How terrible.\n\nI suppose it must have been from the letter opener, though surely anyone could pick up such an object and accidentally cut themselves. Still, how dreadful for them to be so careless with a murder weapon... It's rather concerning, isn't it?",
+      "fsm_state": "Remorseful",
+      "signal": {
+        "evidence": "strong",
+        "accusation": "implied",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": false,
+        "topic": "cut",
+        "nugget": "cut"
+      },
+      "nuggets_dropped": [
+        "corridor",
+        "cut"
+      ],
+      "nuggets_confronted": [
+        "corridor",
+        "cut"
+      ],
+      "nugget_event": "confront:cut",
+      "latency_ms": 8892.8,
+      "real_latency_ms": 8892.8,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 7,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "I never mentioned it was caused by an letter opener, how did you come up to the conclusion?",
+      "npc_reply": "I'm sorry - I must have heard that detail from one of the other guests earlier today. Perhaps my mind is playing tricks on me in this state.\n\nYou're right though, I should pay more attention to what's being discussed rather than jumping to conclusions... It seems like so much has happened these past days and nights; my thoughts are all a jumble at times.",
+      "fsm_state": "Confessed",
+      "signal": {
+        "evidence": "strong",
+        "accusation": "implied",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": true,
+        "topic": "none",
+        "nugget": "wound"
+      },
+      "nuggets_dropped": [
+        "corridor",
+        "cut"
+      ],
+      "nuggets_confronted": [
+        "corridor",
+        "cut"
+      ],
+      "nugget_event": null,
+      "latency_ms": 10019.4,
+      "real_latency_ms": 10019.4,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 8,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "I think you killed him based on the these evidence",
+      "npc_reply": "You're right - it was me who killed Charles Whitmore in his study last night.\n\nI followed him after he went to make that call, we had an argument about money and my gallery, then I grabbed the letter opener from the desk without thinking. The next thing I knew, there was blood on its blade... It's all still so hazy, like a fever dream now receding into memory.\n\nYou'll find it in his study drawer if you haven't already - hidden under some papers where he used to keep things locked away that made him feel powerful over others.",
+      "fsm_state": "Confessed",
+      "signal": {
+        "evidence": "strong",
+        "accusation": "direct",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [
+        "corridor",
+        "cut"
+      ],
+      "nuggets_confronted": [
+        "corridor",
+        "cut"
+      ],
+      "nugget_event": null,
+      "latency_ms": 13449.5,
+      "real_latency_ms": 13449.5,
+      "simulated_latency_ms": 0.0
+    }
+  ],
+  "verdicts": []
+}

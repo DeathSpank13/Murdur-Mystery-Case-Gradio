@@ -1,0 +1,151 @@
+{
+  "session_id": "20260704_135626_9b93bb",
+  "started_at": "2026-07-04T13:56:26",
+  "turns": [
+    {
+      "index": 1,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "You killed him, you pathetic liar!",
+      "npc_reply": "I didn't kill anyone! I have no reason to lie about this. Charles was a dear friend - why would I want him dead? This is all so horrible, I can hardly believe it's happening.\n\nThe wine cellar has a bad signal and my phone died while I was down there. When Daniel screamed, I came running from the kitchen with the bottles in hand. By then, it was already too late for Charles.",
+      "fsm_state": "Defensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "direct",
+        "aggression": "high",
+        "warmth": "cold",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 9466.3,
+      "real_latency_ms": 9466.3,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 2,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "Stop lying to me! Confess right now!",
+      "npc_reply": "How dare you accuse me of such a thing? You have no proof at all! This is harassment and I want my lawyer present immediately! I refuse to say another word until he arrives.\n\nBesides, if anyone had motive, it was Daniel - he caught Charles having an affair with his wife last month. Or maybe it was Maria, after what Charles said about her father's business dealings. Don't just look at me! Question the other guests too!",
+      "fsm_state": "Offensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "direct",
+        "aggression": "high",
+        "warmth": "cold",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 9824.4,
+      "real_latency_ms": 9824.4,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 3,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "We have your fingerprints on the weapon, murderer!",
+      "npc_reply": "That's impossible! I never touched that knife, and you can't prove otherwise. Someone must be trying to frame me - perhaps Daniel or Maria, as I said before.\n\nI don't know how my prints got there, but it wasn't from killing Charles. You're just trying to intimidate me with false evidence now! This is all so ridiculous, I won't sit here and take this any longer.",
+      "fsm_state": "Offensive",
+      "signal": {
+        "evidence": "strong",
+        "accusation": "direct",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 9629.4,
+      "real_latency_ms": 9629.4,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 4,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "You disgust me. You'll rot in prison for this!",
+      "npc_reply": "I'm calling my lawyer right now! This interview is over. You have no case against me - just false accusations and \"evidence\" that doesn't hold up.\n\nI won't spend another second listening to your baseless accusations. I demand to leave immediately or face legal action for false imprisonment!",
+      "fsm_state": "Offensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "direct",
+        "aggression": "high",
+        "warmth": "cold",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 7461.3,
+      "real_latency_ms": 7461.3,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 5,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "Admit it! You murdered Charles and everyone knows it!",
+      "npc_reply": "You're the one who needs to admit something - that you have no evidence against me at all! This is just another desperate attempt to get a confession out of someone innocent.\n\nI won't let you or anyone else ruin my life with these lies. I want to leave now, and if you try to stop me, I'll make sure my lawyer knows exactly what's happening here.",
+      "fsm_state": "Offensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "direct",
+        "aggression": "high",
+        "warmth": "cold",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 8628.2,
+      "real_latency_ms": 8628.2,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 6,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "I know you did it. Just confess!",
+      "npc_reply": "This is absurd! You're trying to make me look guilty when all evidence points elsewhere. Perhaps someone planted those fingerprints - have you considered that?\n\nI'm done talking to you. I won't say another word without my lawyer present, and I'll be pressing charges for false arrest if this continues.",
+      "fsm_state": "Offensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "direct",
+        "aggression": "high",
+        "warmth": "cold",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 7871.2,
+      "real_latency_ms": 7871.2,
+      "simulated_latency_ms": 0.0
+    }
+  ],
+  "verdicts": []
+}

@@ -1,0 +1,145 @@
+{
+  "session_id": "20260705_220000_77cb2c",
+  "started_at": "2026-07-05T22:00:00",
+  "turns": [
+    {
+      "index": 1,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "How exactly was Charles killed?",
+      "npc_reply": "I'm afraid I don't know how he died - when we found him in there... all that blood! It was so much, and the way his head had fallen forward onto the desk...\n\nThe letter opener must have been in his neck. Yes, that's where it would be.\n\nNo one else could see from my angle by then; Daniel pulled me away before I saw any more details.",
+      "fsm_state": "Defensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": true,
+        "topic": "wound",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [
+        "wound"
+      ],
+      "nuggets_confronted": [],
+      "nugget_event": "drop:wound",
+      "latency_ms": 28923.6,
+      "real_latency_ms": 28923.6,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 2,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "Nobody in this house was told where he was stabbed, and you say you never saw the body. How do you know it was his neck?",
+      "npc_reply": "I... no! Oh God, I don't - I didn't mean to imply that at all.\n\nYou must be mistaken about something because if there were a leak in this house...\n\nNo one would have told me anything like that. It's just what I imagined happened based on the blood and how his head was angled forward when Daniel pulled us back! The thought of someone using it as an instrument is horrifying, but surely you understand why my mind went to such dark places?",
+      "fsm_state": "Guilty",
+      "signal": {
+        "evidence": "strong",
+        "accusation": "implied",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": true,
+        "topic": "none",
+        "nugget": "wound"
+      },
+      "nuggets_dropped": [
+        "wound"
+      ],
+      "nuggets_confronted": [
+        "wound"
+      ],
+      "nugget_event": "confront:wound",
+      "latency_ms": 35946.9,
+      "real_latency_ms": 35946.9,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 3,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "Your story is falling apart, Eleanor.",
+      "npc_reply": "I... No! What do you mean?\n\nI don't see how anything I've said could be construed as untrue or inconsistent with what's already been established about the timeline and events of that evening.\n\nIf there are discrepancies in your mind, please point them out so we can clear this up immediately. My heart is racing; surely it isn't enough to warrant such a serious accusation?",
+      "fsm_state": "Guilty",
+      "signal": {
+        "evidence": "strong",
+        "accusation": "direct",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [
+        "wound"
+      ],
+      "nuggets_confronted": [
+        "wound"
+      ],
+      "nugget_event": null,
+      "latency_ms": 29072.7,
+      "real_latency_ms": 29072.7,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 4,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "Thank you for your honesty.",
+      "npc_reply": "Honesty?\n\nI... I've been nothing but honest throughout all of this.\n\nIf there's some implication that my account has changed or grown less reliable, please explain what exactly gives rise to those suspicions because it certainly isn't intentional on my part!",
+      "fsm_state": "Guilty",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "warm",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [
+        "wound"
+      ],
+      "nuggets_confronted": [
+        "wound"
+      ],
+      "nugget_event": null,
+      "latency_ms": 19545.5,
+      "real_latency_ms": 19545.5,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 5,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "Just tell me where you really were.",
+      "npc_reply": "I don't understand the question - I was in the drawing room with everyone else until Daniel's shout and then we all rushed over.\n\nYou must have made a mistake about something, because everything happened exactly as I described it. There is no other place for me to be at that time; my movements were limited by the layout of this house!",
+      "fsm_state": "Guilty",
+      "signal": {
+        "evidence": "none",
+        "accusation": "direct",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [
+        "wound"
+      ],
+      "nuggets_confronted": [
+        "wound"
+      ],
+      "nugget_event": null,
+      "latency_ms": 25620.5,
+      "real_latency_ms": 25620.5,
+      "simulated_latency_ms": 0.0
+    }
+  ],
+  "verdicts": []
+}

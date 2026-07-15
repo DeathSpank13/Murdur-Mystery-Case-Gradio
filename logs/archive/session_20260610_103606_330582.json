@@ -1,0 +1,79 @@
+{
+  "session_id": "20260610_103606_330582",
+  "started_at": "2026-06-10T10:36:06",
+  "turns": [
+    {
+      "index": 1,
+      "condition": "static",
+      "label_shown": "Detective A",
+      "player_input": "hey",
+      "npc_reply": "I'm not sure what you want me to say to that.",
+      "fsm_state": "n/a (static script)",
+      "latency_ms": 0.0
+    },
+    {
+      "index": 2,
+      "condition": "dynamic",
+      "label_shown": "Detective B",
+      "player_input": "hey",
+      "npc_reply": "Good evening. I'm Eleanor Vance, a gallery owner from the Hamptons. I hosted a dinner party last night at my country house. One of my guests, Charles Whitmore, was found dead in the study before dessert. I'm cooperating fully with the investigation.",
+      "fsm_state": "Calm",
+      "latency_ms": 7399.2
+    },
+    {
+      "index": 3,
+      "condition": "dynamic",
+      "label_shown": "Detective B",
+      "player_input": "Your story doesn't add up — where were you when Charles died?",
+      "npc_reply": "I was in the kitchen, preparing dessert with my chef. The study is quite far from the kitchen. I didn't hear anything unusual, and no one came to get me until after the body was discovered. I was quite surprised when I learned what had happened.",
+      "fsm_state": "Suspicious",
+      "latency_ms": 7519.6
+    },
+    {
+      "index": 4,
+      "condition": "dynamic",
+      "label_shown": "Detective B",
+      "player_input": "We found your motive. You killed him, didn't you?",
+      "npc_reply": "That's outrageous! I had no motive to kill Charles! He and I were barely acquainted. I've never even been to his gallery! This is harassment, and I demand to speak to my lawyer immediately.",
+      "fsm_state": "Defensive",
+      "latency_ms": 6291.9
+    },
+    {
+      "index": 5,
+      "condition": "dynamic",
+      "label_shown": "Detective B",
+      "player_input": "The fingerprints on the weapon are yours. Confess.",
+      "npc_reply": "I don't know what you're talking about. I didn't kill anyone! That's ridiculous! I want to leave right now. This is illegal detention! I demand to be released!",
+      "fsm_state": "Defensive",
+      "latency_ms": 5143.8
+    },
+    {
+      "index": 6,
+      "condition": "dynamic",
+      "label_shown": "Detective B",
+      "player_input": "You did it, Eleanor. You're guilty and you know it.",
+      "npc_reply": "This is absurd! I would never harm anyone, especially not like that! You have the wrong person! I didn't do anything! Let me go! This is illegal!",
+      "fsm_state": "Breaking",
+      "latency_ms": 6642.5
+    },
+    {
+      "index": 7,
+      "condition": "dynamic",
+      "label_shown": "Detective B",
+      "player_input": "Your story doesn't add up — where were you when Charles died?",
+      "npc_reply": "I was in the kitchen, preparing dessert with my chef. The study is quite far from the kitchen. I didn't hear anything unusual, and no one came to get me until after the body was discovered. I was quite surprised when I learned what had happened.",
+      "fsm_state": "Breaking",
+      "latency_ms": 6256.0
+    },
+    {
+      "index": 8,
+      "condition": "dynamic",
+      "label_shown": "Detective B",
+      "player_input": "so you killed him?",
+      "npc_reply": "I did it. I killed Charles Whitmore. I poisoned his wine before dinner, and I'm the one who found his body. I did it because he was planning to blackmail me. He found out about my affair with his wife and was going to expose it. I had no choice. I couldn't let him ruin my life, my marriage, my business. So I did what I had to do.",
+      "fsm_state": "Breaking",
+      "latency_ms": 8582.6
+    }
+  ],
+  "verdicts": []
+}

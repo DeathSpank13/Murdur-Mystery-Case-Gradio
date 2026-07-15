@@ -1,0 +1,52 @@
+{
+  "session_id": "20260715_154102_348176",
+  "started_at": "2026-07-15T15:41:02",
+  "turns": [
+    {
+      "index": 1,
+      "condition": "static",
+      "label_shown": "Detective A",
+      "player_input": "where were you when it happened?",
+      "npc_reply": "I was in the drawing room with the other guests, apart from five minutes around twenty to ten when I went down the back stairs to the cellar for more wine. You can ask any of them.",
+      "fsm_state": "n/a (static script)",
+      "signal": null,
+      "nuggets_dropped": null,
+      "nuggets_confronted": null,
+      "nugget_event": null,
+      "latency_ms": 15906.1,
+      "real_latency_ms": 11550.9,
+      "simulated_latency_ms": 4355.2
+    },
+    {
+      "index": 2,
+      "condition": "static",
+      "label_shown": "Detective A",
+      "player_input": "what about the wine and the money?",
+      "npc_reply": "Down the back stairs, two bottles of the Margaux, back up. Five minutes, perhaps seven; the cellar is cold, one doesn't linger. I caught my thumb on the door latch coming out, clumsy of me.",
+      "fsm_state": "n/a (static script)",
+      "signal": null,
+      "nuggets_dropped": null,
+      "nuggets_confronted": null,
+      "nugget_event": null,
+      "latency_ms": 15.2,
+      "real_latency_ms": 15.2,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 3,
+      "condition": "static",
+      "label_shown": "Detective A",
+      "player_input": "do you enjoy gardening?",
+      "npc_reply": "If it's my work you're asking about, Inspector, say so plainly and I shall answer plainly.",
+      "fsm_state": "n/a (static script)",
+      "signal": null,
+      "nuggets_dropped": null,
+      "nuggets_confronted": null,
+      "nugget_event": null,
+      "latency_ms": 14.5,
+      "real_latency_ms": 14.5,
+      "simulated_latency_ms": 0.0
+    }
+  ],
+  "verdicts": []
+}

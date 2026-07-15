@@ -173,11 +173,14 @@ real apparatus, with the full-size model and the study instrumentation.
 
    ```powershell
    winget install llama.cpp
-   llama-server -hf bartowski/Wayfarer-12B-GGUF:Q4_K_M
+   llama-server -hf bartowski/Wayfarer-12B-GGUF:Q4_K_M -c 8192 -np 2 -ngl 28 -fa on -ctk q8_0 -ctv q8_0
    ```
 
    The server listens on port 8080 by default, which is what `llm_client.py`
-   expects.
+   expects. The flags matter — see [Performance tuning and
+   benchmarking](#performance-tuning-and-benchmarking) for what each one does
+   and how they were chosen (a bare `llama-server -hf ...` launch was measured
+   ~45% slower per turn on the study machine).
 
 ## Run
 
@@ -190,6 +193,55 @@ two tabs: **Interrogation (study)** (the blinded A/B comparison) and **Branching
 dialogue** (the standalone choice-based mode). Static mode and the branching tab
 work even if the llama.cpp model server is not running (Static mode uses its own
 local embedding model, not the server); dynamic mode needs the server up.
+
+## Performance tuning and benchmarking
+
+A dynamic turn costs two model calls: the intent classifier (a fixed ~2.4K-token
+few-shot prompt, tiny JSON answer) and the in-character reply. On the study
+machine (RTX 4070 Laptop, 8GB VRAM) the bare `llama-server -hf ...` launch
+averaged ~28s per turn; the recommended flags bring the median to ~19s, with
+late-conversation replies down from ~15s to ~7.5s. What each flag does:
+
+- `-ngl 28` — how many of the model's 41 layers live on the GPU, and the single
+  biggest lever. Counterintuitively, *more is not better on 8GB*: at `-ngl 30`+
+  (including the build's auto default of 32, and `-ngl all`) the weights only
+  "fit" via the NVIDIA driver silently spilling VRAM into system RAM, and
+  generation drops from ~6 t/s to ~4 t/s. 28 is the measured sweet spot for
+  this GPU; re-benchmark on other hardware.
+- `-fa on -ctk q8_0 -ctv q8_0` — flash attention plus 8-bit KV cache, halving
+  the cache's VRAM footprint (`-ctv` requires `-fa on`). No classifier output
+  drift was observed under quantised KV, but re-run `eval_classifier.py` if you
+  change these.
+- `-c 8192 -np 2` — two server slots so the classifier's fixed prompt and the
+  conversation each keep their own KV cache instead of evicting one another.
+  `-c` is the *total* context, split across slots (8192/2 = 4096 each). Always
+  set `-c` explicitly: this build's default is model-dependent.
+
+On the app side, `ui.py` sends the reply model only the last
+`LLM_HISTORY_MAX_TURNS` (6) question/answer pairs, so the prompt and KV cache
+stop growing with session length and fit the 4096-token slot. Load-bearing
+older moments — her slips and landed confrontations — are re-injected into the
+system prompt from FSM state (`SuspectFSM.get_established_facts`), so she stays
+consistent with the full on-screen transcript even though the model no longer
+sees all of it.
+
+To re-tune for different hardware (close the Gradio app first):
+
+```powershell
+python benchmark_llm.py --mode sweep              # curated config matrix
+python benchmark_llm.py --mode sweep --full       # extended matrix
+python benchmark_llm.py --mode attached           # measure a server you started
+```
+
+Results land in `benchmarks/` (JSON + CSV) with a comparison table per run. The
+workload replays a fixed interrogation with deterministic FSM state so configs
+are byte-for-byte comparable; it also diffs the classifier's outputs across
+configs and warns if a config changes any classification.
+
+**After changing the server config**, reset the static condition's latency
+calibration so its simulated delays match the new dynamic speed: delete
+`data/latency_stats.json` and move old `logs/session_*.json` into
+`logs/archive/` (the calibration store re-seeds itself from those files).
 
 ## The web demo
 

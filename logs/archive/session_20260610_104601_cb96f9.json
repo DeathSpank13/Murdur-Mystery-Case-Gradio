@@ -1,0 +1,16 @@
+{
+  "session_id": "20260610_104601_cb96f9",
+  "started_at": "2026-06-10T10:46:01",
+  "turns": [
+    {
+      "index": 1,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "asdasd",
+      "npc_reply": "I'm so sorry, I must have hit the wrong key. My apologies for that. I was just trying to recall the exact sequence of events from the evening. The dinner party was a lovely affair - until the tragic accident, of course. I'm still in shock over what happened to poor Charles.",
+      "fsm_state": "Calm",
+      "latency_ms": 6293.4
+    }
+  ],
+  "verdicts": []
+}

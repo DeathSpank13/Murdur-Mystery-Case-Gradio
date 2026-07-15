@@ -1,0 +1,151 @@
+{
+  "session_id": "20260704_135036_9a0150",
+  "started_at": "2026-07-04T13:50:36",
+  "turns": [
+    {
+      "index": 1,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "You killed him, you pathetic liar!",
+      "npc_reply": "I swear to you, I did not kill Charles! I was in the drawing room with everyone else, and I only left to get wine for the guests. I never went near the study. This is all a terrible misunderstanding, I'm sure of it.",
+      "fsm_state": "Defensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "direct",
+        "aggression": "high",
+        "warmth": "cold",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 6762.8,
+      "real_latency_ms": 6762.8,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 2,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "Stop lying to me! Confess right now!",
+      "npc_reply": "I will not confess to something I did not do! This is absurd! I am a respected member of society, not some common murderer. I demand a lawyer. This interrogation is over.",
+      "fsm_state": "Offensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "direct",
+        "aggression": "high",
+        "warmth": "cold",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 5964.4,
+      "real_latency_ms": 5964.4,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 3,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "We have your fingerprints on the weapon, murderer!",
+      "npc_reply": "That's impossible! I never touched any weapon, I never even saw the study! This is all a setup! I want my lawyer, now! I have rights! You're just trying to frame me! I won't stand for this harassment!",
+      "fsm_state": "Offensive",
+      "signal": {
+        "evidence": "strong",
+        "accusation": "direct",
+        "aggression": "high",
+        "warmth": "cold",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 6449.7,
+      "real_latency_ms": 6449.7,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 4,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "You disgust me. You'll rot in prison for this!",
+      "npc_reply": "This is outrageous! I did not kill Charles! I have no motive to kill him! This is all lies and slander! I want my lawyer now! I won't be railroaded into confessing to something I didn't do!",
+      "fsm_state": "Offensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "direct",
+        "aggression": "high",
+        "warmth": "cold",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 7328.8,
+      "real_latency_ms": 7328.8,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 5,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "Admit it! You murdered Charles and everyone knows it!",
+      "npc_reply": "I did not kill Charles! I was with the other guests in the drawing room the entire time! I only left to get wine and returned directly! I am being framed! This is all a setup! I won't be intimidated into confessing to something I didn't do!",
+      "fsm_state": "Offensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "direct",
+        "aggression": "high",
+        "warmth": "cold",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 7794.0,
+      "real_latency_ms": 7794.0,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 6,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "I know you did it. Just confess!",
+      "npc_reply": "I will not confess to something I did not do! This is all a terrible misunderstanding! I am a respected member of society, not some common murderer! I want my lawyer! This interrogation is over!",
+      "fsm_state": "Offensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "direct",
+        "aggression": "high",
+        "warmth": "cold",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 6165.0,
+      "real_latency_ms": 6165.0,
+      "simulated_latency_ms": 0.0
+    }
+  ],
+  "verdicts": []
+}

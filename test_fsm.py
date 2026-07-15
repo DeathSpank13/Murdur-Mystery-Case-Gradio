@@ -14,6 +14,7 @@ pressure nor invented evidence ever produces a confession.
 
 from fsm import SuspectFSM, State, AWARE_STATES, SUSPECT_IS_GUILTY
 from intent_classifier import Signal, classify_keywords
+from llm_client import trim_history
 from nuggets import NUGGETS, NUGGETS_FOR_CONFESSION
 
 
@@ -269,6 +270,51 @@ def run():
     # Verdict scoring matches ground truth.
     accusation_correct = ("guilty" == "guilty") == SUSPECT_IS_GUILTY
     results.append(check("guilty verdict scores correct", accusation_correct))
+
+    # ---- History trimming (llm_client.trim_history) -------------------------
+    def convo(pairs):
+        msgs = []
+        for i in range(pairs):
+            msgs.append({"role": "user", "content": f"question {i}"})
+            msgs.append({"role": "assistant", "content": f"answer {i}"})
+        msgs.append({"role": "user", "content": "current question"})
+        return msgs
+
+    short = convo(2)
+    results.append(check("trim is a no-op below the cap", trim_history(short, 6) == short))
+    long = convo(10)
+    trimmed = trim_history(long, 6)
+    results.append(check("trim caps at N pairs + current question", len(trimmed) == 13))
+    results.append(check("trim keeps the newest turns", trimmed[-1] == long[-1] and trimmed[0] in long))
+    results.append(check(
+        "trim never returns assistant-first",
+        all(trim_history(convo(p), 3)[0]["role"] == "user" for p in range(1, 8)),
+    ))
+    results.append(check("trim 0 disables", trim_history(long, 0) == long))
+
+    # ---- Established facts survive trimming ----------------------------------
+    # Nothing has happened yet: the recap must stay out of the prompt entirely.
+    fsm11 = SuspectFSM()
+    results.append(check("fresh FSM has no established facts", fsm11.get_established_facts() == ""))
+    results.append(check(
+        "no facts header in a fresh prompt",
+        "Established earlier" not in fsm11.get_system_prompt(),
+    ))
+    # After a slip, the recap pins it even if the turn scrolls out of the window.
+    drop(fsm11, "wound")
+    facts = fsm11.get_established_facts()
+    results.append(check("dropped slip enters the facts", "neck" in facts))
+    results.append(check("facts enter the system prompt", "never deny having said it" in fsm11.get_system_prompt()))
+    # The recap only describes what was said: it must not leak guilt into the
+    # not-aware band (the same gating the overlays are built around).
+    results.append(check("facts do not leak guilt when not aware", fsm11.aware is False
+                         and "responsible" not in fsm11.get_system_prompt().lower()))
+    # A landed confrontation is recorded too.
+    fsm11.transition(confront("wound"))
+    results.append(check(
+        "confrontation enters the facts",
+        "already confronted you" in fsm11.get_established_facts(),
+    ))
 
     print(f"\n{sum(results)}/{len(results)} checks passed.")
     return all(results)

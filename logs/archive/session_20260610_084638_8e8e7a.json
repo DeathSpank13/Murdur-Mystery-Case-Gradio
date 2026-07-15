@@ -1,0 +1,25 @@
+{
+  "session_id": "20260610_084638_8e8e7a",
+  "started_at": "2026-06-10T08:46:38",
+  "turns": [
+    {
+      "index": 1,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "ayo",
+      "npc_reply": "Good evening. I'm Detective Sarah Chen, and I'll be handling the investigation into Mr. Whitmore's death. I appreciate your cooperation, Mrs. Vance. Can you walk me through the events of last night's dinner party, starting from when you first arrived at the house?",
+      "fsm_state": "Calm",
+      "latency_ms": 7627.4
+    },
+    {
+      "index": 2,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "I am the detective and you're the suspect",
+      "npc_reply": "I understand, Detective Chen. I arrived at the house around 6 PM to prepare for the evening. I set up the dining room and arranged the table settings while I waited for my guests to arrive. The first to arrive was my husband, Thomas, followed by Charles Whitmore, and then the rest of the guests trickled in over the next hour. I made sure everyone was comfortable before we sat down for dinner.",
+      "fsm_state": "Suspicious",
+      "latency_ms": 9411.7
+    }
+  ],
+  "verdicts": []
+}

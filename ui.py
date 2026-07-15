@@ -175,14 +175,15 @@ def handle_turn(
         system_prompt = fsm.get_system_prompt()
         attempted_drop = fsm.pending_drop
         llm_history.append({"role": "user", "content": player_input})
-        reply, generation_ms = llm_client.get_response(system_prompt, llm_history)
+        context = llm_client.trim_history(llm_history, LLM_HISTORY_MAX_TURNS)
+        reply, generation_ms = llm_client.get_response(system_prompt, context)
         # One retry when a planned slip was not actually said: the drop
         # instruction is still in the prompt, and a fresh sample usually
         # complies. The retry is kept only if it contains the marker, so a
         # second miss never replaces an otherwise fine reply.
         retried_drop = False
         if attempted_drop and not _marker_in_reply(attempted_drop, reply):
-            retry_reply, retry_latency = llm_client.get_response(system_prompt, llm_history)
+            retry_reply, retry_latency = llm_client.get_response(system_prompt, context)
             generation_ms += retry_latency
             if _marker_in_reply(attempted_drop, retry_reply):
                 reply = retry_reply

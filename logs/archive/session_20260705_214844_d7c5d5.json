@@ -1,0 +1,200 @@
+{
+  "session_id": "20260705_214844_d7c5d5",
+  "started_at": "2026-07-05T21:48:44",
+  "turns": [
+    {
+      "index": 1,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "Good evening. Can you tell me about last night?",
+      "npc_reply": "It was an ordinary dinner party until Charles Whitmore's death - a tragedy that has shaken us all.\n\nWe began with cocktails at eight; then moved into the dining room for dinner, which ended around 9:15 PM. The guests retired to the drawing room after dessert where we enjoyed wine and conversation before I went down to fetch more vintage from our cellar about twenty minutes later...",
+      "fsm_state": "Calm",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 29619.0,
+      "real_latency_ms": 29619.0,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 2,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "How exactly was Charles killed?",
+      "npc_reply": "I'm sorry but I don't know - you'll have to ask the police. When Daniel cried out at a quarter past ten, we all rushed back toward the study where apparently some sort of attack had occurred.\n\nWhen I close my eyes I keep seeing it... that thing in his neck...\n\nOh! I mean - well, there was clearly violence involved but beyond that I can't say for sure what happened.",
+      "fsm_state": "Defensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": true,
+        "topic": "wound",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [
+        "wound"
+      ],
+      "nuggets_confronted": [],
+      "nugget_event": "drop:wound",
+      "latency_ms": 31132.7,
+      "real_latency_ms": 31132.7,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 3,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "When did you last see Charles that evening?",
+      "npc_reply": "The last time I saw him alive was at a quarter to ten when he stepped into the study doorway with his telephone in hand.\n\nHe shooed me off, saying it must be urgent business and couldn't wait. He seemed quite agitated by whatever news had reached him - perhaps that's why... well, no matter now...\n\nI only remember thinking how unlike Charles it was for him to take a call during dinner party hours!",
+      "fsm_state": "Defensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": true,
+        "topic": "corridor",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [
+        "corridor",
+        "wound"
+      ],
+      "nuggets_confronted": [],
+      "nugget_event": "drop:corridor",
+      "latency_ms": 32403.1,
+      "real_latency_ms": 32403.1,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 4,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "We found your fingerprints on the letter opener. You killed him.",
+      "npc_reply": "What? No! That can't be - I never touched that horrible thing after finding his body.\n\nI... Oh god, my prints were there?\n\nNo, no, you must have it wrong. There's an explanation for this - maybe someone else handled the letter opener and left their own traces on top of mine from earlier in the evening?",
+      "fsm_state": "Defensive",
+      "signal": {
+        "evidence": "strong",
+        "accusation": "direct",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [
+        "corridor",
+        "wound"
+      ],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 26882.1,
+      "real_latency_ms": 26882.1,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 5,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "Nobody in this house was told where he was stabbed, and you say you never saw the body. How do you know it was his neck?",
+      "npc_reply": "I... I don't! You're right - how could I possibly know that?\n\nI just assumed from what everyone else has been saying about a violent death, but surely if Daniel found him then he would have mentioned where exactly Charles had been wounded. It's all so terrible and confusing...\n\nMy head is spinning with it all; please excuse me for being unclear on such details!",
+      "fsm_state": "Guilty",
+      "signal": {
+        "evidence": "strong",
+        "accusation": "implied",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": true,
+        "topic": "none",
+        "nugget": "wound"
+      },
+      "nuggets_dropped": [
+        "corridor",
+        "wound"
+      ],
+      "nuggets_confronted": [
+        "wound"
+      ],
+      "nugget_event": "confront:wound",
+      "latency_ms": 30021.7,
+      "real_latency_ms": 30021.7,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 6,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "You told me you never went down the east corridor -- yet you saw him in the study doorway at a quarter to ten.",
+      "npc_reply": "I... I don't know what to say.\n\nThat's not possible, is it? Perhaps my memory has failed me - the trauma of everything that happened last night must be affecting how clearly I can recall events now...\n\nPlease forgive my confusion but surely someone else saw him as well and could corroborate this timeline for you!",
+      "fsm_state": "Remorseful",
+      "signal": {
+        "evidence": "strong",
+        "accusation": "implied",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": true,
+        "topic": "none",
+        "nugget": "corridor"
+      },
+      "nuggets_dropped": [
+        "corridor",
+        "wound"
+      ],
+      "nuggets_confronted": [
+        "corridor",
+        "wound"
+      ],
+      "nugget_event": "confront:corridor",
+      "latency_ms": 26487.8,
+      "real_latency_ms": 26487.8,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 7,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "It's over, Eleanor. Tell the truth, for Charles.",
+      "npc_reply": "Oh god... You're right.\n\nI'm so sorry - I don't know what came over me that night!\n\nWe were talking in the study about his debts to my gallery and he was threatening to force a sale if I didn't give him more time. Then it just happened, like someone else had control of my body...\n\nI grabbed the letter opener from the desk without even thinking...",
+      "fsm_state": "Confessed",
+      "signal": {
+        "evidence": "none",
+        "accusation": "direct",
+        "aggression": "low",
+        "warmth": "warm",
+        "conscience": true,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [
+        "corridor",
+        "wound"
+      ],
+      "nuggets_confronted": [
+        "corridor",
+        "wound"
+      ],
+      "nugget_event": null,
+      "latency_ms": 30633.4,
+      "real_latency_ms": 30633.4,
+      "simulated_latency_ms": 0.0
+    }
+  ],
+  "verdicts": []
+}

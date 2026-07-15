@@ -200,7 +200,8 @@ def run():
     if not llm_client.server_is_up():
         print(
             "llama-server is not reachable on port 8080. Start it first, e.g.\n"
-            "    llama-server -hf bartowski/Wayfarer-12B-GGUF:Q4_K_M\n"
+            "    llama-server -hf bartowski/Wayfarer-12B-GGUF:Q4_K_M "
+            "-c 8192 -np 2 -ngl 28 -fa on -ctk q8_0 -ctv q8_0\n"
             "Without it, classify() silently falls back to keyword matching and "
             "this eval would measure the wrong thing."
         )

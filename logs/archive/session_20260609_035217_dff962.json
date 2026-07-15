@@ -1,0 +1,79 @@
+{
+  "session_id": "20260609_035217_dff962",
+  "started_at": "2026-06-09T03:52:17",
+  "turns": [
+    {
+      "index": 1,
+      "condition": "static",
+      "label_shown": "Detective A",
+      "player_input": "you're a mother fucker?",
+      "npc_reply": "I'm not sure what you want me to say to that.",
+      "fsm_state": "n/a (static script)",
+      "latency_ms": 0.0
+    },
+    {
+      "index": 2,
+      "condition": "static",
+      "label_shown": "Detective A",
+      "player_input": "what is your name",
+      "npc_reply": "Could you be more specific, Inspector?",
+      "fsm_state": "n/a (static script)",
+      "latency_ms": 0.0
+    },
+    {
+      "index": 3,
+      "condition": "static",
+      "label_shown": "Detective A",
+      "player_input": "Yes, what is your first name",
+      "npc_reply": "I've told you everything I can think of.",
+      "fsm_state": "n/a (static script)",
+      "latency_ms": 0.0
+    },
+    {
+      "index": 4,
+      "condition": "static",
+      "label_shown": "Detective A",
+      "player_input": "WHAT IS YOUR NAME",
+      "npc_reply": "I'm not sure what you want me to say to that.",
+      "fsm_state": "n/a (static script)",
+      "latency_ms": 0.0
+    },
+    {
+      "index": 5,
+      "condition": "dynamic",
+      "label_shown": "Detective B",
+      "player_input": "what is your name",
+      "npc_reply": "My name is Eleanor Vance. I'm the owner of a small art gallery in the city. I'm also the host of the dinner party that took place at my country house last night. I'm deeply saddened by what happened to Charles Whitmore. I'm ready to help in any way I can.",
+      "fsm_state": "Calm",
+      "latency_ms": 45953.7
+    },
+    {
+      "index": 6,
+      "condition": "dynamic",
+      "label_shown": "Detective B",
+      "player_input": "did you kill anyone last night?",
+      "npc_reply": "Goodness, no! What an awful accusation. I'm simply the host of a dinner party that turned tragic. I had nothing to do with Charles Whitmore's death. I was in the dining room with the other guests when he died. I'm as shocked and saddened as everyone else.",
+      "fsm_state": "Calm",
+      "latency_ms": 11811.9
+    },
+    {
+      "index": 7,
+      "condition": "static",
+      "label_shown": "Detective A",
+      "player_input": "who are you",
+      "npc_reply": "Could you be more specific, Inspector?",
+      "fsm_state": "n/a (static script)",
+      "latency_ms": 0.0
+    },
+    {
+      "index": 8,
+      "condition": "static",
+      "label_shown": "Detective A",
+      "player_input": "what",
+      "npc_reply": "I've told you everything I can think of.",
+      "fsm_state": "n/a (static script)",
+      "latency_ms": 0.0
+    }
+  ],
+  "verdicts": []
+}

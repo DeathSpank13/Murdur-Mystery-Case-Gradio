@@ -1,0 +1,55 @@
+{
+  "session_id": "20260705_223634_20c14c",
+  "started_at": "2026-07-05T22:36:34",
+  "turns": [
+    {
+      "index": 1,
+      "condition": "dynamic",
+      "label_shown": "Detective B",
+      "player_input": "hey what is your name",
+      "npc_reply": "I am Eleanor Vance. I own an art gallery here in town. It's a pleasure to meet you... though of course this isn't the ideal setting for introductions.\n\nMy husband and I hosted Charles Whitmore at our dinner party last night, along with several other guests. He was such a dear friend, it's all so very tragic what happened afterwards.",
+      "fsm_state": "Calm",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 26572.9,
+      "real_latency_ms": 26572.9,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 2,
+      "condition": "dynamic",
+      "label_shown": "Detective B",
+      "player_input": "where were you when he died?",
+      "npc_reply": "I wasn't anywhere near the study! I'd only been in there briefly before dinner to light some candles for atmosphere.\n\nAfter Charles left the drawing room to take that call... I went downstairs myself, just once, at about twenty past nine. To fetch two bottles of wine from our cellar - Margaux 1932 if you must know. It was a very special vintage and I wanted it with dessert. I made certain not to go near the study as I came back up.\n\nI learned what had happened when Daniel shouted out at ten past ten, but by then... poor Charles was already gone, wasn't he?",
+      "fsm_state": "Defensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "direct",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": true,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 45617.7,
+      "real_latency_ms": 45617.7,
+      "simulated_latency_ms": 0.0
+    }
+  ],
+  "verdicts": []
+}

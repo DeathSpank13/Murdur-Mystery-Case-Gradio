@@ -1,0 +1,115 @@
+{
+  "session_id": "20260610_103026_532550",
+  "started_at": "2026-06-10T10:30:26",
+  "turns": [
+    {
+      "index": 1,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "our story doesn't add up — where were you when Charles died?",
+      "npc_reply": "I was in the kitchen, preparing the dessert. When I heard the commotion, I rushed to the study to see what had happened. It was quite a shock, I must say. Poor Charles, what a tragedy. I believe most of the other guests were still in the dining room, but I'm not entirely sure of the exact sequence. I do know I didn't have anything to do with it, if that's what you're implying.",
+      "fsm_state": "Suspicious",
+      "latency_ms": 9616.9
+    },
+    {
+      "index": 2,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "We found your motive. You killed him, didn't you?",
+      "npc_reply": "That's preposterous! How dare you accuse me of such a thing? I had no motive to harm Charles. He was a guest in my home, for heaven's sake! This is harassment, plain and simple. I want to speak to my lawyer immediately. How dare you insinuate I had anything to do with his death!",
+      "fsm_state": "Defensive",
+      "latency_ms": 8065.0
+    },
+    {
+      "index": 3,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "The fingerprints on the weapon are yours. Confess.",
+      "npc_reply": "I will not be bullied into a confession for a crime I didn't commit! Those fingerprints must be a mistake. I didn't kill Charles, and I refuse to say anything else without my lawyer present. This is completely ridiculous and I demand to be released at once!",
+      "fsm_state": "Defensive",
+      "latency_ms": 6178.9
+    },
+    {
+      "index": 4,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "You did it, Eleanor. You're guilty and you know it.",
+      "npc_reply": "I will not sit here and be insulted! I had nothing to do with Charles's death, and I refuse to continue this conversation until my lawyer is present. You have no evidence, no proof, and you're just trying to scare me into a false confession. This is outrageous and I want to leave immediately!",
+      "fsm_state": "Breaking",
+      "latency_ms": 8292.0
+    },
+    {
+      "index": 5,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "You did it, Eleanor. You're guilty and you know it.",
+      "npc_reply": "I didn't do anything! You can't keep me here, I have rights! This is illegal! I want a lawyer now! You have no evidence, no proof, and you're just trying to scare me into a false confession. This is outrageous and I want to leave immediately!",
+      "fsm_state": "Breaking",
+      "latency_ms": 6545.0
+    },
+    {
+      "index": 6,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "The fingerprints on the weapon are yours. Confess.",
+      "npc_reply": "I will not be bullied into a confession for a crime I didn't commit! Those fingerprints must be a mistake. I didn't kill Charles, and I refuse to say anything else without my lawyer present. This is completely ridiculous and I demand to be released at once!",
+      "fsm_state": "Breaking",
+      "latency_ms": 6250.4
+    },
+    {
+      "index": 7,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "The fingerprints on the weapon are yours. Confess.",
+      "npc_reply": "I will not be bullied into a confession for a crime I didn't commit! Those fingerprints must be a mistake. I didn't kill Charles, and I refuse to say anything else without my lawyer present. This is completely ridiculous and I demand to be released at once!",
+      "fsm_state": "Breaking",
+      "latency_ms": 6356.5
+    },
+    {
+      "index": 8,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "you killed him ",
+      "npc_reply": "I didn't kill him, and I refuse to say anything else without my lawyer present. This is completely ridiculous and I demand to be released at once!",
+      "fsm_state": "Breaking",
+      "latency_ms": 4670.6
+    },
+    {
+      "index": 9,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "we have your murdur weapon ",
+      "npc_reply": "I didn't kill him, and I refuse to say anything else without my lawyer present. This is completely ridiculous and I demand to be released at once!",
+      "fsm_state": "Breaking",
+      "latency_ms": 4687.8
+    },
+    {
+      "index": 10,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "do you have an alibi?",
+      "npc_reply": "I was in the kitchen, preparing the dessert. When I heard the commotion, I rushed to the study to see what had happened. It was quite a shock, I must say. Poor Charles, what a tragedy. I believe most of the other guests were still in the dining room, but I'm not entirely sure of the exact sequence. I do know I didn't have anything to do with it, if that's what you're implying.",
+      "fsm_state": "Breaking",
+      "latency_ms": 8537.2
+    },
+    {
+      "index": 11,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "it doesn't add up to your story",
+      "npc_reply": "I can only tell you what I know. I was in the kitchen, preparing the dessert. When I heard the commotion, I rushed to the study to see what had happened. It was quite a shock, I must say. Poor Charles, what a tragedy. I believe most of the other guests were still in the dining room, but I'm not entirely sure of the exact sequence. I do know I didn't have anything to do with it, if that's what you're implying.",
+      "fsm_state": "Breaking",
+      "latency_ms": 9321.5
+    },
+    {
+      "index": 12,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "I know about your motives",
+      "npc_reply": "I had no motive to harm Charles. He was a guest in my home, for heaven's sake! This is harassment, plain and simple. I want to speak to my lawyer immediately. How dare you insinuate I had anything to do with his death!",
+      "fsm_state": "Breaking",
+      "latency_ms": 6093.4
+    }
+  ],
+  "verdicts": []
+}

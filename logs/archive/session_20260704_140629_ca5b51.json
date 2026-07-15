@@ -1,0 +1,124 @@
+{
+  "session_id": "20260704_140629_ca5b51",
+  "started_at": "2026-07-04T14:06:29",
+  "turns": [
+    {
+      "index": 1,
+      "condition": "static",
+      "label_shown": "Detective A",
+      "player_input": "hello",
+      "npc_reply": "Good evening, Inspector. Forgive me if I'm not at my brightest; it has been a dreadful day.",
+      "fsm_state": "n/a (static script)",
+      "signal": null,
+      "nuggets_dropped": null,
+      "nuggets_confronted": null,
+      "nugget_event": null,
+      "latency_ms": 1801.4,
+      "real_latency_ms": 43.0,
+      "simulated_latency_ms": 1758.3
+    },
+    {
+      "index": 2,
+      "condition": "dynamic",
+      "label_shown": "Detective B",
+      "player_input": "Hello",
+      "npc_reply": "Good morning, Detective. I'm Eleanor Vance, owner of this house. How may I assist you with your investigation? My thoughts are still reeling from what transpired last night - it was such a tragedy! Please, let me know if there's anything I can do to help.",
+      "fsm_state": "Calm",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 7393.9,
+      "real_latency_ms": 7393.9,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 3,
+      "condition": "dynamic",
+      "label_shown": "Detective B",
+      "player_input": "so where were you last night between 9:30 and 10?",
+      "npc_reply": "I was in the drawing room with my other guests until Daniel discovered Charles at around ten past ten. Before that, I stepped out briefly to fetch more wine from the cellar - just for a few minutes before returning to the group. The last time I saw Charles was when he left the room at about quarter to ten to take an important phone call. He was standing in the doorway of the study with the telephone to his ear, shooing me off with a little wave. It seemed like such a trivial moment now - how could anyone have known what would happen next?",
+      "fsm_state": "Defensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": true,
+        "topic": "corridor",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [
+        "corridor"
+      ],
+      "nuggets_confronted": [],
+      "nugget_event": "drop:corridor",
+      "latency_ms": 12103.8,
+      "real_latency_ms": 12103.8,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 4,
+      "condition": "dynamic",
+      "label_shown": "Detective B",
+      "player_input": "what do you think about his wound? it looked like someone had some negative feeling about him",
+      "npc_reply": "I'm afraid I don't know anything about the nature of Charles' injury, Detective. The guests were kept out of the study after Daniel's discovery. From what little I gathered from other people's accounts and the noise - there was a lot of blood. And yes, it did seem someone had strong negative feelings toward him. But I couldn't begin to guess who or why. Charles could be difficult at times, but he had been behaving perfectly normally all evening until that phone call.",
+      "fsm_state": "Calm",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "warm",
+        "conscience": false,
+        "probing": false,
+        "topic": "wound",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [
+        "corridor"
+      ],
+      "nuggets_confronted": [],
+      "nugget_event": "drop_failed:wound",
+      "latency_ms": 11494.2,
+      "real_latency_ms": 11494.2,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 5,
+      "condition": "dynamic",
+      "label_shown": "Detective B",
+      "player_input": "the blood was on his neck, wasn't it?",
+      "npc_reply": "I'm sorry Detective, I don't recall any details about the nature of the wound. All I know is what I overheard in the hallway - Daniel had to physically restrain one of the other guests who wanted to go see Charles. There were lots of exclamations and gasps from those nearby, but no specifics. The whole thing was terribly upsetting.",
+      "fsm_state": "Defensive",
+      "signal": {
+        "evidence": "strong",
+        "accusation": "implied",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": true,
+        "topic": "wound",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [
+        "corridor"
+      ],
+      "nuggets_confronted": [],
+      "nugget_event": "drop_failed:wound",
+      "latency_ms": 9076.0,
+      "real_latency_ms": 9076.0,
+      "simulated_latency_ms": 0.0
+    }
+  ],
+  "verdicts": []
+}

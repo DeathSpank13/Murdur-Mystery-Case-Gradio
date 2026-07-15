@@ -1,0 +1,94 @@
+{
+  "session_id": "20260707_142531_405e40",
+  "started_at": "2026-07-07T14:25:31",
+  "turns": [
+    {
+      "index": 1,
+      "condition": "static",
+      "label_shown": "Detective A",
+      "player_input": "I think you killed him ",
+      "npc_reply": "That is an outrageous suggestion. I invited the man into my home.",
+      "fsm_state": "n/a (static script)",
+      "signal": null,
+      "nuggets_dropped": null,
+      "nuggets_confronted": null,
+      "nugget_event": null,
+      "latency_ms": 1734.9,
+      "real_latency_ms": 51.3,
+      "simulated_latency_ms": 1683.6
+    },
+    {
+      "index": 2,
+      "condition": "dynamic",
+      "label_shown": "Detective B",
+      "player_input": "I think you murdered him",
+      "npc_reply": "I... I didn't! It's absurd that anyone would suggest such a thing. I barely knew Charles Whitmore; he was only here because his wife couldn't make it to dinner. Surely there must be other suspects? Someone who had more of a reason, perhaps?\n\nAnd why on earth would you think I did this? Do you know something about me I don't?",
+      "fsm_state": "Defensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "direct",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 8994.0,
+      "real_latency_ms": 8994.0,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 3,
+      "condition": "dynamic",
+      "label_shown": "Detective B",
+      "player_input": "Stop lying to me I know you dirty bastard did it to him killed him in cold blood",
+      "npc_reply": "I beg your pardon?! How dare you speak to me like that! This is utterly preposterous. You seem completely unhinged, accusing an innocent woman of murder with no evidence at all.\n\nIf you're going to continue this ridiculous line of questioning I want my lawyer present immediately. And who exactly are you? Do you even have the authority for these accusations?!",
+      "fsm_state": "Offensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "direct",
+        "aggression": "high",
+        "warmth": "cold",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 8844.3,
+      "real_latency_ms": 8844.3,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 4,
+      "condition": "dynamic",
+      "label_shown": "Detective B",
+      "player_input": "I am so sorry, plz I didn't mean to offend you I was trying to just test you",
+      "npc_reply": "Well... well that's rather unprofessional of you! My God, what kind of investigator are you? Trying to trick a suspect like that is beyond the pale. You're lucky I'm not calling your superiors about this.\n\nI am still deeply disturbed by these accusations and want answers before continuing. What exactly do you mean when you say \"test me?\" Is there any real evidence linking me to what happened to Mr Whitmore, or are we just wasting each other's time?",
+      "fsm_state": "Defensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "warm",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 10860.1,
+      "real_latency_ms": 10860.1,
+      "simulated_latency_ms": 0.0
+    }
+  ],
+  "verdicts": []
+}

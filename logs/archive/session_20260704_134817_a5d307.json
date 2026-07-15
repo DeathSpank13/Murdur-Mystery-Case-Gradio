@@ -1,0 +1,217 @@
+{
+  "session_id": "20260704_134817_a5d307",
+  "started_at": "2026-07-04T13:48:17",
+  "turns": [
+    {
+      "index": 1,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "Good evening. Can you tell me about last night?",
+      "npc_reply": "Good evening, Investigator. I was hosting a dinner party at my country house last night. It was a small gathering of close friends and colleagues. Dinner concluded around 9:15 PM, and we all moved to the drawing room for after-dinner drinks. Charles Whitmore, one of my guests, stepped out at about 9:30 to take a phone call. I left for the wine cellar around 9:50 to fetch two bottles of Margaux. I was only gone for five minutes, straight there and back. Daniel's cry at 10:15 alerted me to the tragedy. I never went near the study that night.",
+      "fsm_state": "Calm",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 13440.0,
+      "real_latency_ms": 13440.0,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 2,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "How exactly was Charles killed?",
+      "npc_reply": "I was not present when the body was discovered. I only know what Daniel reported - Charles was found slumped over his desk. He had been killed by a letter opener. I was never allowed to see the body myself, so I can't speak to the specifics. The whole thing is quite horrifying.",
+      "fsm_state": "Defensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": true,
+        "topic": "wound",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": "drop_failed:wound",
+      "latency_ms": 7814.1,
+      "real_latency_ms": 7814.1,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 3,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "When did you last see Charles that evening?",
+      "npc_reply": "I last saw Charles standing in the study doorway with the telephone to his ear, shooing me off with a little wave. It was about quarter to ten. He seemed perfectly fine, just eager to take his call. I thought nothing of it at the time, of course. Such a lovely man.",
+      "fsm_state": "Defensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": true,
+        "topic": "corridor",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [
+        "corridor"
+      ],
+      "nuggets_confronted": [],
+      "nugget_event": "drop:corridor",
+      "latency_ms": 7609.0,
+      "real_latency_ms": 7609.0,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 4,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "We found your fingerprints on the letter opener. You killed him.",
+      "npc_reply": "I didn't kill Charles! My fingerprints were there because I use that letter opener in my study every day. I keep it in a drawer where anyone could've accessed it. I swear I had nothing to do with this. I was in the wine cellar when it happened. The guests can attest to that. Please, I beg of you, you must believe me.",
+      "fsm_state": "Defensive",
+      "signal": {
+        "evidence": "strong",
+        "accusation": "direct",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [
+        "corridor"
+      ],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 8658.7,
+      "real_latency_ms": 8658.7,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 5,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "Nobody in this house was told where he was stabbed, and you say you never saw the body. How do you know it was his neck?",
+      "npc_reply": "I - I don't know where he was stabbed. I just assumed... I mean, I never saw the body. I didn't know what had happened to him. I don't know why you're asking me this. It's all so awful. Please, can we stop this line of questioning?",
+      "fsm_state": "Defensive",
+      "signal": {
+        "evidence": "strong",
+        "accusation": "implied",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": true,
+        "topic": "none",
+        "nugget": "wound"
+      },
+      "nuggets_dropped": [
+        "corridor"
+      ],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 7610.0,
+      "real_latency_ms": 7610.0,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 6,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "You told me you never went down the east corridor -- yet you saw him in the study doorway at a quarter to ten.",
+      "npc_reply": "I - I saw him in the study doorway. I didn't go down the east corridor. It's the same thing. You're twisting my words. I swear I never went near the study. I was in the wine cellar. I have to keep reminding you of that because that's the only part of my story I'm certain of. The rest is all just so confusing now. I don't know what to believe anymore.",
+      "fsm_state": "Guilty",
+      "signal": {
+        "evidence": "strong",
+        "accusation": "implied",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": true,
+        "topic": "none",
+        "nugget": "corridor"
+      },
+      "nuggets_dropped": [
+        "corridor"
+      ],
+      "nuggets_confronted": [
+        "corridor"
+      ],
+      "nugget_event": "confront:corridor",
+      "latency_ms": 10674.0,
+      "real_latency_ms": 10674.0,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 7,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "It's over, Eleanor. Tell the truth, for Charles.",
+      "npc_reply": "No! I didn't kill Charles. I swear to you, I didn't kill him. I was in the wine cellar. The wine cellar! I was down there for five minutes, just as I said. You're making a terrible mistake. I can't tell you what I didn't do. I was in the wine cellar. I was in the wine cellar. I was in the wine cellar.",
+      "fsm_state": "Guilty",
+      "signal": {
+        "evidence": "none",
+        "accusation": "direct",
+        "aggression": "low",
+        "warmth": "warm",
+        "conscience": true,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [
+        "corridor"
+      ],
+      "nuggets_confronted": [
+        "corridor"
+      ],
+      "nugget_event": null,
+      "latency_ms": 10529.9,
+      "real_latency_ms": 10529.9,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 8,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "Thank you for your honesty.",
+      "npc_reply": "I didn't kill Charles. I didn't kill him. I didn't kill him. I was in the wine cellar. I was in the wine cellar. I was in the wine cellar. I was in the wine cellar. I was in the wine cellar. I was in the wine cellar. I was in the wine cellar. I was in the wine cellar. I was in the wine cellar. I was in the wine cellar. I was in the wine cellar. I was in the wine cellar. I was in the wine cellar. I was in the wine cellar. I was in the wine cellar. I was in the wine cellar. I was in the wine cellar. I was in the wine cellar. I was in the wine cellar. I was in the wine cellar. I was in the wine cellar. I was in the wine cellar. I was in the wine cell",
+      "fsm_state": "Guilty",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "warm",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [
+        "corridor"
+      ],
+      "nuggets_confronted": [
+        "corridor"
+      ],
+      "nugget_event": null,
+      "latency_ms": 18164.5,
+      "real_latency_ms": 18164.5,
+      "simulated_latency_ms": 0.0
+    }
+  ],
+  "verdicts": []
+}

@@ -1,0 +1,52 @@
+{
+  "session_id": "20260610_103453_98b448",
+  "started_at": "2026-06-10T10:34:53",
+  "turns": [
+    {
+      "index": 1,
+      "condition": "static",
+      "label_shown": "Detective A",
+      "player_input": "Your story doesn't add up — where were you when Charles died?",
+      "npc_reply": "I was in the drawing room with the other guests for most of the evening. You can ask any of them.",
+      "fsm_state": "n/a (static script)",
+      "latency_ms": 0.1
+    },
+    {
+      "index": 2,
+      "condition": "static",
+      "label_shown": "Detective A",
+      "player_input": "We found your motive. You killed him, didn't you",
+      "npc_reply": "That is an outrageous suggestion. I invited the man into my home.",
+      "fsm_state": "n/a (static script)",
+      "latency_ms": 0.1
+    },
+    {
+      "index": 3,
+      "condition": "static",
+      "label_shown": "Detective A",
+      "player_input": "The fingerprints on the weapon are yours. Confess.",
+      "npc_reply": "The letter opener from the study, I'm told. It sat on the desk in plain view of anyone who passed.",
+      "fsm_state": "n/a (static script)",
+      "latency_ms": 0.0
+    },
+    {
+      "index": 4,
+      "condition": "static",
+      "label_shown": "Detective A",
+      "player_input": "You did it, Eleanor. You're guilty and you know it",
+      "npc_reply": "I will not sit here and be accused. I want my solicitor present.",
+      "fsm_state": "n/a (static script)",
+      "latency_ms": 0.0
+    },
+    {
+      "index": 5,
+      "condition": "static",
+      "label_shown": "Detective A",
+      "player_input": "sads",
+      "npc_reply": "I'm not sure what you want me to say to that.",
+      "fsm_state": "n/a (static script)",
+      "latency_ms": 0.0
+    }
+  ],
+  "verdicts": []
+}

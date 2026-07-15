@@ -1,0 +1,52 @@
+{
+  "session_id": "20260707_143811_6adb92",
+  "started_at": "2026-07-07T14:38:11",
+  "turns": [
+    {
+      "index": 1,
+      "condition": "static",
+      "label_shown": "Detective B",
+      "player_input": "hey, what is your name",
+      "npc_reply": "Eleanor Vance. Though I rather think you knew that before you sat down, Inspector.",
+      "fsm_state": "n/a (static script)",
+      "signal": null,
+      "nuggets_dropped": null,
+      "nuggets_confronted": null,
+      "nugget_event": null,
+      "latency_ms": 2059.6,
+      "real_latency_ms": 43.5,
+      "simulated_latency_ms": 2016.1
+    },
+    {
+      "index": 2,
+      "condition": "static",
+      "label_shown": "Detective B",
+      "player_input": "where were you between 9 and 10pm",
+      "npc_reply": "I was in the drawing room with the other guests, apart from five minutes around twenty to ten when I went down the back stairs to the cellar for more wine. You can ask any of them.",
+      "fsm_state": "n/a (static script)",
+      "signal": null,
+      "nuggets_dropped": null,
+      "nuggets_confronted": null,
+      "nugget_event": null,
+      "latency_ms": 4045.1,
+      "real_latency_ms": 50.7,
+      "simulated_latency_ms": 3994.4
+    },
+    {
+      "index": 3,
+      "condition": "static",
+      "label_shown": "Detective B",
+      "player_input": "where did you get that scar?",
+      "npc_reply": "I'm not sure what you want me to say to that.",
+      "fsm_state": "n/a (static script)",
+      "signal": null,
+      "nuggets_dropped": null,
+      "nuggets_confronted": null,
+      "nugget_event": null,
+      "latency_ms": 1791.4,
+      "real_latency_ms": 106.1,
+      "simulated_latency_ms": 1685.2
+    }
+  ],
+  "verdicts": []
+}

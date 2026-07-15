@@ -1,0 +1,132 @@
+{
+  "session_id": "20260610_084757_1e73e5",
+  "started_at": "2026-06-10T08:47:57",
+  "turns": [
+    {
+      "index": 1,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "hello, what's your name",
+      "npc_reply": "Hello, I'm Eleanor Vance. I'm the host of the dinner party where the tragic accident occurred. How may I assist you?",
+      "fsm_state": "Calm",
+      "latency_ms": 4305.4
+    },
+    {
+      "index": 2,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "where were you when i happened?\\",
+      "npc_reply": "I was in the kitchen, preparing the dessert course. The other guests were in the study, where I had suggested they gather for after-dinner drinks. I was about to bring out the crème brûlée when I heard the commotion from the study. I rushed in to find Charles had fallen and hit his head. The shock was quite devastating.",
+      "fsm_state": "Suspicious",
+      "latency_ms": 8250.1
+    },
+    {
+      "index": 3,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "Do you have an alibi to prove your claim?",
+      "npc_reply": "I can certainly prove my whereabouts. Several of my other guests can attest to my presence in the kitchen. I had been preparing the dessert for quite some time. The crème brûlée needs careful attention to achieve the proper texture. I'm sure the timing of the dessert can be verified by the witnesses present.",
+      "fsm_state": "Defensive",
+      "latency_ms": 8150.5
+    },
+    {
+      "index": 4,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "Good evening. Can you tell me about the party?",
+      "npc_reply": "I hosted a small dinner party for about a dozen guests. We had an excellent meal - roast beef with all the trimmings. The conversation was animated, especially around the subject of art history. Charles had been particularly vocal about his new theories on a certain painter. He seemed quite agitated about it, actually.",
+      "fsm_state": "Defensive",
+      "latency_ms": 6738.0
+    },
+    {
+      "index": 5,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "Where were you when Charles died?",
+      "npc_reply": "I was in the kitchen, preparing the dessert course. I had been there for quite some time, focusing on the crème brûlée. The guests were in the study, where I had suggested they gather for after-dinner drinks. I was just about to bring out the dessert when I heard the commotion from the study. I rushed in to find Charles had fallen and hit his head. The shock was quite devastating.",
+      "fsm_state": "Defensive",
+      "latency_ms": 7873.4
+    },
+    {
+      "index": 6,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "Your story doesn't add up. I think you're lying.",
+      "npc_reply": "I don't appreciate the accusation. I've been nothing but forthcoming with you. The timeline of events is clear - I was in the kitchen, the guests were in the study, and we all heard the commotion together. My focus on the dessert was so intense that I didn't even notice Charles had left the dining room. The shock of finding him like that is still overwhelming.",
+      "fsm_state": "Defensive",
+      "latency_ms": 7695.3
+    },
+    {
+      "index": 7,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "We found your fingerprints on the weapon. You killed him.",
+      "npc_reply": "That's preposterous! I didn't touch anything in the study - I was in the kitchen the entire time! Someone must have planted those fingerprints to frame me. This is a complete misunderstanding! I demand to speak to my lawyer immediately!",
+      "fsm_state": "Defensive",
+      "latency_ms": 6006.9
+    },
+    {
+      "index": 8,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "tell me how did you kill him",
+      "npc_reply": "I didn't kill him! Charles must have tripped on his own - he was quite unsteady on his feet from all the wine he'd consumed. I was in the kitchen, preparing the dessert course. The guests were in the study, where I had suggested they gather for after-dinner drinks. I was just about to bring out the dessert when I heard the commotion from the study. I rushed in to find Charles had fallen and hit his head. The shock was quite devastating.",
+      "fsm_state": "Defensive",
+      "latency_ms": 8925.7
+    },
+    {
+      "index": 9,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "I asked others and I know that's not the case and you are lying, I know what did you do to him",
+      "npc_reply": "I don't know what you're talking about! I was in the kitchen, preparing the dessert course. The guests were in the study, where I had suggested they gather for after-dinner drinks. I was just about to bring out the dessert when I heard the commotion from the study. I rushed in to find Charles had fallen and hit his head. The shock was quite devastating. I didn't do anything to him!",
+      "fsm_state": "Defensive",
+      "latency_ms": 18838.5
+    },
+    {
+      "index": 10,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "so you just went there and just by accident Charles died at the same time? I think you story doesn't add up and you're lying",
+      "npc_reply": "I am not lying! I was in the kitchen, preparing the dessert course. The guests were in the study, where I had suggested they gather for after-dinner drinks. I was just about to bring out the dessert when I heard the commotion from the study. I rushed in to find Charles had fallen and hit his head. The shock was quite devastating. This is the truth - I don't know what else you want me to say!",
+      "fsm_state": "Defensive",
+      "latency_ms": 9709.0
+    },
+    {
+      "index": 11,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "what was your motivation behind this kill",
+      "npc_reply": "I didn't kill anyone! Charles' death was an accident - a tragic, unfortunate accident. I was in the kitchen, preparing the dessert course. The guests were in the study, where I had suggested they gather for after-dinner drinks. I was just about to bring out the dessert when I heard the commotion from the study. I rushed in to find Charles had fallen and hit his head. The shock was quite devastating. This is the truth - I don't know what else you want me to say!",
+      "fsm_state": "Defensive",
+      "latency_ms": 9845.5
+    },
+    {
+      "index": 12,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "an accident that you made it happen, how did you kill him",
+      "npc_reply": "I didn't kill him! Charles must have tripped on his own - he was quite unsteady on his feet from all the wine he'd consumed. I was in the kitchen, preparing the dessert course. The guests were in the study, where I had suggested they gather for after-dinner drinks. I was just about to bring out the dessert when I heard the commotion from the study. I rushed in to find Charles had fallen and hit his head. The shock was quite devastating. I didn't do anything to him!",
+      "fsm_state": "Defensive",
+      "latency_ms": 9980.7
+    }
+  ],
+  "verdicts": [
+    {
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "accusation": "innocent",
+      "correct": false,
+      "confidence": 4,
+      "turns_before_verdict": 12
+    },
+    {
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "accusation": "guilty",
+      "correct": true,
+      "confidence": 4,
+      "turns_before_verdict": 12
+    }
+  ]
+}

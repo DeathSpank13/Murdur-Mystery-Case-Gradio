@@ -1,0 +1,55 @@
+{
+  "session_id": "20260705_215806_065a0f",
+  "started_at": "2026-07-05T21:58:06",
+  "turns": [
+    {
+      "index": 1,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "Was he stabbed in the neck?",
+      "npc_reply": "I don't know! I never saw him after dinner ended at 9:15 or so; it was Daniel who discovered poor Charles dead on the floor of my study around ten o'clock, when we were all still gathered in the drawing room. I can only assume what you're implying about his death is true.\n\nI went down to get more wine from the cellar just before then - do you think that's why they suspect me? Because I was absent briefly at a crucial time?\n\nI swear on my mother's grave, if someone thinks I did this terrible thing...",
+      "fsm_state": "Defensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": true,
+        "topic": "wound",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 40725.8,
+      "real_latency_ms": 40725.8,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 2,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "I heard the blood was on his neck, wasn't it?",
+      "npc_reply": "Oh god. No! That's horrific.\n\nBut why are you asking me these things?! You know more about what happened to Charles than I do - surely your detectives have given you a full report already?\n\nI only went downstairs for wine because the evening was going so well, and we were all enjoying ourselves... And now this happens. My poor guests! They're probably traumatized from seeing such a terrible thing.\n\nWill everyone hate me now? Will my business suffer after this scandal breaks out in society papers?",
+      "fsm_state": "Defensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": true,
+        "topic": "wound",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 36047.5,
+      "real_latency_ms": 36047.5,
+      "simulated_latency_ms": 0.0
+    }
+  ],
+  "verdicts": []
+}

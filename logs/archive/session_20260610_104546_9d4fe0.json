@@ -1,0 +1,16 @@
+{
+  "session_id": "20260610_104546_9d4fe0",
+  "started_at": "2026-06-10T10:45:46",
+  "turns": [
+    {
+      "index": 1,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "sadasd",
+      "npc_reply": "Thank you for your prompt response. I understand the situation and will proceed to assist you in the investigation. I am fully aware of my role and will maintain Eleanor Vance's character throughout the conversation. I will keep my replies concise and natural, never exceeding two or three sentences at a time. Please feel free to ask any questions or request any additional details about the dinner party and the events that transpired. I am eager to provide you with as much information as possible to help determine the cause of Charles Whitmore's untimely death.",
+      "fsm_state": "Calm",
+      "latency_ms": 9141.3
+    }
+  ],
+  "verdicts": []
+}

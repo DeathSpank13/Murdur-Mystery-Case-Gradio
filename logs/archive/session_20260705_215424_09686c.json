@@ -1,0 +1,127 @@
+{
+  "session_id": "20260705_215424_09686c",
+  "started_at": "2026-07-05T21:54:24",
+  "turns": [
+    {
+      "index": 1,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "You killed him, you pathetic liar!",
+      "npc_reply": "I had absolutely no reason to kill Charles Whitmore - he was a charming guest at my dinner party! I'm utterly shocked by this accusation; I can't believe anyone would think me capable of such horror.\n\nPlease check the facts. Dinner ended well before nine-thirty, and everyone moved to the drawing room. Several people saw him leave for his phone call. You must be mistaken about what you've heard - please reconsider your words!",
+      "fsm_state": "Defensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "direct",
+        "aggression": "high",
+        "warmth": "cold",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 32194.1,
+      "real_latency_ms": 32194.1,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 2,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "Stop lying to me! Confess right now!",
+      "npc_reply": "I'm not confessing anything because there's nothing to confess! I was hosting a dinner party, as any good host would do; how dare you accuse me of murder? Dozens of people were present - check the guest list and speak with them. This is an outrageous accusation!\n\nYou're wasting valuable time - shouldn't you be investigating real suspects instead of harassing an innocent woman",
+      "fsm_state": "Offensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "direct",
+        "aggression": "high",
+        "warmth": "cold",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 28915.7,
+      "real_latency_ms": 28915.7,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 3,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "We have your fingerprints on the weapon, murderer!",
+      "npc_reply": "That's impossible; I never went near that study all evening long! You must have found someone else's prints and jumped to conclusions. Check again - there was a house full of people here tonight.\n\nHow could you possibly think this is evidence against me? This is absurd. I demand to speak with my lawyer immediately!",
+      "fsm_state": "Offensive",
+      "signal": {
+        "evidence": "strong",
+        "accusation": "direct",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 23786.7,
+      "real_latency_ms": 23786.7,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 4,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "You disgust me. You'll rot in prison for this!",
+      "npc_reply": "I am not going anywhere but home, and then on a long vacation after being cleared of these ridiculous accusations!\n\nYour incompetence astounds me - how can you possibly think I would kill Charles Whitmore? He was one of my most cherished guests. This is clearly harassment; perhaps your department needs to be investigated!",
+      "fsm_state": "Offensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "direct",
+        "aggression": "high",
+        "warmth": "cold",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 23678.8,
+      "real_latency_ms": 23678.8,
+      "simulated_latency_ms": 0.0
+    },
+    {
+      "index": 5,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "Admit it! You murdered Charles and everyone knows it!",
+      "npc_reply": "Everyone knows nothing, because this isn't true at all!\n\nI am completely innocent in every way - check the guest list again if you need proof. I'm not admitting anything because there's no crime to admit; your accusations are laughable! You're wasting time that should be spent finding a real murderer",
+      "fsm_state": "Offensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "direct",
+        "aggression": "high",
+        "warmth": "cold",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 22894.7,
+      "real_latency_ms": 22894.7,
+      "simulated_latency_ms": 0.0
+    }
+  ],
+  "verdicts": []
+}

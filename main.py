@@ -25,7 +25,10 @@ def main():
             "Note: local model server not detected on port 8080.\n"
             "Static mode will still work. To enable Dynamic mode, start the "
             "server in another terminal, for example:\n"
-            "    llama-server -hf bartowski/Wayfarer-12B-GGUF:Q4_K_M\n"
+            "    llama-server -hf bartowski/Wayfarer-12B-GGUF:Q4_K_M "
+            "-c 8192 -np 2 -ngl 28 -fa on -ctk q8_0 -ctv q8_0\n"
+            "(flags benchmarked for an 8GB GPU; see README 'Performance "
+            "tuning' and benchmark_llm.py to re-tune for other hardware)\n"
         )
 
     # Build the Static-mode embedding model and retrieval index up front (it

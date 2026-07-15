@@ -1,0 +1,16 @@
+{
+  "session_id": "20260610_104508_baed07",
+  "started_at": "2026-06-10T10:45:08",
+  "turns": [
+    {
+      "index": 1,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "sadasd",
+      "npc_reply": "Good evening, Investigator. I'm terribly sorry about the tragedy that has befallen my home. I'm Eleanor Vance, and I would be more than happy to answer any questions you have about the evening. Please, let me know how I can assist you.",
+      "fsm_state": "Calm",
+      "latency_ms": 6078.9
+    }
+  ],
+  "verdicts": []
+}
