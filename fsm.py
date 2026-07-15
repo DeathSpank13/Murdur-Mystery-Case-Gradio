@@ -205,7 +205,7 @@ class SuspectFSM:
     Tracks and updates the suspect's emotional state and her three slips.
 
     Typical use per player turn:
-        signal = intent_classifier.classify(player_input, llm_history)
+        signal, _ = intent_classifier.classify(player_input, llm_history)
         new_state = fsm.transition(signal)
         system_prompt = fsm.get_system_prompt()
         reply, _ = llm_client.get_response(system_prompt, llm_history)
@@ -238,16 +238,56 @@ class SuspectFSM:
     def get_system_prompt(self):
         """
         Return the full system prompt for the current state, plus the per-turn
-        addenda: the "you have just been caught" reaction when a confrontation
-        landed, and the drop instruction when a slip is planned for this reply.
+        addenda: the recap of established facts (so a trimmed transcript cannot
+        make her contradict her own earlier slips), the "you have just been
+        caught" reaction when a confrontation landed, and the drop instruction
+        when a slip is planned for this reply.
         """
         parts = [BASE_PERSONA, STATE_OVERLAYS[self.state]]
+        facts = self.get_established_facts()
+        if facts:
+            parts.append(facts)
         if self.last_confront:
             label = NUGGETS[self.last_confront]["label"]
             parts.append(CONFRONT_ADDENDUM.format(label=label))
         if self.pending_drop:
             parts.append(NUGGETS[self.pending_drop]["drop_instruction"])
         return "\n\n".join(parts)
+
+    def get_established_facts(self):
+        """
+        A deterministic recap of the load-bearing things that already happened,
+        for when the conversation sent to the model is trimmed to its recent
+        tail (llm_client.trim_history): her own slips and the confrontations
+        must survive even when the turns containing them scroll out of the
+        window, or she may deny saying something that is in the player's
+        transcript.
+
+        Built purely from FSM bookkeeping -- no model call, no added latency.
+        Every line describes what was *said*, never whether she is guilty, so
+        including it in the not-aware band cannot break the guilt gating that
+        BASE_PERSONA/STATE_OVERLAYS are built around. Empty string when nothing
+        has happened yet, leaving short sessions' prompts unchanged.
+        """
+        lines = []
+        for nugget_id in sorted(self.nuggets_dropped):
+            lines.append(
+                "- You have already let something slip: "
+                f"{NUGGETS[nugget_id]['label']}. It is on the record; never "
+                "deny having said it."
+            )
+        for nugget_id in sorted(self.nuggets_confronted):
+            lines.append(
+                "- The investigator has already confronted you about "
+                f"{NUGGETS[nugget_id]['label']}."
+            )
+        if not lines:
+            return ""
+        return (
+            "Established earlier in this interrogation (the exchange shown to "
+            "you may omit older turns, but these things did happen and you "
+            "stay consistent with them):\n" + "\n".join(lines)
+        )
 
     def transition(self, signal, player_text=""):
         """

@@ -16,14 +16,21 @@ How it works:
      questions are embedded once with a Sentence Transformer
      (all-MiniLM-L6-v2) and stored in a ChromaDB collection.
   2. When the player writes something, that text is embedded with the same
-     model and ChromaDB returns the nearest neighbour by cosine distance.
-  3. The matched entry's next unspoken variant is returned: the first ask gets
-     responses[0] (the canonical answer), later asks walk the remaining
-     variants in order, and once those run out the repeat_responses cycle. The
-     per-session visit_counts dict passed in by ui.py tracks the position, so
-     the rotation is deterministic and resets with the session. If nothing is
-     close enough (distance above MATCH_DISTANCE_THRESHOLD), a generic
-     fallback line is returned instead, cycling from polite to testy.
+     model and ChromaDB returns the nearest neighbours by cosine distance.
+     The result is routed into one of three bands (see _route): a confident
+     match speaks the entry's line; a near-miss -- either slightly too far, or
+     a coin-flip tie between two different entries -- gets an in-character
+     clarifying line that names the closest topic; anything farther gets a
+     generic fallback. The margin check between the best and the best
+     *different* entry is what stops a borderline question from routing to a
+     confident answer about the wrong topic.
+  3. On a confident match the entry's next unspoken variant is returned: the
+     first ask gets responses[0] (the canonical answer), later asks walk the
+     remaining variants in order, and once those run out the repeat_responses
+     cycle. The per-session visit_counts dict passed in by ui.py tracks the
+     position, so the rotation is deterministic and resets with the session.
+     The clarify and fallback lines cycle the same way, under the reserved
+     "_clarify" / "_fallback" counter keys.
 
 This replaces the older best-match *keyword* tree. The win over keywords is
 that paraphrases the script never anticipated ("remind me what you're called")
@@ -45,32 +52,52 @@ tiny deterministic stub and run offline.
 
 import json
 import os
-import random
-import time
 
 # Default Sentence Transformer used both here and (as its ONNX twin
 # "Xenova/all-MiniLM-L6-v2") in the browser mirror, so retrieval behaves the
 # same in both. Small, fast, and good enough for short interrogation lines.
 EMBED_MODEL_NAME = "all-MiniLM-L6-v2"
 
-# ChromaDB is configured for cosine *distance* (1 - cosine similarity), so this
-# is in [0, 2]. A query whose nearest neighbour is farther than this is treated
-# as "no good match" and gets a generic fallback instead of a wrong answer.
-# Tuned against data/suspect_qa.json with the real model: clear paraphrases land
-# around 0.2-0.4 and off-topic input around 0.7+, so 0.6 keeps a comfortable
-# margin on both sides (see the sweep used while authoring the dataset).
-MATCH_DISTANCE_THRESHOLD = 0.6
+# --- Retrieval routing bands ---------------------------------------------------
+# ChromaDB is configured for cosine *distance* (1 - cosine similarity), so all
+# thresholds here are in [0, 2]. Tuned against data/suspect_qa.json with the
+# real model: clear paraphrases land around 0.2-0.4 and off-topic input around
+# 0.7+. The query result is routed into one of three bands:
+#
+#   match     d0 <= MATCH_DISTANCE_THRESHOLD and the best *different* entry is
+#             at least MATCH_MARGIN farther -- speak the entry's line
+#   clarify   d0 <= CLARIFY_DISTANCE_THRESHOLD, or the margin was too small --
+#             ask an in-character clarifying question naming the nearest topic
+#   fallback  anything farther -- generic "I don't follow" cycle
+#
+# (Mirror any change in docs/js/static_dialogue.js, which uses the same values
+# in cosine *similarity* space: similarity = 1 - distance.)
 
-# --- Simulated "thinking" latency for the static control ----------------------
-# The static lookup answers almost instantly, which would let testers spot the
-# pre-written condition by speed alone (and confounds the study). To match the
-# dynamic LLM's feel, we sleep for a delay that scales with reply length (like
-# real token generation) plus random jitter so it is never a constant tell.
-# Starting values; calibrate against observed dynamic latencies in logs/.
-SIM_LATENCY_BASE_S = 0.8       # fixed "thinking" floor before any text
-SIM_LATENCY_PER_CHAR_S = 0.015 # per-character "generation" time
-SIM_LATENCY_JITTER = 0.20      # +/- fraction applied to the total
-SIM_LATENCY_MAX_S = 6.0        # hard ceiling so a long reply can't stall forever
+# How many neighbours to fetch per query. Entries have ~6 example questions
+# each, so the top of the list can be filled by one entry; 5 is enough to find
+# the best *different* entry for the margin check.
+QUERY_TOP_K = 5
+
+# Nearest neighbour farther than this is never a confident match.
+MATCH_DISTANCE_THRESHOLD = 0.55
+
+# Upper edge of the near-miss band: beyond this the input is genuinely
+# off-topic (observed 0.7+) and guessing a topic would itself feel weird.
+CLARIFY_DISTANCE_THRESHOLD = 0.70
+
+# Minimum distance gap between the best entry and the best *different* entry
+# for a confident match. Same-topic paraphrases typically separate by >0.1
+# with MiniLM; a smaller gap is a coin flip between two topics, and a wrong
+# but confident answer is exactly the failure mode this exists to prevent.
+MATCH_MARGIN = 0.08
+
+# Spoken in the clarify band, with {topic} filled from the nearest entry's
+# topic_hint. Cycled like FALLBACK_LINES so repeated ambiguity doesn't echo.
+CLARIFY_TEMPLATES = [
+    "If it's {topic} you're asking about, Inspector, say so plainly and I shall answer plainly.",
+    "You'll forgive me -- is this about {topic}? Ask it straight and you'll have it straight.",
+    "I can guess you mean {topic}, but I'd rather not answer a guess. Put the question properly.",
+]
 
 # Path to the authored prompt -> response database.
 _DATA_PATH = os.path.join(os.path.dirname(__file__), "data", "suspect_qa.json")
@@ -102,9 +129,11 @@ def load_qa_data(path=_DATA_PATH):
     Validation is deliberately fail-fast: a malformed database should crash at
     startup (warm_up), not answer players with a KeyError mid-study. Rules:
     every entry needs a unique id that does not start with "_" (underscore
-    keys, like "_fallback", are reserved for counters in the visit_counts
-    dict), a non-empty responses list and a non-empty questions list.
-    repeat_responses is optional.
+    keys, like "_fallback" and "_clarify", are reserved for counters in the
+    visit_counts dict), a non-empty responses list and a non-empty questions
+    list. repeat_responses is optional, as is topic_hint (a short in-character
+    noun phrase spoken in the clarify band; when absent it is derived from the
+    id).
     """
     with open(path, "r", encoding="utf-8") as f:
         qa_data = json.load(f)
@@ -126,6 +155,13 @@ def load_qa_data(path=_DATA_PATH):
             raise ValueError(f"QA entry {entry_id!r} has no responses.")
         if not entry.get("questions"):
             raise ValueError(f"QA entry {entry_id!r} has no example questions.")
+        if "topic_hint" in entry and (
+            not entry["topic_hint"] or not isinstance(entry["topic_hint"], str)
+        ):
+            raise ValueError(
+                f"QA entry {entry_id!r} has an invalid topic_hint (must be a "
+                "non-empty string when present)."
+            )
     return qa_data
 
 
@@ -179,6 +215,7 @@ def _build_collection(qa_data=None, embedding_fn=None):
                 "entry_id": entry["id"],
                 "responses": json.dumps(entry["responses"]),
                 "repeat_responses": json.dumps(entry.get("repeat_responses", [])),
+                "topic_hint": entry.get("topic_hint") or entry["id"].replace("_", " "),
             })
             ids.append(f"{entry['id']}_{i}")
 
@@ -204,6 +241,52 @@ def warm_up():
     _get_collection()
 
 
+def _route(player_input):
+    """
+    Query the collection and decide which band the input lands in.
+
+    Returns (band, metadata) where band is "match", "clarify" or "fallback",
+    and metadata is the nearest entry's document metadata ("match" and
+    "clarify") or None ("fallback"). All the routing thresholds live here so
+    get_response and the test sweeps exercise one code path.
+
+    The margin check: results are the nearest embedded example questions, and
+    one entry usually owns several of them, so hits 2..k from the *same* entry
+    as the best hit are corroboration, not ambiguity. Only the distance gap to
+    the best *different* entry decides whether the match is confident.
+    """
+    collection = _get_collection()
+    result = collection.query(
+        query_texts=[player_input],
+        # Clamp: tiny test databases can hold fewer documents than QUERY_TOP_K,
+        # and some ChromaDB versions raise when n_results exceeds the count.
+        n_results=min(QUERY_TOP_K, collection.count()),
+    )
+
+    distances = (result.get("distances") or [[]])[0]
+    metadatas = (result.get("metadatas") or [[]])[0]
+    if not distances:
+        return "fallback", None
+
+    best_distance = distances[0]
+    best_metadata = metadatas[0]
+    if best_distance > CLARIFY_DISTANCE_THRESHOLD:
+        return "fallback", None
+
+    # Distance to the best entry that is NOT the matched one (None if every
+    # returned neighbour belongs to the same entry -- maximal confidence).
+    other_distance = next(
+        (d for d, m in zip(distances, metadatas)
+         if m["entry_id"] != best_metadata["entry_id"]),
+        None,
+    )
+    if best_distance <= MATCH_DISTANCE_THRESHOLD and (
+        other_distance is None or other_distance - best_distance >= MATCH_MARGIN
+    ):
+        return "match", best_metadata
+    return "clarify", best_metadata
+
+
 def get_response(player_input, visit_counts=None):
     """
     Return the scripted NPC line whose stored question best matches the input.
@@ -216,31 +299,28 @@ def get_response(player_input, visit_counts=None):
         Per-session counters, keyed by entry id (ui.py passes its gr.State
         dict here and resets it with the session). The count for the matched
         entry decides which pre-written variant is spoken this time -- see
-        _select_variant -- and "_fallback" tracks the generic-fallback cycle.
-        Passing None keeps the call stateless: always responses[0].
+        _select_variant -- and the reserved "_fallback" / "_clarify" keys
+        track the fallback and clarify cycles. Passing None keeps the call
+        stateless: always responses[0] / the first template.
 
     Returns
     -------
     str
         The chosen NPC reply.
 
-    The match is the single nearest neighbour by cosine distance over the
-    embedded example questions. If that distance is above
-    MATCH_DISTANCE_THRESHOLD (or the input is empty), a generic fallback line is
-    returned instead.
+    The input is embedded and routed by _route: a confident nearest-neighbour
+    match speaks the entry's next variant; a near-miss or a too-close tie
+    between two entries gets a clarifying line naming the nearest topic; a
+    clear miss (or empty input) gets a generic fallback line.
     """
     if not player_input or not player_input.strip():
         return _next_fallback(visit_counts)
 
-    collection = _get_collection()
-    result = collection.query(query_texts=[player_input], n_results=1)
-
-    distances = result.get("distances") or [[]]
-    metadatas = result.get("metadatas") or [[]]
-    if not distances[0] or distances[0][0] > MATCH_DISTANCE_THRESHOLD:
+    band, metadata = _route(player_input)
+    if band == "fallback":
         return _next_fallback(visit_counts)
-
-    metadata = metadatas[0][0]
+    if band == "clarify":
+        return _next_clarify(metadata["topic_hint"], visit_counts)
     return _select_variant(
         metadata["entry_id"],
         json.loads(metadata["responses"]),
@@ -278,21 +358,13 @@ def _select_variant(entry_id, responses, repeat_responses, visit_counts):
     return responses[extra % len(responses)]
 
 
-def simulate_latency(reply):
-    """
-    Sleep for a human/LLM-plausible delay derived from the reply length, then
-    return the actual time slept in milliseconds.
-
-    Used only by the static control so its perceived response time matches the
-    dynamic LLM condition. The delay is base + per-char * len(reply), scaled by
-    a random jitter factor and capped at SIM_LATENCY_MAX_S.
-    """
-    target = SIM_LATENCY_BASE_S + SIM_LATENCY_PER_CHAR_S * len(reply or "")
-    target *= random.uniform(1.0 - SIM_LATENCY_JITTER, 1.0 + SIM_LATENCY_JITTER)
-    target = min(target, SIM_LATENCY_MAX_S)
-    start = time.perf_counter()
-    time.sleep(target)
-    return (time.perf_counter() - start) * 1000.0
+def _next_clarify(topic_hint, visit_counts):
+    """Cycle the clarify templates, filling {topic} with the nearest entry's hint."""
+    if visit_counts is None:
+        return CLARIFY_TEMPLATES[0].format(topic=topic_hint)
+    count = visit_counts.get("_clarify", 0)
+    visit_counts["_clarify"] = count + 1
+    return CLARIFY_TEMPLATES[count % len(CLARIFY_TEMPLATES)].format(topic=topic_hint)
 
 
 def _next_fallback(visit_counts):

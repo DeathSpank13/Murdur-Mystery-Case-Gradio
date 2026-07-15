@@ -40,7 +40,8 @@ class SessionLogger:
 
     def log_turn(self, condition, label_shown, player_input, reply, state, latency_ms,
                  signal=None, real_latency_ms=None, simulated_latency_ms=None,
-                 nuggets_dropped=None, nuggets_confronted=None, nugget_event=None):
+                 nuggets_dropped=None, nuggets_confronted=None, nugget_event=None,
+                 classifier_latency_ms=None, generation_latency_ms=None):
         """
         Record one question and answer exchange.
 
@@ -59,6 +60,11 @@ class SessionLogger:
         the static condition this includes an artificial delay; ``real_latency_ms``
         (the true compute cost) and ``simulated_latency_ms`` (the injected delay)
         are logged separately so the analysis can recover both.
+
+        ``classifier_latency_ms`` / ``generation_latency_ms`` split the dynamic
+        condition's real cost into its two model calls (generation includes the
+        occasional drop retry). None for static turns and in logs written before
+        the split existed.
         """
         self.turns.append(
             {
@@ -75,6 +81,8 @@ class SessionLogger:
                 "latency_ms": round(latency_ms, 1),  # perceived total
                 "real_latency_ms": round(real_latency_ms, 1) if real_latency_ms is not None else None,
                 "simulated_latency_ms": round(simulated_latency_ms, 1) if simulated_latency_ms is not None else None,
+                "classifier_latency_ms": round(classifier_latency_ms, 1) if classifier_latency_ms is not None else None,
+                "generation_latency_ms": round(generation_latency_ms, 1) if generation_latency_ms is not None else None,
             }
         )
         self._flush()

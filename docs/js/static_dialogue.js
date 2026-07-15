@@ -12,16 +12,24 @@
 //      "Xenova/all-MiniLM-L6-v2" via transformers.js) and cached as unit vectors.
 //   2. The player's input is embedded with the same model; we take the dot
 //      product against every cached vector (they're L2-normalised, so the dot
-//      product is the cosine similarity) and pick the highest.
-//   3. The matched entry's next unspoken variant is returned: the first ask gets
-//      responses[0], later asks walk the remaining variants in order, then the
-//      repeat_responses cycle. Position lives in the per-session visitCounts, so
-//      the rotation is deterministic and resets with the session. If nothing is
-//      close enough (similarity below MATCH_SIMILARITY_THRESHOLD), a generic
-//      fallback line is returned instead, cycling from polite to testy.
+//      product is the cosine similarity) and route the best hit into one of
+//      three bands: a confident match speaks the entry's line; a near-miss --
+//      slightly too far, or a coin-flip tie between two different entries --
+//      gets an in-character clarifying line naming the closest topic; anything
+//      farther gets a generic fallback. The margin check against the best
+//      *different* entry is what stops a borderline question from routing to a
+//      confident answer about the wrong topic.
+//   3. On a confident match the entry's next unspoken variant is returned: the
+//      first ask gets responses[0], later asks walk the remaining variants in
+//      order, then the repeat_responses cycle. Position lives in the
+//      per-session visitCounts, so the rotation is deterministic and resets
+//      with the session. Clarify and fallback lines cycle the same way under
+//      the reserved `_clarify` / `_fallback` counter keys.
 //
 // There is no ChromaDB in the browser; a linear scan over a few dozen vectors is
 // instant. static_dialogue.py in the repo root is the canonical version.
+// Unlike the Python app, the demo adds no artificial latency: the tabs here are
+// openly labeled, so there is no blinded condition to disguise by timing.
 
 import { pipeline } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3";
 import { SUSPECT_QA } from "./static_qa_data.js";
@@ -29,10 +37,24 @@ import { SUSPECT_QA } from "./static_qa_data.js";
 // ONNX twin of the Python side's all-MiniLM-L6-v2, so retrieval matches.
 const EMBED_MODEL_ID = "Xenova/all-MiniLM-L6-v2";
 
-// Cosine similarity below this is treated as "no good match" and gets a generic
-// fallback. Mirrors MATCH_DISTANCE_THRESHOLD = 0.6 on the Python side (cosine
-// distance 0.6 == cosine similarity 0.4).
-const MATCH_SIMILARITY_THRESHOLD = 0.4;
+// Routing bands, in cosine *similarity* space. The Python side works in cosine
+// distance; similarity = 1 - distance, and a margin is a difference so it maps
+// unchanged. Keep these in lock-step with static_dialogue.py:
+//   MATCH_SIMILARITY_THRESHOLD   0.45 similarity == 0.55 distance
+//   CLARIFY_SIMILARITY_THRESHOLD 0.30 similarity == 0.70 distance
+//   MATCH_MARGIN                 0.08 in both spaces
+const MATCH_SIMILARITY_THRESHOLD = 0.45;
+const CLARIFY_SIMILARITY_THRESHOLD = 0.30;
+const MATCH_MARGIN = 0.08;
+
+// Spoken in the clarify band, with {topic} filled from the nearest entry's
+// topic_hint. Cycled like FALLBACK_LINES so repeated ambiguity doesn't echo.
+// Mirrors CLARIFY_TEMPLATES in static_dialogue.py.
+const CLARIFY_TEMPLATES = [
+  "If it's {topic} you're asking about, Inspector, say so plainly and I shall answer plainly.",
+  "You'll forgive me -- is this about {topic}? Ask it straight and you'll have it straight.",
+  "I can guess you mean {topic}, but I'd rather not answer a guess. Put the question properly.",
+];
 
 // Used when no entry is close enough to the player's input. Cycled in order so
 // repeated off-topic prompts don't echo the same line — and since the cycle
@@ -121,10 +143,27 @@ export async function getResponse(playerInput, visitCounts) {
     }
   }
 
-  if (bestEntry === null || bestScore < MATCH_SIMILARITY_THRESHOLD) {
+  if (bestEntry === null || bestScore < CLARIFY_SIMILARITY_THRESHOLD) {
     return nextFallback(visitCounts);
   }
-  return selectVariant(bestEntry, visitCounts);
+
+  // Margin check, mirroring _route in static_dialogue.py: one entry usually
+  // owns several stored questions, so other hits from the *same* entry are
+  // corroboration; only the best *different* entry decides confidence.
+  let bestOtherScore = -Infinity;
+  for (let i = 0; i < corpus.vectors.length; i++) {
+    if (corpus.entries[i].id === bestEntry.id) continue;
+    const score = dot(queryVec, corpus.vectors[i]);
+    if (score > bestOtherScore) bestOtherScore = score;
+  }
+
+  if (
+    bestScore >= MATCH_SIMILARITY_THRESHOLD &&
+    bestScore - bestOtherScore >= MATCH_MARGIN
+  ) {
+    return selectVariant(bestEntry, visitCounts);
+  }
+  return nextClarify(bestEntry, visitCounts);
 }
 
 // Pick which pre-written line the matched entry speaks on this visit. Mirrors
@@ -143,6 +182,16 @@ function selectVariant(entry, visitCounts) {
   const extra = n - responses.length;
   if (repeats.length) return repeats[extra % repeats.length];
   return responses[extra % responses.length];
+}
+
+// Cycle the clarify templates, filling {topic} with the nearest entry's hint
+// (or a default derived from its id). Mirrors _next_clarify in Python.
+function nextClarify(entry, visitCounts) {
+  const topic = entry.topic_hint || entry.id.replace(/_/g, " ");
+  if (!visitCounts) return CLARIFY_TEMPLATES[0].replace("{topic}", topic);
+  const count = visitCounts._clarify || 0;
+  visitCounts._clarify = count + 1;
+  return CLARIFY_TEMPLATES[count % CLARIFY_TEMPLATES.length].replace("{topic}", topic);
 }
 
 // Cycle through the generic fallbacks, tracking position if given a counts dict.

@@ -534,10 +534,14 @@ def classify(player_input, recent_context=None, use_few_shot=True):
 
     Returns
     -------
-    Signal
-        The model's judgement, validated against the allowed values. Falls back
-        to ``classify_keywords`` if the server is unreachable or the reply is not
-        usable JSON, so a turn is never lost.
+    tuple (Signal, float)
+        The model's judgement, validated against the allowed values, and the
+        wall-clock latency of the classification call in milliseconds. The
+        latency is part of what the participant actually waits for, so callers
+        add it to the turn's perceived total instead of discarding it. Falls
+        back to ``classify_keywords`` if the server is unreachable or the reply
+        is not usable JSON, so a turn is never lost; the latency still reflects
+        the time the failed call cost.
     """
     last_npc = ""
     if recent_context:
@@ -556,7 +560,7 @@ def classify(player_input, recent_context=None, use_few_shot=True):
     # temperature 0 for a stable, repeatable judgement; the reply is tiny JSON.
     # RESPONSE_FORMAT constrains decoding to the schema so even a roleplay-tuned
     # model returns a valid Signal instead of staying in character.
-    reply, _ = llm_client.get_response(
+    reply, latency_ms = llm_client.get_response(
         CLASSIFIER_SYSTEM_PROMPT,
         messages,
         temperature=0.0,
@@ -565,8 +569,8 @@ def classify(player_input, recent_context=None, use_few_shot=True):
     )
 
     try:
-        return _signal_from_dict(_extract_json(reply))
+        return _signal_from_dict(_extract_json(reply)), latency_ms
     except (ValueError, KeyError, TypeError):
         # Server down (reply is a bracketed fallback string) or malformed JSON:
         # fall back to the deterministic keyword reading of the same input.
-        return classify_keywords(player_input)
+        return classify_keywords(player_input), latency_ms

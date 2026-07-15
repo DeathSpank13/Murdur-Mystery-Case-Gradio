@@ -12,6 +12,12 @@ env/
 # Session logs (research/run artifacts, not source)
 logs/*.json
 
+# Machine-specific latency calibration for the static condition (see latency.py)
+data/latency_stats.json
+
+# Benchmark output (machine-specific measurements, see benchmark_llm.py)
+benchmarks/
+
 # Editors / OS
 .vscode/
 .idea/

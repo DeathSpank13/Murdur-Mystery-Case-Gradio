@@ -1,6 +1,7 @@
 [
   {
     "id": "identity",
+    "topic_hint": "my name",
     "responses": [
       "Eleanor Vance. Though I rather think you knew that before you sat down, Inspector.",
       "Still Eleanor Vance, Inspector. That much of the evening has not changed.",
@@ -21,6 +22,7 @@
   },
   {
     "id": "occupation",
+    "topic_hint": "my work",
     "responses": [
       "I own a gallery in town. Paintings, mostly, and the occasional piece of sculpture when something fine comes along.",
       "Art, Inspector. I keep a gallery in town; I find pictures for people with more money than walls.",
@@ -41,6 +43,7 @@
   },
   {
     "id": "greeting",
+    "topic_hint": "pleasantries",
     "responses": [
       "Good evening, Inspector. Forgive me if I'm not at my brightest; it has been a dreadful day.",
       "Good evening. You'll forgive the state of the house; none of us slept.",
@@ -61,6 +64,7 @@
   },
   {
     "id": "alibi",
+    "topic_hint": "my whereabouts that evening",
     "responses": [
       "I was in the drawing room with the other guests, apart from five minutes around twenty to ten when I went down the back stairs to the cellar for more wine. You can ask any of them.",
       "As I said: the drawing room, the whole evening, save five minutes fetching wine from the cellar at about twenty to ten. Hardly time to do anything dreadful.",
@@ -76,11 +80,14 @@
       "Account for your whereabouts that night.",
       "Where were you at the time of the murder?",
       "Tell me where you were when it happened.",
-      "Did you leave the drawing room at any point?"
+      "Did you leave the drawing room at any point?",
+      "Give me a full account of your movements that evening.",
+      "Were you with your guests the whole time?"
     ]
   },
   {
     "id": "lastseen",
+    "topic_hint": "when I last saw Charles",
     "responses": [
       "When he left the drawing room to take his telephone call, half past nine or so. Though the last I actually laid eyes on him, he was in the study doorway with the telephone to his ear, shooing me off with a little wave; a quarter to ten, I suppose. I never spoke to him again.",
       "Half past nine, or near enough, when he left the drawing room for his telephone call. That was the last we spoke.",
@@ -95,11 +102,14 @@
       "When was the last time you saw him?",
       "What time did you last speak to the victim?",
       "When did you last lay eyes on Charles?",
-      "Where did you last see him?"
+      "Where did you last see him?",
+      "What time did Charles leave the drawing room?",
+      "When did you last speak with Charles?"
     ]
   },
   {
     "id": "party",
+    "topic_hint": "the evening itself",
     "responses": [
       "A small gathering. Old friends, a little wine, far too much talk of business. Charles was in good spirits when he arrived.",
       "Dinner ended at a quarter past nine and we all moved through to the drawing room. An entirely ordinary evening, until it wasn't.",
@@ -120,6 +130,7 @@
   },
   {
     "id": "guests",
+    "topic_hint": "who was in the house",
     "responses": [
       "The Harringtons, my business partner Vivian, Charles, and young Daniel who keeps my books. Seven of us, with the staff.",
       "A short list: the Harringtons, Vivian, Daniel, Charles, and myself. The staff make it seven under the roof.",
@@ -140,6 +151,7 @@
   },
   {
     "id": "argument",
+    "topic_hint": "the quarrel at dinner",
     "responses": [
       "Daniel and Charles had words over money near the end. Quiet, but I saw Daniel's face.",
       "Only the one worth the name: Daniel and Charles, over money, near the end of dinner. I'd not make too much of it; he is a gentle boy.",
@@ -160,6 +172,7 @@
   },
   {
     "id": "relationship",
+    "topic_hint": "Charles and me",
     "responses": [
       "Charles was an old friend. We went back twenty years, and did business together on and off for most of them.",
       "Twenty years of friendship, and business woven through most of them. Friendship like that has its weather, Inspector.",
@@ -182,6 +195,7 @@
   },
   {
     "id": "motive",
+    "topic_hint": "the money he owed me",
     "responses": [
       "He owed me, in fact. A great deal, and he was slow about it. A debt is a reason to keep a man paying, not to harm him.",
       "A debt is a reason to keep a man alive and paying, Inspector, not to put a blade in him. Do think it through.",
@@ -202,6 +216,7 @@
   },
   {
     "id": "weapon",
+    "topic_hint": "the letter opener",
     "responses": [
       "The letter opener from the study, I'm told. It sat on the desk in plain view, and now when I close my eyes I keep seeing it, that thing in his neck, him slumped over his own desk. Forgive me. You were asking about the opener.",
       "The letter opener, Inspector, as your people no doubt told you before I did. It lived on the study desk in plain view of anyone who passed.",
@@ -215,15 +230,18 @@
       "What was the murder weapon?",
       "How was he killed?",
       "How was Charles killed?",
-      "How did Charles die?",
       "What was he stabbed with?",
       "Tell me about the letter opener.",
       "What did the killer use?",
-      "What weapon was used on Charles?"
+      "What weapon was used on Charles?",
+      "What killed him?",
+      "Where was he stabbed?",
+      "Describe the wound."
     ]
   },
   {
     "id": "study_door",
+    "topic_hint": "what I noticed that night",
     "responses": [
       "The study door was shut, which was odd; it's always left open. I noticed it and thought nothing of it.",
       "Only the study door, shut when it's always left open. I noticed it in passing and thought nothing of it. Perhaps I should have.",
@@ -244,6 +262,7 @@
   },
   {
     "id": "wellbeing",
+    "topic_hint": "how I am bearing up",
     "responses": [
       "Tired, Inspector, nothing worse. Though I did catch my thumb on the cellar door latch last night, and it bled terribly for such a small cut. Clumsy of me. It is not every day one's dinner party ends with a body in the study.",
       "As well as can be expected. I shan't pretend I slept.",
@@ -264,6 +283,7 @@
   },
   {
     "id": "deny",
+    "topic_hint": "whether I killed him",
     "responses": [
       "That is an outrageous suggestion. I invited the man into my home.",
       "No, Inspector. I did not harm Charles. Twenty years of friendship, and you'd have me end it over a dinner I cooked for him.",
@@ -287,6 +307,7 @@
   },
   {
     "id": "wine_cellar",
+    "topic_hint": "my trip to the cellar",
     "responses": [
       "Down the back stairs, two bottles of the Margaux, back up. Five minutes, perhaps seven; the cellar is cold, one doesn't linger. I caught my thumb on the door latch coming out, clumsy of me.",
       "West through the kitchen and down the back stairs, as I said. Two bottles of Margaux and straight back to my guests.",
@@ -302,11 +323,14 @@
       "Walk me through fetching the wine.",
       "How long were you in the cellar?",
       "Which way did you go to the cellar?",
-      "What wine did you fetch that night?"
+      "What wine did you fetch that night?",
+      "Why did you go down to the cellar?",
+      "Describe the wine cellar."
     ]
   },
   {
     "id": "east_corridor",
+    "topic_hint": "the east corridor",
     "responses": [
       "I never went down the east corridor that night, Inspector. The cellar is at the west end, through the kitchen; the study end of the house had no business for me.",
       "No. The east corridor leads to the study, and I had no reason to be anywhere near it.",
@@ -322,11 +346,14 @@
       "Did you go down the east corridor at any point?",
       "Were you anywhere near the study around the time he died?",
       "Did you pass by the study?",
-      "How close did you get to the study that evening?"
+      "How close did you get to the study that evening?",
+      "Did you set foot in the east wing that night?",
+      "Were you near the study end of the house?"
     ]
   },
   {
     "id": "discovery",
+    "topic_hint": "how he was found",
     "responses": [
       "It was Daniel who found him, at a quarter past ten; he'd been sent to fetch Charles for dessert. We heard him cry out. The guests were kept out of the study, so I never saw the body.",
       "Daniel found him and cried out, and after that the evening was police and waiting. None of us were allowed into the study.",
@@ -342,11 +369,14 @@
       "How did you learn Charles was dead?",
       "When was the body discovered?",
       "Did you go into the study after he was found?",
-      "What happened when the body was discovered?"
+      "What happened when the body was discovered?",
+      "Who found Charles and when?",
+      "Tell me how the body was discovered."
     ]
   },
   {
     "id": "witness_vivian",
+    "topic_hint": "who can vouch for me",
     "responses": [
       "Vivian, certainly. She and I were thick as thieves on the settee most of the night. Though she did step out for some air around then, now I think of it.",
       "Ask Vivian; she barely left my side. Or the Harringtons; the drawing room is not a large place to disappear from.",
@@ -367,6 +397,7 @@
   },
   {
     "id": "business",
+    "topic_hint": "our business together",
     "responses": [
       "Three galleries over the years, Charles and I. The last one did poorly, and money has a way of souring even old affection.",
       "We were partners more than once. Some ventures did well; the last did not. That is business, not a grievance.",
@@ -387,6 +418,7 @@
   },
   {
     "id": "insurance",
+    "topic_hint": "the insurance",
     "responses": [
       "On the gallery partnership, yes, a modest one. Standard between partners. I'd hardly call it a fortune.",
       "There is a partnership policy, as there is in half the businesses in town. Modest, and slow to pay, no doubt.",
@@ -407,6 +439,7 @@
   },
   {
     "id": "victim_character",
+    "topic_hint": "what Charles was like",
     "responses": [
       "Charles? Charming, stubborn, generous when it suited him and impossible when it didn't. He thought me reckless with the accounts; I thought him a coward with them. We were both a little right.",
       "A good man, on balance, though he'd sit on a debt like a hen on an egg. One forgave him things one shouldn't have.",
@@ -427,6 +460,7 @@
   },
   {
     "id": "who_suspect",
+    "topic_hint": "who I suspect",
     "responses": [
       "If I had to point a finger, and I hate to do it, I would look at Daniel and that quarrel over money. But I may be wronging the boy.",
       "It's not for me to do your work, Inspector. But you might ask where everyone was between half past nine and ten; the drawing room was not as full as it might have been.",
@@ -447,6 +481,7 @@
   },
   {
     "id": "daniel",
+    "topic_hint": "Daniel",
     "responses": [
       "Young Daniel Reeve; he keeps my books, and Charles was fond of him in his way. It was Daniel they sent to fetch Charles for dessert, poor boy. I shan't forget his cry.",
       "A gentle boy, whatever that quarrel over money looked like. Wound tight that night, yes, but bookkeepers usually are.",
@@ -467,6 +502,7 @@
   },
   {
     "id": "fingerprints",
+    "topic_hint": "fingerprints on the opener",
     "responses": [
       "Mine, I suppose, from dusting the desk. And half the county's, for all I know; it's hardly under lock and key.",
       "Whoever passed through the study might have handled it. It lived on the desk; it was decorative more than useful.",
@@ -482,11 +518,14 @@
       "Would your prints be on it?",
       "Who had access to the letter opener?",
       "Did you ever touch the letter opener?",
-      "Whose prints are on the murder weapon?"
+      "Whose prints are on the murder weapon?",
+      "Would we find your fingerprints on the murder weapon?",
+      "Did forensics find your prints on the weapon?"
     ]
   },
   {
     "id": "phone_call",
+    "topic_hint": "the telephone call",
     "responses": [
       "The telephone call? I haven't the faintest idea who rang him. Business, I assumed; with Charles it was usually business.",
       "He didn't say, and I didn't ask. One doesn't interrogate a guest over a telephone call, though I grant the evening has rather changed the rules.",
@@ -507,6 +546,7 @@
   },
   {
     "id": "blood_doorknob",
+    "topic_hint": "the blood on the door",
     "responses": [
       "I read nothing into a smear on a doorknob, Inspector. Half the household touches that door in a day; I can't account for what your forensics people scraped off it.",
       "If it isn't Charles's blood, then it belongs to whoever you should be hunting. I'd start there rather than here.",
@@ -523,6 +563,133 @@
       "How did blood get on the study door?",
       "The blood on the knob wasn't Charles's. Explain that.",
       "What do you make of the blood evidence?"
+    ]
+  },
+  {
+    "id": "harringtons",
+    "topic_hint": "the Harringtons",
+    "responses": [
+      "The Harringtons? Friends of longer standing than I care to count, Inspector. They were on the drawing room settee all evening, well within sight, and neither of them has raised a voice in twenty years, let alone a blade.",
+      "A thoroughly respectable couple, and thoroughly accounted for. They barely moved from the settee between dinner and... the rest of it.",
+      "If your suspicions have reached the Harringtons, Inspector, the case is thinner than I feared. They came for the wine and the gossip, as they always do."
+    ],
+    "repeat_responses": [
+      "The Harringtons are as I described them: present, pleasant, and blameless. Repetition will not make them sinister.",
+      "Still the same Harringtons, Inspector. Ask them your questions; they will bore you honestly."
+    ],
+    "questions": [
+      "Tell me about the Harringtons.",
+      "Who are the Harringtons?",
+      "What can you tell me about the Harrington couple?",
+      "Where were the Harringtons that evening?",
+      "Could the Harringtons have been involved?",
+      "Did the Harringtons have any quarrel with Charles?"
+    ]
+  },
+  {
+    "id": "staff",
+    "topic_hint": "the household staff",
+    "responses": [
+      "The staff were below stairs seeing to dinner and the washing-up, Inspector, as staff are on such an evening. Whether anyone marked my coming and going, you would have to ask them; I don't keep count of who watches me in my own house.",
+      "They had the kitchen and the clearing-up to manage; a dinner for six keeps hands busy. I shouldn't think they saw anything of the drawing room, let alone the study.",
+      "You are welcome to question the staff, Inspector. They have been with me for years, and they will tell you the same dull truth: dinner was served, plates were cleared, and nobody saw anything worth your notebook."
+    ],
+    "repeat_responses": [
+      "As before, Inspector: the staff were at their work, and their work was not watching me.",
+      "You have my answer on the staff. Question them and let mine rest."
+    ],
+    "questions": [
+      "Tell me about the staff.",
+      "Who works in the house?",
+      "Did the staff see anything that night?",
+      "Did the servants see you go to the cellar?",
+      "Could one of the staff have done it?",
+      "Were the servants in the kitchen all evening?"
+    ]
+  },
+  {
+    "id": "time_of_death",
+    "topic_hint": "when Charles died",
+    "responses": [
+      "Your own people put it between half past nine and ten, Inspector; I have nothing better to offer than the coroner. All I can tell you is that the evening was perfectly ordinary until a quarter past ten, when it wasn't.",
+      "Between half past nine and ten, or so I'm told. I learned the hour from your colleagues, not from anything I saw.",
+      "I couldn't say precisely, and I rather think that's your department. He left us at half past nine; Daniel found him at a quarter past ten. The awful part fits somewhere in between."
+    ],
+    "repeat_responses": [
+      "The window hasn't moved since you last asked, Inspector: half past nine to ten, by your own coroner's reckoning.",
+      "I can't sharpen the hour for you. I wasn't there when it happened -- that is rather the point."
+    ],
+    "questions": [
+      "What was the time of death?",
+      "What time was he killed?",
+      "When did Charles die?",
+      "At what hour did Charles die?",
+      "Do you know when the murder happened?",
+      "How long had he been dead when he was found?",
+      "When exactly did it happen?"
+    ]
+  },
+  {
+    "id": "intruder",
+    "topic_hint": "whether someone broke in",
+    "responses": [
+      "The doors were bolted at dusk, Inspector, as they are every evening; nothing was taken, and no window so much as rattled. I wish I could hand you a convenient stranger, but whatever happened, it happened under my roof.",
+      "No sign of it, or so your own men tell me. The house was shut up for the night and nothing is missing.",
+      "A burglar who takes nothing and leaves the silver? You may search the grounds with my blessing, but I don't believe it any more than you do."
+    ],
+    "repeat_responses": [
+      "Still no obliging stranger, Inspector. The doors were bolted and the house holds what it held.",
+      "We've been over the locks and the windows. Nothing has changed except the hour."
+    ],
+    "questions": [
+      "Could someone have broken in?",
+      "Was there any sign of an intruder?",
+      "Could an outsider have entered the house?",
+      "Were the doors locked that night?",
+      "Was anything stolen?",
+      "Could a stranger have gotten inside?"
+    ]
+  },
+  {
+    "id": "heard_anything",
+    "topic_hint": "what I heard",
+    "responses": [
+      "Nothing from the study, Inspector. It sits at the far end of the house, and with the talk and the laughter in the drawing room I heard nothing at all until Daniel cried out.",
+      "No raised voices, no crash of furniture. Whatever happened in that room happened quietly, and the house kept it to itself.",
+      "I have turned the evening over all night and there is nothing: talk, laughter, the clink of glasses, and then Daniel's cry. Nothing in between."
+    ],
+    "repeat_responses": [
+      "Still nothing, Inspector, however hard you have me listen to my memory.",
+      "As I said: nothing until Daniel cried out. The house is large and the party was loud."
+    ],
+    "questions": [
+      "Did you hear anything unusual that night?",
+      "Did anyone hear a struggle?",
+      "Did you hear any noise from the study?",
+      "Was there a scream or a shout?",
+      "Did you hear anything strange before the body was found?",
+      "Could you hear what was happening in the study?"
+    ]
+  },
+  {
+    "id": "lawyer",
+    "topic_hint": "my solicitor",
+    "responses": [
+      "I have a solicitor, Inspector, as anyone with property does. I haven't telephoned him, if that's the question; innocent hosts generally don't -- though you are working hard to change my mind.",
+      "If I want him, I shall send for him. That I haven't yet should tell you something about my conscience.",
+      "You may take my answering you freely, without a solicitor at my elbow, however you like. I take it as the behaviour of a woman with nothing to hide."
+    ],
+    "repeat_responses": [
+      "The solicitor remains unsummoned, Inspector. Give me a reason and that will change.",
+      "As before: I speak for myself. If that changes, you will be the first to know."
+    ],
+    "questions": [
+      "Do you have a lawyer?",
+      "Do you want a solicitor present?",
+      "Have you called your solicitor?",
+      "Do you need legal representation?",
+      "Should you be speaking to me without a lawyer?",
+      "Do you want an attorney before we continue?"
     ]
   }
 ]

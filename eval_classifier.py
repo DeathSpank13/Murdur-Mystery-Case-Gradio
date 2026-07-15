@@ -172,7 +172,8 @@ def _score(use_few_shot):
     exact = 0
     got_signals = []
     for last_npc, line, expected in CASES:
-        got = classify(line, _context_for(last_npc), use_few_shot=use_few_shot).as_dict()
+        got_signal, _ = classify(line, _context_for(last_npc), use_few_shot=use_few_shot)
+        got = got_signal.as_dict()
         got_signals.append(got)
         all_ok = True
         for axis in AXES:

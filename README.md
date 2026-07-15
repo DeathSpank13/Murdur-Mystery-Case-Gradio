@@ -36,7 +36,9 @@ away); see the design note below for what it demonstrates.
 | `fsm.py` | The Finite State Machine: states, transition rules, the per state system prompts, nugget tracking, and the scenario ground truth. |
 | `nuggets.py` | The three "slips" (nuggets): trigger topics, per turn drop instructions, reply markers, confrontation definitions, and the confession thresholds. |
 | `intent_classifier.py` | Classifies each player turn into a multi-axis `Signal` (evidence, accusation, aggression, warmth, conscience, probing, topic, nugget) with a keyword fallback. |
-| `static_dialogue.py` | The control condition. Semantic retrieval (ChromaDB + a Sentence Transformer) over a fixed Q&A database (`data/suspect_qa.json`): the player's input is embedded and the nearest topic's next pre-written variant is returned (repeat questions get "asked and answered" lines). No generation. |
+| `static_dialogue.py` | The control condition. Semantic retrieval (ChromaDB + a Sentence Transformer) over a fixed Q&A database (`data/suspect_qa.json`), routed into three bands: a confident nearest-topic match speaks the next pre-written variant (repeat questions get "asked and answered" lines), a near-miss or a tie between two topics gets an in-character clarifying line naming the closest topic, and off-script input gets generic fallbacks. No generation. |
+| `latency.py` | Simulated "thinking" delay for the static condition, sampled from the dynamic condition's actually recorded latencies (rolling window persisted in `data/latency_stats.json`) so the two conditions can't be told apart by timing. |
+| `sync_qa_data.py` | Regenerates the web demo's `docs/js/static_qa_data.js` from `data/suspect_qa.json`; run it whenever the database changes. |
 | `branching_dialogue.py` | Standalone choice-based dialogue tree: a menu of clickable options with one-time questions, mutually exclusive forks, and nested follow-ups. |
 | `llm_client.py` | Talks to the local llama.cpp server; returns each reply together with its measured latency. |
 | `logger.py` | Writes each session (transcript, condition, FSM state, latency, verdicts) to a JSON file under `logs/`. |
@@ -44,6 +46,7 @@ away); see the design note below for what it demonstrates.
 | `main.py` | Entry point. Checks the server and launches the app. |
 | `test_fsm.py` | Lightweight checks for the state machine and verdict scoring. |
 | `test_dialogue.py` | Lightweight checks for the branching dialogue engine's once / exclusive / nesting rules. |
+| `test_retrieval.py` | Lightweight checks for the static retrieval (band routing, rotation, nugget-slip integrity, latency sampling), plus an optional real-model sweep. |
 | `docs/` | The static, browser-based demo published to GitHub Pages. Plain HTML/CSS/JS ports of the three modes; the AI suspect uses Qwen2.5-0.5B-Instruct via transformers.js. See [The web demo](#the-web-demo). |
 
 ## Design notes (worth knowing before a demo or a question)
@@ -90,14 +93,25 @@ scripted suspect games have traditionally used, with the matching done by
 alibi, money, the weapon, the cellar trip, the blood on the doorknob, and so
 on), each holding an ordered list of pre-written reply variants, optional
 "asked and answered" repeat lines, and several example questions. The player's
-input is embedded with a Sentence Transformer (all-MiniLM-L6-v2) and the
-nearest topic's next unspoken variant is returned: the first ask gets the
-canonical answer, repeat asks get rephrasings and then pointed
-you've-asked-me-this lines, and off-script input gets generic fallbacks that
-cycle from polite to testy. The rotation is a deterministic per-session
-counter, not a model. This keeps it from being a strawman without turning it
+input is embedded with a Sentence Transformer (all-MiniLM-L6-v2) and routed by
+distance into one of three bands. A *confident* match -- close enough, and
+clearly closer to one topic than to any other -- speaks that topic's next
+unspoken variant: the first ask gets the canonical answer, repeat asks get
+rephrasings and then pointed you've-asked-me-this lines. A *near-miss* (or a
+coin-flip tie between two topics; all the entries orbit the same murder, so
+neighbouring topics sit close in embedding space) gets an in-character
+clarifying line that names the closest topic ("If it's my trip to the cellar
+you're asking about, Inspector, say so plainly...") instead of a confident
+answer about the wrong thing. Genuinely off-script input gets generic
+fallbacks that cycle from polite to testy. The rotation is a deterministic
+per-session counter, not a model. Her response *time* is disguised too: the
+lookup is instant, so `latency.py` sleeps for a delay sampled from the dynamic
+condition's actually recorded latencies (fed live from every dynamic turn and
+persisted across sessions), keeping timing from unblinding the conditions.
+This keeps it from being a strawman without turning it
 into anything adaptive: it answers obvious questions, tolerates paraphrases the
-script never anticipated ("remind me what you're called"), and doesn't parrot
+script never anticipated ("remind me what you're called"), asks for precision
+rather than guessing when a question is ambiguous, and doesn't parrot
 one line forever -- yet it still generates nothing and adapts to nothing. The
 three slips are baked into the script as fixed text (the neck detail in the
 weapon answer, the doorway at a quarter to ten in the last-seen answer, the cut
@@ -190,10 +204,13 @@ published to GitHub Pages. It re-implements the three modes in plain JavaScript:
 | `docs/js/llm.js` | `llm_client.py`, but loads Qwen2.5-0.5B-Instruct in-browser via transformers.js |
 | `docs/js/app.js`, `docs/index.html`, `docs/css/style.css` | the UI (a JS counterpart to `ui.py`) |
 
-The **Python files are the canonical source**; the JS files are hand-kept mirrors
-of the same frozen scenario data and rules (`docs/js/static_qa_data.js` is a
-paste of `data/suspect_qa.json`, so the static tab has the same variants,
-repeat lines and baked-in slips as the Python app). Note: the web demo's *AI*
+The **Python files are the canonical source**; the JS logic files are hand-kept
+mirrors of the same frozen scenario rules, and `docs/js/static_qa_data.js` is
+**generated** from `data/suspect_qa.json` by `python sync_qa_data.py`, so the
+static tab has the same variants, repeat lines, topic hints and baked-in slips
+as the Python app. (The demo's static tab adds no artificial latency: its tabs
+are openly labeled, so there is no blinded condition to disguise.) Note: the
+web demo's *AI*
 tab still mirrors the pre-nugget version of the scenario -- the in-browser 0.5B
 model is too small to follow per-turn drop instructions reliably, so the
 three-slips confrontation mechanic is a Python-app feature for now. The AI tab

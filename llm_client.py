@@ -25,7 +25,7 @@ REQUEST_TIMEOUT = 120
 
 
 def get_response(system_prompt, messages, temperature=0.7, max_tokens=200,
-                 response_format=None, repeat_penalty=1.2):
+                 response_format=None, repeat_penalty=1.2, id_slot=None):
     """
     Send one chat completion request to the local server and return the reply.
 
@@ -57,6 +57,12 @@ def get_response(system_prompt, messages, temperature=0.7, max_tokens=200,
         when ``response_format`` is None: penalising repeats during constrained
         JSON decoding would bias the classifier against giving several axes the
         same (correct) value such as "none".
+    id_slot : int, optional
+        Pin the request to a specific llama-server slot. The app itself never
+        sets this: with ``--parallel 2`` the server's prompt-similarity routing
+        already keeps the classifier's fixed prefix and the conversation on
+        separate cached slots. It exists so benchmark_llm.py can A/B explicit
+        pinning against that automatic routing.
 
     Returns
     -------
@@ -72,11 +78,17 @@ def get_response(system_prompt, messages, temperature=0.7, max_tokens=200,
         "temperature": temperature,
         "max_tokens": max_tokens,
         "stream": False,
+        # llama.cpp extension: reuse the slot's KV cache for the longest common
+        # prompt prefix instead of reprocessing from token 0. Recent builds
+        # default this on; explicit keeps it true regardless of server version.
+        "cache_prompt": True,
     }
     if response_format is not None:
         payload["response_format"] = response_format
     else:
         payload["repeat_penalty"] = repeat_penalty
+    if id_slot is not None:
+        payload["id_slot"] = id_slot
 
     start = time.perf_counter()
     try:
@@ -96,6 +108,30 @@ def get_response(system_prompt, messages, temperature=0.7, max_tokens=200,
 
     latency_ms = (time.perf_counter() - start) * 1000.0
     return reply, latency_ms
+
+
+def trim_history(messages, max_turns):
+    """
+    Return the tail of a chat history, capped at ``max_turns`` question/answer
+    pairs plus the trailing user message.
+
+    The full history is kept elsewhere (UI transcript, session logs); this only
+    shrinks what is sent to the model, so the prompt stops growing without
+    bound and fits a small server context. Load-bearing older facts are
+    re-injected via the system prompt (SuspectFSM.get_established_facts), not
+    kept as raw transcript.
+
+    The result never starts with an assistant message: Mistral-family chat
+    templates expect strict user-first alternation after the system message,
+    and a dangling assistant line at the top can degrade or error the template.
+    ``max_turns`` <= 0 (or None) disables trimming and returns the list as is.
+    """
+    if not max_turns or max_turns <= 0 or len(messages) <= 2 * max_turns + 1:
+        return messages
+    trimmed = messages[-(2 * max_turns + 1):]
+    if trimmed and trimmed[0].get("role") == "assistant":
+        trimmed = trimmed[1:]
+    return trimmed
 
 
 def server_is_up():

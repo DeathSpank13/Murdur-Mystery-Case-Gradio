@@ -26,6 +26,7 @@ import time
 import gradio as gr
 
 import static_dialogue
+import latency
 import llm_client
 import logger
 import intent_classifier
@@ -48,6 +49,16 @@ MAX_OPTIONS = max(
 # fades them. Gradio 6 reads custom css from launch(css=...), so main.py passes
 # this there (the Blocks(css=...) constructor argument is deprecated and ignored).
 BRANCHING_CSS = ".option-used { opacity: 0.55; }"
+
+# How many recent question/answer pairs the reply model sees. The full history
+# still lives in llm_history (UI transcript, logs, classifier context); only
+# the generation call is capped, so the prompt and the server's KV cache stop
+# growing without bound. Older load-bearing moments (her slips, landed
+# confrontations) are re-injected via SuspectFSM.get_established_facts(), so
+# trimming never lets her contradict the on-record transcript. 6 pairs plus
+# the current question stays well inside a 4096-token server slot alongside
+# the persona prompt.
+LLM_HISTORY_MAX_TURNS = 6
 
 
 INTRO = (
@@ -140,27 +151,31 @@ def handle_turn(
 
     signal_dict = None
     nugget_event = None
+    classifier_ms = None
+    generation_ms = None
     if condition == "static":
         start = time.perf_counter()
         reply = static_dialogue.get_response(player_input, static_counts)
         real_latency_ms = (time.perf_counter() - start) * 1000.0
-        # Add a length-scaled artificial delay so the instant lookup doesn't
-        # give the static condition away (and confound the study). A researcher
+        # Add an artificial delay so the instant lookup doesn't give the
+        # static condition away (and confound the study): sampled from the
+        # dynamic condition's recorded latencies (see latency.py). A researcher
         # can disable it via the dev toggle for fast iteration.
-        simulated_latency_ms = static_dialogue.simulate_latency(reply) if simulate_delay else 0.0
+        simulated_latency_ms = latency.simulate_latency(reply) if simulate_delay else 0.0
         latency_ms = real_latency_ms + simulated_latency_ms   # perceived total
         state_value = "n/a (static script)"
     else:
         # Classify the turn on its multi-axis Signal first (using the history so
         # far for context), then let the FSM move on the combination of axes. The
-        # classification is a separate model call, so it adds to the turn latency.
-        signal = intent_classifier.classify(player_input, llm_history)
+        # classification is a separate model call, so it adds to the turn latency
+        # and is counted into the perceived total below.
+        signal, classifier_ms = intent_classifier.classify(player_input, llm_history)
         signal_dict = signal.as_dict()
         fsm.transition(signal, player_input)
         system_prompt = fsm.get_system_prompt()
         attempted_drop = fsm.pending_drop
         llm_history.append({"role": "user", "content": player_input})
-        reply, latency_ms = llm_client.get_response(system_prompt, llm_history)
+        reply, generation_ms = llm_client.get_response(system_prompt, llm_history)
         # One retry when a planned slip was not actually said: the drop
         # instruction is still in the prompt, and a fresh sample usually
         # complies. The retry is kept only if it contains the marker, so a
@@ -168,10 +183,14 @@ def handle_turn(
         retried_drop = False
         if attempted_drop and not _marker_in_reply(attempted_drop, reply):
             retry_reply, retry_latency = llm_client.get_response(system_prompt, llm_history)
-            latency_ms += retry_latency
+            generation_ms += retry_latency
             if _marker_in_reply(attempted_drop, retry_reply):
                 reply = retry_reply
                 retried_drop = True
+        latency_ms = classifier_ms + generation_ms
+        # Feed the observed latency into the calibration store so the static
+        # condition's simulated waits track what the dynamic one really takes.
+        latency.record_dynamic_latency(latency_ms)
         llm_history.append({"role": "assistant", "content": reply})
         # Confirm whether the slip planned for this reply was actually said;
         # the nugget only becomes confrontable once it is in the transcript.
@@ -192,6 +211,8 @@ def handle_turn(
         signal=signal_dict,
         real_latency_ms=real_latency_ms,
         simulated_latency_ms=simulated_latency_ms,
+        classifier_latency_ms=classifier_ms,
+        generation_latency_ms=generation_ms,
         nuggets_dropped=sorted(fsm.nuggets_dropped) if signal_dict else None,
         nuggets_confronted=sorted(fsm.nuggets_confronted) if signal_dict else None,
         nugget_event=nugget_event,
