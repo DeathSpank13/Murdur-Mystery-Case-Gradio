@@ -358,56 +358,145 @@ def run_integration():
 
 
 def run_latency():
-    """Unit-test the pure latency sampling maths (no sleeps, seeded rng)."""
+    """Unit-test the pure pacing maths (no sleeps, no I/O, seeded rng)."""
     results = []
     rng = random.Random(0)
 
-    # Empirical path: a drawn sample stays within jitter of the input sample.
-    lo = 8000.0 * (1.0 - latency.LATENCY_JITTER)
-    hi = 8000.0 * (1.0 + latency.LATENCY_JITTER)
-    drawn = [latency.sample_latency_ms("x" * 100, [8000.0], rng) for _ in range(20)]
+    # Empirical path: a drawn pre-delay stays within jitter of the input sample.
+    lo = 8000.0 * (1.0 - latency.JITTER)
+    hi = 8000.0 * (1.0 + latency.JITTER)
+    drawn = [latency.sample_pre_delay_ms([8000.0], rng) for _ in range(20)]
     results.append(check(
-        "empirical sample stays within jitter of the observed latency",
+        "pre-delay sample stays within jitter of the observed wait",
         all(lo <= value <= hi for value in drawn),
     ))
 
-    # Clamping at both ends: a tiny observed sample can't produce an instant
-    # reply, a huge one can't stall past the ceiling.
+    # Clamping at both ends: a tiny observed wait can't feel instant, a huge
+    # one can't stall past the ceiling (and never lands identically at it).
     results.append(check(
-        "small samples clamp to the floor",
-        latency.sample_latency_ms("reply", [500.0], rng) == latency.SIM_LATENCY_MIN_MS,
+        "small pre-delay samples clamp to the floor",
+        latency.sample_pre_delay_ms([500.0], rng) == latency.PRE_DELAY_MIN_MS,
     ))
-    over = [latency.sample_latency_ms("reply", [50000.0], rng) for _ in range(20)]
+    over = [latency.sample_pre_delay_ms([50000.0], rng) for _ in range(20)]
     results.append(check(
-        "large samples land just under the ceiling, never identically at it",
-        all(0.9 * latency.SIM_LATENCY_MAX_MS <= value <= latency.SIM_LATENCY_MAX_MS
+        "large pre-delay samples land just under the ceiling, never at it",
+        all(0.9 * latency.PRE_DELAY_MAX_MS <= value <= latency.PRE_DELAY_MAX_MS
             for value in over)
         and len(set(over)) > 1,
     ))
 
-    # Cold-start fallback (no samples anywhere): scales with reply length and
-    # respects the same clamps.
-    short = [latency.sample_latency_ms("", [], rng) for _ in range(20)]
-    long = [latency.sample_latency_ms("x" * 400, [], rng) for _ in range(20)]
-    base_lo = latency.FALLBACK_BASE_MS * (1.0 - latency.FALLBACK_JITTER)
-    base_hi = latency.FALLBACK_BASE_MS * (1.0 + latency.FALLBACK_JITTER)
+    # Cold-start fallbacks (no samples anywhere) land around the constants.
+    fallback_pre = [latency.sample_pre_delay_ms([], rng) for _ in range(20)]
+    pre_lo = latency.FALLBACK_PRE_DELAY_MS * (1.0 - latency.FALLBACK_JITTER)
+    pre_hi = latency.FALLBACK_PRE_DELAY_MS * (1.0 + latency.FALLBACK_JITTER)
     results.append(check(
-        "cold-start formula: empty reply lands around the base delay",
-        all(base_lo <= value <= base_hi for value in short),
+        "cold-start pre-delay lands around the fallback constant",
+        all(pre_lo <= value <= pre_hi for value in fallback_pre),
     ))
+    fallback_pace = [latency.sample_chars_per_sec([], rng) for _ in range(20)]
+    pace_lo = latency.FALLBACK_CHARS_PER_SEC * (1.0 - latency.FALLBACK_JITTER)
+    pace_hi = latency.FALLBACK_CHARS_PER_SEC * (1.0 + latency.FALLBACK_JITTER)
     results.append(check(
-        "cold-start formula: a long reply waits longer, up to the ceiling",
-        all(value > base_hi and value <= latency.SIM_LATENCY_MAX_MS for value in long),
+        "cold-start pace lands around the fallback constant",
+        all(pace_lo <= value <= pace_hi for value in fallback_pace),
     ))
 
-    # Record-range guard: server-down instant replies and timeout pathologies
-    # must never enter the calibration pool.
+    # Pace clamps are soft on BOTH sides: repeated draws near a bound must not
+    # collapse to one identical value (a fixed pace is itself a tell).
+    fast = [latency.sample_chars_per_sec([500.0], rng) for _ in range(20)]
     results.append(check(
-        "record validation rejects outliers and accepts normal turns",
-        not latency._valid_sample(200.0)
-        and not latency._valid_sample(120000.0)
-        and not latency._valid_sample(None)
-        and latency._valid_sample(9000.0),
+        "fast pace samples land just under the ceiling, never at it",
+        all(0.9 * latency.PACE_MAX_CPS <= value <= latency.PACE_MAX_CPS for value in fast)
+        and len(set(fast)) > 1,
+    ))
+    slow = [latency.sample_chars_per_sec([6.0], rng) for _ in range(20)]
+    results.append(check(
+        "slow pace samples land just above the floor, never at it",
+        all(latency.PACE_MIN_CPS <= value <= 1.1 * latency.PACE_MIN_CPS for value in slow)
+        and len(set(slow)) > 1,
+    ))
+
+    # Record-range guards: server-down instant replies, timeout pathologies
+    # and implausible paces must never enter the calibration pool.
+    results.append(check(
+        "record validation rejects outliers and accepts normal observations",
+        not latency._valid_pre_delay(200.0)
+        and not latency._valid_pre_delay(120000.0)
+        and not latency._valid_pre_delay(None)
+        and latency._valid_pre_delay(9000.0)
+        and not latency._valid_pace(2.0)
+        and not latency._valid_pace(500.0)
+        and not latency._valid_pace(None)
+        and latency._valid_pace(25.0),
+    ))
+
+    # Store parsing: v2 round-trips with out-of-range entries filtered; the
+    # legacy v1 flat list (unsplittable totals) and garbage parse to empty.
+    parsed = latency._parse_store({
+        "version": 2,
+        "pre_delay_ms": [4000.0, 100.0, 100000.0, "bad"],
+        "chars_per_sec": [25.0, 2.0, 500.0, None],
+    })
+    results.append(check(
+        "v2 store round-trips with out-of-range entries filtered",
+        parsed == {"pre_delay_ms": [4000.0], "chars_per_sec": [25.0]},
+    ))
+    results.append(check(
+        "legacy flat-list store and garbage parse to an empty store",
+        latency._parse_store([9000.0, 12000.0]) == latency._empty_store()
+        and latency._parse_store("garbage") == latency._empty_store()
+        and latency._parse_store(None) == latency._empty_store(),
+    ))
+
+    # Log harvesting: only dynamic turns written by the streaming code (which
+    # carry ttft_ms) yield observations; the pace maths matches by hand.
+    new_turn = {
+        "condition": "dynamic", "ttft_ms": 1000.0,
+        "classifier_latency_ms": 2000.0, "generation_latency_ms": 6000.0,
+        "npc_reply": "x" * 100,
+    }
+    pre_delay, pace = latency.observation_from_turn(new_turn)
+    results.append(check(
+        "observation_from_turn derives pre-delay and pace from a new-style turn",
+        pre_delay == 3000.0 and pace is not None and abs(pace - 20.0) < 1e-9,
+    ))
+    old_turn = {"condition": "dynamic", "latency_ms": 9000.0,
+                "classifier_latency_ms": 2000.0, "generation_latency_ms": 7000.0,
+                "npc_reply": "x" * 100}
+    short_turn = dict(new_turn, npc_reply="x" * 5)
+    results.append(check(
+        "old-style, static and too-short turns contribute no observations",
+        latency.observation_from_turn(old_turn) == (None, None)
+        and latency.observation_from_turn({"condition": "static"}) == (None, None)
+        and latency.observation_from_turn(short_turn)[1] is None,
+    ))
+
+    # Reveal chunking: prefixes grow monotonically to exactly the full reply,
+    # chunks stay in the 2-6 char band, and the total sleep preserves the
+    # requested pace within one tick's tolerance.
+    reply = "x" * 157
+    cps = 25.0
+    ticks = latency.reveal_ticks(reply, cps)
+    prefixes = [prefix for prefix, _ in ticks]
+    total_sleep = sum(sleep for _, sleep in ticks)
+    steps = [len(b) - len(a) for a, b in zip(prefixes, prefixes[1:])]
+    results.append(check(
+        "reveal_ticks ends on the full reply with strictly growing prefixes",
+        prefixes[-1] == reply and all(step > 0 for step in steps),
+    ))
+    results.append(check(
+        "reveal_ticks chunks stay in the 2-6 char band (last may be partial)",
+        len(prefixes[0]) in range(2, 7)
+        and set(steps[:-1]) <= set(range(2, 7))
+        and steps[-1] in range(1, 7),
+    ))
+    results.append(check(
+        "reveal_ticks total sleep preserves the requested pace",
+        abs(total_sleep - len(reply) / cps) <= 6.0 / cps,
+    ))
+    results.append(check(
+        "reveal_ticks handles an empty reply as a single instant tick",
+        latency.reveal_ticks("", cps) == [("", 0.0)],
     ))
     return results
 

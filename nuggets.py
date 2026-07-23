@@ -93,8 +93,9 @@ NUGGETS = {
         "drop_markers": ["doorway", "quarter to ten"],
         "confront_hint": (
             "points out that the suspect claims she never went down the east "
-            "corridor, yet said she saw Charles in the study doorway at a "
-            "quarter to ten, inside the time of death window"
+            "corridor, or was in the drawing room or the cellar at that hour, "
+            "yet said she saw Charles in the study doorway at a quarter to "
+            "ten, inside the time of death window"
         ),
         "label": (
             "saying you saw him in the study doorway at a quarter to ten, when "

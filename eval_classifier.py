@@ -141,6 +141,11 @@ CASES = [
      {"evidence": "strong", "accusation": "implied", "aggression": "low",
       "warmth": "neutral", "conscience": False, "probing": False,
       "topic": "none", "nugget": "corridor"}),
+    ("He was at the study doorway with the telephone, a quarter to ten perhaps, waving me off.",
+     "Your own statement puts you in the cellar at a quarter to ten -- yet you tell me you watched him in the study doorway at that same hour. Both cannot be true.",
+     {"evidence": "strong", "accusation": "implied", "aggression": "low",
+      "warmth": "neutral", "conscience": False, "probing": False,
+      "topic": "none", "nugget": "corridor"}),
     ("Just a nick on my thumb from the cellar latch. It bled absurdly.",
      "The blood on the inside of the study doorknob isn't Charles's. It's from that thumb of yours, isn't it?",
      {"evidence": "strong", "accusation": "implied", "aggression": "low",
@@ -158,6 +163,10 @@ CASES = [
      {"evidence": "none", "accusation": "none", "aggression": "low",
       "warmth": "neutral", "conscience": False, "probing": False,
       "topic": "cut", "nugget": "none"}),
+    ("", "You told the constable you never entered the east corridor -- do you stand by that?",
+     {"evidence": "none", "accusation": "none", "aggression": "low",
+      "warmth": "neutral", "conscience": False, "probing": True,
+      "topic": "none", "nugget": "none"}),
 ]
 
 

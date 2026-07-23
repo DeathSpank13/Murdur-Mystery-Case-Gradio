@@ -11,6 +11,7 @@ library is used, no vendor SDKs, which keeps the dependency surface small and
 makes the data flow easy to inspect.
 """
 
+import json
 import time
 
 import requests
@@ -22,6 +23,15 @@ SERVER_URL = "http://localhost:8080/v1/chat/completions"
 # Network timeout in seconds. Local inference can be slow on first token, so
 # this is generous. Latency is one of the things worth measuring in Phase 5.
 REQUEST_TIMEOUT = 120
+
+# Fallback replies shared by the blocking and streaming paths, so a streamed
+# failure reads exactly like a non-streamed one in the transcript and logs.
+FALLBACK_UNREACHABLE = (
+    "[The suspect says nothing. The local model server is not "
+    "reachable. Start llama-server on port 8080 and try again.]"
+)
+FALLBACK_TIMEOUT = "[The suspect hesitates too long. The model timed out.]"
+FALLBACK_BAD_FORMAT = "[The model returned an unexpected response format.]"
 
 
 def get_response(system_prompt, messages, temperature=0.7, max_tokens=200,
@@ -97,17 +107,123 @@ def get_response(system_prompt, messages, temperature=0.7, max_tokens=200,
         data = response.json()
         reply = data["choices"][0]["message"]["content"].strip()
     except requests.exceptions.ConnectionError:
-        reply = (
-            "[The suspect says nothing. The local model server is not "
-            "reachable. Start llama-server on port 8080 and try again.]"
-        )
+        reply = FALLBACK_UNREACHABLE
     except requests.exceptions.Timeout:
-        reply = "[The suspect hesitates too long. The model timed out.]"
+        reply = FALLBACK_TIMEOUT
     except (KeyError, IndexError, ValueError):
-        reply = "[The model returned an unexpected response format.]"
+        reply = FALLBACK_BAD_FORMAT
 
     latency_ms = (time.perf_counter() - start) * 1000.0
     return reply, latency_ms
+
+
+# Sentinel returned by parse_sse_line for the end-of-stream marker.
+SSE_DONE = object()
+
+
+def parse_sse_line(line):
+    """
+    Decode one line of a llama-server SSE stream. Pure, never raises.
+
+    Returns SSE_DONE for the terminal "data: [DONE]" marker, the content delta
+    string (possibly "") for a data chunk that carries one, and None for
+    everything else: blank keep-alive lines, ": comment" lines, the role-only
+    first chunk, the finish_reason chunk, and malformed JSON (skipped rather
+    than surfaced -- one bad chunk should not kill an otherwise good reply).
+    """
+    line = (line or "").strip()
+    if not line.startswith("data:"):
+        return None
+    payload = line[len("data:"):].strip()
+    if payload == "[DONE]":
+        return SSE_DONE
+    try:
+        chunk = json.loads(payload)
+        delta = chunk["choices"][0].get("delta") or {}
+        content = delta.get("content")
+    except (ValueError, KeyError, IndexError, TypeError, AttributeError):
+        return None
+    return content if isinstance(content, str) else None
+
+
+def stream_response(system_prompt, messages, temperature=0.7, max_tokens=200,
+                    repeat_penalty=1.2, id_slot=None):
+    """
+    Stream one chat completion from the local server.
+
+    A generator counterpart to get_response() for in-character replies (the
+    classifier keeps the blocking call: constrained-JSON output is useless
+    until complete). Yields ("delta", text) as tokens arrive, then exactly one
+    ("done", info) where info is:
+
+        reply     full accumulated text, stripped -- authoritative: callers
+                  must replace any partial display with it (on errors it is a
+                  fallback string that never streamed as deltas).
+        ttft_ms   start to first content delta, or None if none arrived.
+        total_ms  start to stream end (or failure), the generation wall time.
+        error     True when reply is a fallback rather than model output.
+
+    Failures anywhere -- before the first token or mid-stream -- collapse to
+    the same fallback strings get_response() uses, so a dropped stream reads
+    exactly like a failed blocking call. With stream=True the request timeout
+    applies per socket read, so a mid-generation stall raises Timeout here
+    rather than hanging the turn.
+    """
+    payload = {
+        "messages": [{"role": "system", "content": system_prompt}] + messages,
+        "temperature": temperature,
+        "max_tokens": max_tokens,
+        "stream": True,
+        "cache_prompt": True,
+        "repeat_penalty": repeat_penalty,
+    }
+    if id_slot is not None:
+        payload["id_slot"] = id_slot
+
+    start = time.perf_counter()
+    parts = []
+    ttft_ms = None
+    error = None
+    response = None
+    try:
+        response = requests.post(
+            SERVER_URL, json=payload, timeout=REQUEST_TIMEOUT, stream=True
+        )
+        response.raise_for_status()
+        for line in response.iter_lines(decode_unicode=True):
+            piece = parse_sse_line(line)
+            if piece is SSE_DONE:
+                break
+            if piece is None:
+                continue
+            if ttft_ms is None:
+                ttft_ms = (time.perf_counter() - start) * 1000.0
+            parts.append(piece)
+            yield ("delta", piece)
+    except requests.exceptions.Timeout:
+        error = FALLBACK_TIMEOUT
+    except requests.exceptions.RequestException:
+        # ConnectionError before the first byte, ChunkedEncodingError on a
+        # mid-stream disconnect, HTTPError from raise_for_status: all mean
+        # the server failed us, same as unreachable in the blocking client.
+        error = FALLBACK_UNREACHABLE
+    except (KeyError, IndexError, ValueError):
+        error = FALLBACK_BAD_FORMAT
+    finally:
+        if response is not None:
+            response.close()
+
+    total_ms = (time.perf_counter() - start) * 1000.0
+    if error is not None:
+        info = {"reply": error, "ttft_ms": None, "total_ms": total_ms, "error": True}
+    else:
+        info = {
+            "reply": "".join(parts).strip(),
+            "ttft_ms": ttft_ms,
+            "total_ms": total_ms,
+            "error": False,
+        }
+    yield ("done", info)
 
 
 def trim_history(messages, max_turns):

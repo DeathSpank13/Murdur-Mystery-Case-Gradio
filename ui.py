@@ -71,11 +71,16 @@ INTRO = (
     "to fetch him for dessert. Guests were kept out of the room, and details "
     "of the wound have not been released to anyone in the house.\n"
     "2. The coroner puts the time of death between 9:30 and 10:00 pm.\n"
-    "3. The study sits at the end of the east corridor; the kitchen, back "
-    "stairs and wine cellar are at the west end of the house.\n"
+    "3. The study sits at the end of the east corridor, and its door can be "
+    "seen only from inside that corridor; the kitchen, back stairs and wine "
+    "cellar are at the west end of the house.\n"
     "4. Forensics found a fresh smear of blood on the inside knob of the study "
     "door -- not Charles's type. The letter opener that killed him was wiped "
-    "clean.\n\n"
+    "clean.\n"
+    "5. In her statement to the constable last night, Mrs Vance said she was "
+    "in the drawing room all evening, apart from roughly five minutes fetching "
+    "wine from the cellar at about twenty to ten, and that she never set foot "
+    "in the east corridor.\n\n"
     "Listen closely: a suspect's own words are worth more than any accusation. "
     "Accusing her outright, or waving evidence you cannot actually show, will "
     "only put her on her guard. Ask her about the case instead, compare her "
@@ -121,48 +126,95 @@ def _marker_in_reply(nugget_id, reply):
     return any(marker in text for marker in NUGGETS[nugget_id]["drop_markers"])
 
 
+def paced_reveal(reply, pre_delay_ms, chars_per_sec):
+    """
+    Yield growing prefixes of a finished reply so it looks live-streamed:
+    sleep out the synthesized "thinking" wait, then walk latency.reveal_ticks
+    at the given pace. The static condition uses this on every turn and the
+    dynamic condition on buffered drop turns (with pre_delay_ms=0, since their
+    real compute already provided the visible wait) -- one code path, so the
+    two conditions cannot drift apart visually.
+    """
+    if pre_delay_ms > 0:
+        time.sleep(pre_delay_ms / 1000.0)
+    for prefix, sleep_s in latency.reveal_ticks(reply, chars_per_sec):
+        if sleep_s > 0:
+            time.sleep(sleep_s)
+        yield prefix
+
+
 def handle_turn(
     player_input, chat, detective_label, fsm, static_counts, llm_history,
     label_mapping, session_logger, researcher_on, simulate_delay=True,
 ):
     """
-    Process one player turn.
+    Process one player turn, yielding UI updates as the reply appears.
 
-    Resolves the chosen neutral label to its hidden condition, generates the
-    reply, logs the turn (with latency and FSM state), and returns updated UI
-    values. State readout and latency are only made visible when researcher_on.
+    A generator: Gradio streams each yielded tuple to the components, so the
+    reply materialises in the chatbot instead of popping in whole. Resolves
+    the chosen neutral label to its hidden condition, generates the reply
+    (live-streamed from the model for dynamic turns, replayed through
+    paced_reveal for static and buffered-drop turns), logs the turn (with
+    latency and FSM state), and finishes with the full readout. State and
+    latency are only made visible when researcher_on.
     """
     chat = chat or []
     condition = label_mapping.get(detective_label, "dynamic")
+    turn_start = time.perf_counter()
 
     def state_update(text):
         return gr.update(value=text, visible=researcher_on)
 
+    def step(latency_update=None, state_text=None):
+        """One yield's full output tuple; labels default to no-op updates."""
+        return (
+            chat, "",
+            state_update(state_text) if state_text is not None else gr.update(),
+            latency_update if latency_update is not None else gr.update(),
+            fsm, static_counts, llm_history, label_mapping, session_logger,
+        )
+
     if not player_input or not player_input.strip():
         current = fsm.get_state().value if condition == "dynamic" else "n/a (static script)"
-        return (
+        yield (
             chat, "",
             state_update(f"**Suspect state:** {current}"),
             gr.update(visible=researcher_on),
             fsm, static_counts, llm_history, label_mapping, session_logger,
         )
+        return
 
     chat.append({"role": "user", "content": player_input})
+    # Show the question immediately, with a thinking bubble that the first
+    # revealed text replaces in place. Both conditions render this identically.
+    chat.append({"role": "assistant", "content": "…"})
+    yield step()
 
     signal_dict = None
     nugget_event = None
     classifier_ms = None
     generation_ms = None
+    ttft_ms = None
+    reveal_pre_delay_ms = None
+    reveal_cps = None
     if condition == "static":
         start = time.perf_counter()
         reply = static_dialogue.get_response(player_input, static_counts)
         real_latency_ms = (time.perf_counter() - start) * 1000.0
-        # Add an artificial delay so the instant lookup doesn't give the
-        # static condition away (and confound the study): sampled from the
-        # dynamic condition's recorded latencies (see latency.py). A researcher
-        # can disable it via the dev toggle for fast iteration.
-        simulated_latency_ms = latency.simulate_latency(reply) if simulate_delay else 0.0
-        latency_ms = real_latency_ms + simulated_latency_ms   # perceived total
+        # Mimic the dynamic condition's streaming so the instant lookup doesn't
+        # give the static condition away (and confound the study): a thinking
+        # wait matched to observed classifier+first-token delays, then a
+        # typewriter reveal at an observed generation pace (see latency.py). A
+        # researcher can disable both via the dev toggle for fast iteration.
+        if simulate_delay:
+            reveal_pre_delay_ms, reveal_cps = latency.sample_static_pacing()
+            for prefix in paced_reveal(reply, reveal_pre_delay_ms, reveal_cps):
+                chat[-1]["content"] = prefix
+                yield step()
+        else:
+            chat[-1]["content"] = reply
+        latency_ms = (time.perf_counter() - turn_start) * 1000.0   # perceived total
+        simulated_latency_ms = latency_ms - real_latency_ms
         state_value = "n/a (static script)"
     else:
         # Classify the turn on its multi-axis Signal first (using the history so
@@ -176,22 +228,60 @@ def handle_turn(
         attempted_drop = fsm.pending_drop
         llm_history.append({"role": "user", "content": player_input})
         context = llm_client.trim_history(llm_history, LLM_HISTORY_MAX_TURNS)
-        reply, generation_ms = llm_client.get_response(system_prompt, context)
-        # One retry when a planned slip was not actually said: the drop
-        # instruction is still in the prompt, and a fresh sample usually
-        # complies. The retry is kept only if it contains the marker, so a
-        # second miss never replaces an otherwise fine reply.
         retried_drop = False
-        if attempted_drop and not _marker_in_reply(attempted_drop, reply):
-            retry_reply, retry_latency = llm_client.get_response(system_prompt, context)
-            generation_ms += retry_latency
-            if _marker_in_reply(attempted_drop, retry_reply):
-                reply = retry_reply
-                retried_drop = True
-        latency_ms = classifier_ms + generation_ms
-        # Feed the observed latency into the calibration store so the static
-        # condition's simulated waits track what the dynamic one really takes.
-        latency.record_dynamic_latency(latency_ms)
+        if attempted_drop:
+            # Buffered path. A planned slip gets one silent retry when the
+            # reply misses its marker (the drop instruction is still in the
+            # prompt, and a fresh sample usually complies; the retry is kept
+            # only if it contains the marker, so a second miss never replaces
+            # an otherwise fine reply). Streaming live would flash a reply
+            # that the retry is about to replace, so generate blocking and
+            # replay the reveal exactly as the static condition does.
+            reply, generation_ms = llm_client.get_response(system_prompt, context)
+            if not _marker_in_reply(attempted_drop, reply):
+                retry_reply, retry_latency = llm_client.get_response(system_prompt, context)
+                generation_ms += retry_latency
+                if _marker_in_reply(attempted_drop, retry_reply):
+                    reply = retry_reply
+                    retried_drop = True
+            if simulate_delay:
+                # Pre-delay 0: the real classify+generate wall time already
+                # served as the visible thinking wait.
+                _, reveal_cps = latency.sample_static_pacing()
+                reveal_pre_delay_ms = 0.0
+                for prefix in paced_reveal(reply, reveal_pre_delay_ms, reveal_cps):
+                    chat[-1]["content"] = prefix
+                    yield step()
+            else:
+                chat[-1]["content"] = reply
+            latency_ms = (time.perf_counter() - turn_start) * 1000.0
+        else:
+            # Live streaming: tokens appear exactly as the model produces
+            # them. The done event's reply is authoritative (on a mid-stream
+            # failure it is the fallback string, replacing any partial text).
+            buffer = ""
+            info = None
+            for kind, value in llm_client.stream_response(system_prompt, context):
+                if kind == "delta":
+                    buffer += value
+                    chat[-1]["content"] = buffer.lstrip()
+                    yield step()
+                else:
+                    info = value
+            reply = info["reply"]
+            generation_ms = info["total_ms"]
+            chat[-1]["content"] = reply
+            if not info["error"] and info["ttft_ms"] is not None:
+                ttft_ms = info["ttft_ms"]
+                # Feed the observed pacing into the calibration store so the
+                # static condition's synthesized reveals track what the dynamic
+                # one really does. Only live streams are recorded: a buffered
+                # turn's pacing was itself synthesized from this store.
+                pace = None
+                if generation_ms > ttft_ms and len(reply) >= latency.MIN_REPLY_CHARS_FOR_PACE:
+                    pace = len(reply) / ((generation_ms - ttft_ms) / 1000.0)
+                latency.record_dynamic_observation(classifier_ms + ttft_ms, pace)
+            latency_ms = classifier_ms + generation_ms
         llm_history.append({"role": "assistant", "content": reply})
         # Confirm whether the slip planned for this reply was actually said;
         # the nugget only becomes confrontable once it is in the transcript.
@@ -203,10 +293,9 @@ def handle_turn(
         elif attempted_drop:
             nugget_event = f"drop_failed:{attempted_drop}"
         state_value = fsm.get_state().value
-        real_latency_ms = latency_ms          # dynamic latency is already real
-        simulated_latency_ms = 0.0
+        real_latency_ms = classifier_ms + generation_ms   # true compute cost
+        simulated_latency_ms = latency_ms - real_latency_ms   # buffered reveal time
 
-    chat.append({"role": "assistant", "content": reply})
     session_logger.log_turn(
         condition, detective_label, player_input, reply, state_value, latency_ms,
         signal=signal_dict,
@@ -217,6 +306,9 @@ def handle_turn(
         nuggets_dropped=sorted(fsm.nuggets_dropped) if signal_dict else None,
         nuggets_confronted=sorted(fsm.nuggets_confronted) if signal_dict else None,
         nugget_event=nugget_event,
+        ttft_ms=ttft_ms,
+        reveal_pre_delay_ms=reveal_pre_delay_ms,
+        reveal_chars_per_sec=reveal_cps,
     )
 
     # Researcher readout: the state, plus the axes that drove it for the dynamic
@@ -239,11 +331,12 @@ def handle_turn(
             + nugget_text
         )
 
-    return (
-        chat, "",
-        state_update(state_text),
-        gr.update(value=f"**Last response latency:** {latency_ms:.0f} ms", visible=researcher_on),
-        fsm, static_counts, llm_history, label_mapping, session_logger,
+    yield step(
+        latency_update=gr.update(
+            value=f"**Last response latency:** {latency_ms:.0f} ms",
+            visible=researcher_on,
+        ),
+        state_text=state_text,
     )
 
 
@@ -443,8 +536,10 @@ def build_app():
             chatbot, msg, state_label, latency_label, fsm_state,
             static_counts_state, llm_history_state, label_mapping_state, logger_state,
         ]
-        send_btn.click(handle_turn, inputs=turn_inputs, outputs=turn_outputs)
-        msg.submit(handle_turn, inputs=turn_inputs, outputs=turn_outputs)
+        # handle_turn is a generator: Gradio streams each yielded tuple, so
+        # the reply materialises in the chatbot as it is generated/revealed.
+        send_evt = send_btn.click(handle_turn, inputs=turn_inputs, outputs=turn_outputs)
+        submit_evt = msg.submit(handle_turn, inputs=turn_inputs, outputs=turn_outputs)
 
         researcher_view.change(
             toggle_researcher, inputs=[researcher_view, label_mapping_state],
@@ -465,6 +560,9 @@ def build_app():
                 fsm_state, static_counts_state, llm_history_state,
                 label_mapping_state, logger_state, verdict_output,
             ],
+            # Stop an in-flight streaming turn so it can't keep writing into
+            # the freshly cleared chat (all its state is replaced anyway).
+            cancels=[send_evt, submit_evt],
         )
 
         # Wire branching events. Each button passes its fixed slot index; the

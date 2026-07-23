@@ -41,7 +41,8 @@ class SessionLogger:
     def log_turn(self, condition, label_shown, player_input, reply, state, latency_ms,
                  signal=None, real_latency_ms=None, simulated_latency_ms=None,
                  nuggets_dropped=None, nuggets_confronted=None, nugget_event=None,
-                 classifier_latency_ms=None, generation_latency_ms=None):
+                 classifier_latency_ms=None, generation_latency_ms=None,
+                 ttft_ms=None, reveal_pre_delay_ms=None, reveal_chars_per_sec=None):
         """
         Record one question and answer exchange.
 
@@ -65,6 +66,17 @@ class SessionLogger:
         condition's real cost into its two model calls (generation includes the
         occasional drop retry). None for static turns and in logs written before
         the split existed.
+
+        ``ttft_ms`` is the generation's time to first streamed token, recorded
+        only for live-streamed dynamic turns (None for static turns, buffered
+        drop turns, fallback replies, and logs from before streaming existed).
+        latency.py harvests it together with the reply length to calibrate the
+        static condition's synthesized pacing.
+
+        ``reveal_pre_delay_ms`` / ``reveal_chars_per_sec`` are the *synthetic*
+        pacing actually used to reveal the reply: set for static turns (both)
+        and for buffered dynamic drop turns (pre-delay 0.0, pace set). None for
+        live-streamed turns, whose pacing was the model's own.
         """
         self.turns.append(
             {
@@ -83,6 +95,9 @@ class SessionLogger:
                 "simulated_latency_ms": round(simulated_latency_ms, 1) if simulated_latency_ms is not None else None,
                 "classifier_latency_ms": round(classifier_latency_ms, 1) if classifier_latency_ms is not None else None,
                 "generation_latency_ms": round(generation_latency_ms, 1) if generation_latency_ms is not None else None,
+                "ttft_ms": round(ttft_ms, 1) if ttft_ms is not None else None,
+                "reveal_pre_delay_ms": round(reveal_pre_delay_ms, 1) if reveal_pre_delay_ms is not None else None,
+                "reveal_chars_per_sec": round(reveal_chars_per_sec, 1) if reveal_chars_per_sec is not None else None,
             }
         )
         self._flush()

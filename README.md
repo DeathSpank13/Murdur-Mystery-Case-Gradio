@@ -37,16 +37,17 @@ away); see the design note below for what it demonstrates.
 | `nuggets.py` | The three "slips" (nuggets): trigger topics, per turn drop instructions, reply markers, confrontation definitions, and the confession thresholds. |
 | `intent_classifier.py` | Classifies each player turn into a multi-axis `Signal` (evidence, accusation, aggression, warmth, conscience, probing, topic, nugget) with a keyword fallback. |
 | `static_dialogue.py` | The control condition. Semantic retrieval (ChromaDB + a Sentence Transformer) over a fixed Q&A database (`data/suspect_qa.json`), routed into three bands: a confident nearest-topic match speaks the next pre-written variant (repeat questions get "asked and answered" lines), a near-miss or a tie between two topics gets an in-character clarifying line naming the closest topic, and off-script input gets generic fallbacks. No generation. |
-| `latency.py` | Simulated "thinking" delay for the static condition, sampled from the dynamic condition's actually recorded latencies (rolling window persisted in `data/latency_stats.json`) so the two conditions can't be told apart by timing. |
+| `latency.py` | Pacing calibration for the static condition's fake streaming: rolling windows of the dynamic condition's observed thinking waits (classifier + first token) and typing paces (chars/sec), persisted in `data/latency_stats.json`, plus the pure reveal-chunking maths — so the two conditions can't be told apart by timing or by how the text appears. |
 | `sync_qa_data.py` | Regenerates the web demo's `docs/js/static_qa_data.js` from `data/suspect_qa.json`; run it whenever the database changes. |
 | `branching_dialogue.py` | Standalone choice-based dialogue tree: a menu of clickable options with one-time questions, mutually exclusive forks, and nested follow-ups. |
-| `llm_client.py` | Talks to the local llama.cpp server; returns each reply together with its measured latency. |
+| `llm_client.py` | Talks to the local llama.cpp server: a blocking call (classifier, drop turns) and an SSE streaming generator (live suspect replies), both returning measured latencies. |
 | `logger.py` | Writes each session (transcript, condition, FSM state, latency, verdicts) to a JSON file under `logs/`. |
 | `ui.py` | The Gradio interface: two tabs (the blinded A/B study, and the branching dialogue), researcher view, verdict mechanic, and the per turn logic. |
 | `main.py` | Entry point. Checks the server and launches the app. |
 | `test_fsm.py` | Lightweight checks for the state machine and verdict scoring. |
 | `test_dialogue.py` | Lightweight checks for the branching dialogue engine's once / exclusive / nesting rules. |
-| `test_retrieval.py` | Lightweight checks for the static retrieval (band routing, rotation, nugget-slip integrity, latency sampling), plus an optional real-model sweep. |
+| `test_retrieval.py` | Lightweight checks for the static retrieval (band routing, rotation, nugget-slip integrity, pacing calibration maths), plus an optional real-model sweep. |
+| `test_llm_stream.py` | Offline checks for the SSE streaming client: line parsing, the delta/done event protocol, and every failure mode collapsing to the blocking client's fallback strings. |
 | `docs/` | The static, browser-based demo published to GitHub Pages. Plain HTML/CSS/JS ports of the three modes; the AI suspect uses Qwen2.5-0.5B-Instruct via transformers.js. See [The web demo](#the-web-demo). |
 
 ## Design notes (worth knowing before a demo or a question)
@@ -105,9 +106,12 @@ you're asking about, Inspector, say so plainly...") instead of a confident
 answer about the wrong thing. Genuinely off-script input gets generic
 fallbacks that cycle from polite to testy. The rotation is a deterministic
 per-session counter, not a model. Her response *time* is disguised too: the
-lookup is instant, so `latency.py` sleeps for a delay sampled from the dynamic
-condition's actually recorded latencies (fed live from every dynamic turn and
-persisted across sessions), keeping timing from unblinding the conditions.
+dynamic suspect streams her reply token by token, so the instant static lookup
+replays the same look -- a "thinking" wait matched to the dynamic condition's
+observed classifier+first-token delays, then a character-paced typewriter
+reveal at an observed generation pace (both fed live from every streamed
+dynamic turn and persisted across sessions), so that neither the wait nor the
+way the text appears unblinds the conditions.
 This keeps it from being a strawman without turning it
 into anything adaptive: it answers obvious questions, tolerates paraphrases the
 script never anticipated ("remind me what you're called"), asks for precision
@@ -238,10 +242,12 @@ workload replays a fixed interrogation with deterministic FSM state so configs
 are byte-for-byte comparable; it also diffs the classifier's outputs across
 configs and warns if a config changes any classification.
 
-**After changing the server config**, reset the static condition's latency
-calibration so its simulated delays match the new dynamic speed: delete
-`data/latency_stats.json` and move old `logs/session_*.json` into
-`logs/archive/` (the calibration store re-seeds itself from those files).
+**After changing the server config**, reset the static condition's pacing
+calibration so its synthesized waits and typing pace match the new dynamic
+speed: delete `data/latency_stats.json` and move old `logs/session_*.json`
+into `logs/archive/` (the calibration store re-seeds itself from logged
+dynamic turns that carry `ttft_ms`; until fresh streamed turns accumulate,
+built-in fallback constants apply).
 
 ## The web demo
 
