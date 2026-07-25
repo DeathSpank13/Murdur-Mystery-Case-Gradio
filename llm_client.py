@@ -4,7 +4,7 @@ llm_client.py
 Thin client for the local llama.cpp server.
 
 llama-server exposes an OpenAI compatible endpoint at
-    http://localhost:8080/v1/chat/completions
+    http://127.0.0.1:8080/v1/chat/completions
 so we send a standard chat completion request: a system message (the persona
 chosen by the FSM) followed by the running conversation. Only the `requests`
 library is used, no vendor SDKs, which keeps the dependency surface small and
@@ -17,8 +17,12 @@ import time
 import requests
 
 # Default endpoint for `llama-server`. Override host/port here if you launch
-# the server differently.
-SERVER_URL = "http://localhost:8080/v1/chat/completions"
+# the server differently. Use the numeric address, not "localhost": on Windows
+# each new connection to "localhost" tries IPv6 ::1 first and stalls ~2s
+# before falling back to IPv4, and with one fresh connection per model call
+# that was ~4s of dead time on every dynamic turn (measured 2,040ms vs 16ms
+# per request on the study machine).
+SERVER_URL = "http://127.0.0.1:8080/v1/chat/completions"
 
 # Network timeout in seconds. Local inference can be slow on first token, so
 # this is generous. Latency is one of the things worth measuring in Phase 5.
@@ -257,7 +261,7 @@ def server_is_up():
     """
     try:
         # The models endpoint is cheap and confirms the server is alive.
-        probe = requests.get("http://localhost:8080/v1/models", timeout=3)
+        probe = requests.get("http://127.0.0.1:8080/v1/models", timeout=3)
         return probe.status_code == 200
     except requests.exceptions.RequestException:
         return False
