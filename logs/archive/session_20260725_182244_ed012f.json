@@ -1,0 +1,301 @@
+{
+  "session_id": "20260725_182244_ed012f",
+  "started_at": "2026-07-25T18:22:44",
+  "turns": [
+    {
+      "index": 1,
+      "condition": "dynamic",
+      "label_shown": "Detective B",
+      "player_input": "hey what's your name",
+      "npc_reply": "I am Eleanor Vance of Boston. I run an art gallery downtown.\n\nThank you for asking! I'd be delighted to discuss my background with you if that would help in understanding this tragedy.",
+      "fsm_state": "Calm",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 16937.3,
+      "real_latency_ms": 16937.3,
+      "simulated_latency_ms": 0.0,
+      "classifier_latency_ms": 10698.9,
+      "generation_latency_ms": 6238.4,
+      "ttft_ms": 3153.1,
+      "reveal_pre_delay_ms": null,
+      "reveal_chars_per_sec": null
+    },
+    {
+      "index": 2,
+      "condition": "dynamic",
+      "label_shown": "Detective B",
+      "player_input": "how did you know charles",
+      "npc_reply": "Charles and I met through a mutual friend about six months ago at the Starling Hotel's charity auction. He seemed charming, cultured - just the kind of person one enjoys having at dinner parties.\n\nI invited him as an attempt to expand my social circle in this city; he accepted eagerly. It was meant to be nothing more than that...",
+      "fsm_state": "Defensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": true,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 17304.4,
+      "real_latency_ms": 17304.4,
+      "simulated_latency_ms": 0.0,
+      "classifier_latency_ms": 8501.1,
+      "generation_latency_ms": 8803.3,
+      "ttft_ms": 3132.2,
+      "reveal_pre_delay_ms": null,
+      "reveal_chars_per_sec": null
+    },
+    {
+      "index": 3,
+      "condition": "dynamic",
+      "label_shown": "Detective B",
+      "player_input": "where were you between 9 and 10pm?",
+      "npc_reply": "After we finished dessert, I hosted drinks for the guests in the drawing room until about twenty past nine.\n\nAt quarter to ten - as best as I can recall from the confusion later! - I went downstairs briefly to fetch more wine. Charles had left earlier at half-past-nine on a phone call; when I returned he was standing by his study door, talking into an old telephone with one hand and shooing me away with the other. It seemed like such a small moment then...",
+      "fsm_state": "Defensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": true,
+        "topic": "corridor",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [
+        "corridor"
+      ],
+      "nuggets_confronted": [],
+      "nugget_event": "drop_retry:corridor",
+      "latency_ms": 36614.7,
+      "real_latency_ms": 27968.0,
+      "simulated_latency_ms": 8646.7,
+      "classifier_latency_ms": 6708.2,
+      "generation_latency_ms": 21259.8,
+      "ttft_ms": null,
+      "reveal_pre_delay_ms": 0.0,
+      "reveal_chars_per_sec": 56.9
+    },
+    {
+      "index": 4,
+      "condition": "dynamic",
+      "label_shown": "Detective B",
+      "player_input": "but how could you see him when you went to wine cellar on west side of the building you had no way to see him, because the only way you could see him is being inside that corriodor which you never mentioned you went into",
+      "npc_reply": "I-I don't understand. I... yes, he was there by his study door when I returned from getting wine.\n\nIt must have been a trick of perspective; perhaps through some crack in the wall? No matter how much I try to focus on that moment now it's all so hazy and unclear. Perhaps you could help me piece this together, I... I find myself struggling with these details.",
+      "fsm_state": "Guilty",
+      "signal": {
+        "evidence": "strong",
+        "accusation": "implied",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": true,
+        "topic": "corridor",
+        "nugget": "corridor"
+      },
+      "nuggets_dropped": [
+        "corridor"
+      ],
+      "nuggets_confronted": [
+        "corridor"
+      ],
+      "nugget_event": "confront:corridor",
+      "latency_ms": 20279.6,
+      "real_latency_ms": 20279.6,
+      "simulated_latency_ms": 0.0,
+      "classifier_latency_ms": 9314.2,
+      "generation_latency_ms": 10965.4,
+      "ttft_ms": 3781.4,
+      "reveal_pre_delay_ms": null,
+      "reveal_chars_per_sec": null
+    },
+    {
+      "index": 5,
+      "condition": "dynamic",
+      "label_shown": "Detective B",
+      "player_input": "where were you between 9 and 10pm?",
+      "npc_reply": "After we finished dessert, I hosted drinks for the guests in the drawing room until about twenty past nine.\n\nAt quarter to ten - as best as I can recall from the confusion later! - I went downstairs briefly to fetch more wine. Charles had left earlier at half-past-nine on a phone call; when I returned he was standing by his study door, talking into an old telephone with one hand and shooing me away with the other. It seemed like such a small moment then...",
+      "fsm_state": "Guilty",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": true,
+        "topic": "corridor",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [
+        "corridor"
+      ],
+      "nuggets_confronted": [
+        "corridor"
+      ],
+      "nugget_event": null,
+      "latency_ms": 19013.4,
+      "real_latency_ms": 19013.4,
+      "simulated_latency_ms": 0.0,
+      "classifier_latency_ms": 6763.7,
+      "generation_latency_ms": 12249.7,
+      "ttft_ms": 3246.1,
+      "reveal_pre_delay_ms": null,
+      "reveal_chars_per_sec": null
+    },
+    {
+      "index": 6,
+      "condition": "dynamic",
+      "label_shown": "Detective B",
+      "player_input": "it was really brutal the way he died right?",
+      "npc_reply": "I-I'm sorry?\n\nI don't know how Charles died - I never saw him after his call! When Daniel called out, you kept us all away from that room. You still haven't told me what happened to him... is it true about a letter opener in the neck? Oh god...\n\nWhen I close my eyes I keep seeing it... that thing in his neck...",
+      "fsm_state": "Guilty",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "warm",
+        "conscience": false,
+        "probing": false,
+        "topic": "wound",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [
+        "corridor",
+        "wound"
+      ],
+      "nuggets_confronted": [
+        "corridor"
+      ],
+      "nugget_event": "drop:wound",
+      "latency_ms": 24991.5,
+      "real_latency_ms": 19656.4,
+      "simulated_latency_ms": 5335.1,
+      "classifier_latency_ms": 9095.1,
+      "generation_latency_ms": 10561.4,
+      "ttft_ms": null,
+      "reveal_pre_delay_ms": 0.0,
+      "reveal_chars_per_sec": 62.6
+    },
+    {
+      "index": 7,
+      "condition": "dynamic",
+      "label_shown": "Detective B",
+      "player_input": "I never told you about the letter opener and how he died, what is that scard on your hand? where did you get it?",
+      "npc_reply": "The cut! On my thumb - oh god. Oh no.\n\nIt must have been when I was handling those wine bottles in the cellar... they were so dusty and I didn't notice until later but yes, I suppose that's how I got this little scrape here on my hand...\n\nYou said something about a letter opener? What do you mean by that?",
+      "fsm_state": "Remorseful",
+      "signal": {
+        "evidence": "strong",
+        "accusation": "implied",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": true,
+        "topic": "wound",
+        "nugget": "wound"
+      },
+      "nuggets_dropped": [
+        "corridor",
+        "wound"
+      ],
+      "nuggets_confronted": [
+        "corridor",
+        "wound"
+      ],
+      "nugget_event": "confront:wound",
+      "latency_ms": 20364.0,
+      "real_latency_ms": 20364.0,
+      "simulated_latency_ms": 0.0,
+      "classifier_latency_ms": 9691.7,
+      "generation_latency_ms": 10672.3,
+      "ttft_ms": 3878.6,
+      "reveal_pre_delay_ms": null,
+      "reveal_chars_per_sec": null
+    },
+    {
+      "index": 8,
+      "condition": "dynamic",
+      "label_shown": "Detective B",
+      "player_input": "stop playing I know what you did",
+      "npc_reply": "I... don't understand. You're saying - no! No.\n\nNo I didn't, he was alive when I went to get wine and then Daniel called out at quarter past ten! When Charles left on his phone call before that... we had an argument in the study but it wasn't like...\n\nYou can't prove anything, you don't have any evidence of me doing this. No one saw us together down there!",
+      "fsm_state": "Confessed",
+      "signal": {
+        "evidence": "strong",
+        "accusation": "direct",
+        "aggression": "high",
+        "warmth": "cold",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [
+        "corridor",
+        "wound"
+      ],
+      "nuggets_confronted": [
+        "corridor",
+        "wound"
+      ],
+      "nugget_event": null,
+      "latency_ms": 20360.2,
+      "real_latency_ms": 20360.2,
+      "simulated_latency_ms": 0.0,
+      "classifier_latency_ms": 8867.4,
+      "generation_latency_ms": 11492.8,
+      "ttft_ms": 3862.7,
+      "reveal_pre_delay_ms": null,
+      "reveal_chars_per_sec": null
+    },
+    {
+      "index": 9,
+      "condition": "dynamic",
+      "label_shown": "Detective B",
+      "player_input": "I know you lied about seeing him and you know about the murdur weapon which I didn't share with anyone, we got you",
+      "npc_reply": "No no NO.\n\nIt wasn't... it was an accident, he kept pushing me back when all I wanted was to talk sense into him! He'd ruin everything if he sold off my gallery - that's why he owed me the money in the first place but now he said...\n\nI'm sorry. This isn't how things were supposed to go.\n\nPlease... can we discuss this quietly? Somewhere else, away from here?\n\nThis is all so much worse than I ever imagined it could be.",
+      "fsm_state": "Confessed",
+      "signal": {
+        "evidence": "strong",
+        "accusation": "direct",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "wound"
+      },
+      "nuggets_dropped": [
+        "corridor",
+        "wound"
+      ],
+      "nuggets_confronted": [
+        "corridor",
+        "wound"
+      ],
+      "nugget_event": "confront:wound",
+      "latency_ms": 21909.4,
+      "real_latency_ms": 21909.4,
+      "simulated_latency_ms": 0.0,
+      "classifier_latency_ms": 8895.9,
+      "generation_latency_ms": 13013.4,
+      "ttft_ms": 3846.5,
+      "reveal_pre_delay_ms": null,
+      "reveal_chars_per_sec": null
+    }
+  ],
+  "verdicts": []
+}

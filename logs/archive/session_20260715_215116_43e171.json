@@ -1,0 +1,370 @@
+{
+  "session_id": "20260715_215116_43e171",
+  "started_at": "2026-07-15T21:51:16",
+  "turns": [
+    {
+      "index": 1,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "Good evening. Thank you for making time for me tonight.",
+      "npc_reply": "It's quite alright; I'm just glad we can clear this matter up as quickly as possible. It was such a tragic night - Charles' death has left us all stunned and grieving.\n\nI do hope the police will find out what happened soon, so that poor Sarah can have closure for her loss of her brother...",
+      "fsm_state": "Calm",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "warm",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 25577.0,
+      "real_latency_ms": 25577.0,
+      "simulated_latency_ms": 0.0,
+      "classifier_latency_ms": 11496.2,
+      "generation_latency_ms": 14080.7
+    },
+    {
+      "index": 2,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "Tell me a little about yourself and the gallery.",
+      "npc_reply": "Well I'm Eleanor Vance; I run an art gallery in town called \"The Gallery on Fifth.\" We specialize mostly in contemporary artists - oils, watercolors, that sort of thing.\n\nI also own this house out here near the riverbank where we had dinner last night for Charles and his sister Sarah. They were both so charming! It's such a shame what happened to him...",
+      "fsm_state": "Calm",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "warm",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 27239.4,
+      "real_latency_ms": 27239.4,
+      "simulated_latency_ms": 0.0,
+      "classifier_latency_ms": 11003.8,
+      "generation_latency_ms": 16235.6
+    },
+    {
+      "index": 3,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "Who else was at the party last night?",
+      "npc_reply": "We invited quite a few people, but only about half of them could make it - there must have been 12 guests in total. Along with Charles and Sarah Whitmore,\n\nthere were my dear friend Daniel Morris; his wife Emily; their daughter Maryanne who's away at college for now; Mr. & Mrs. Johnson from down the street here... oh, I'm sorry! This is all so upsetting that it's hard to keep track of everyone right now...\n\nI hope you understand, officer?",
+      "fsm_state": "Defensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": true,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 31211.6,
+      "real_latency_ms": 31211.6,
+      "simulated_latency_ms": 0.0,
+      "classifier_latency_ms": 10772.4,
+      "generation_latency_ms": 20439.1
+    },
+    {
+      "index": 4,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "What was served at dinner?",
+      "npc_reply": "Oh we had a lovely meal - roast beef with Yorkshire pudding and gravy for the main course. For appetizers there were some delightful little puff pastries filled with mushroom duxelles,\n\nand for dessert I'd planned on serving chocolate mousse cakes which my cook, Mrs. Parker, prepared earlier in the day. The wine was a lovely red - 2018 Bordeaux from the cellar... I hope that answers your question!",
+      "fsm_state": "Defensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": true,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 28980.8,
+      "real_latency_ms": 28980.8,
+      "simulated_latency_ms": 0.0,
+      "classifier_latency_ms": 10688.6,
+      "generation_latency_ms": 18292.2
+    },
+    {
+      "index": 5,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "How long have you known Charles?",
+      "npc_reply": "I've only met him once before this dinner party actually; he's Sarah's brother, and she came to my gallery opening last month. We got along so well that when I was planning the party,\n\nshe asked if her brother could join us as a guest - how tragic it turned out! He seemed like such a charming man...",
+      "fsm_state": "Defensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": true,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 25226.2,
+      "real_latency_ms": 25226.2,
+      "simulated_latency_ms": 0.0,
+      "classifier_latency_ms": 10785.0,
+      "generation_latency_ms": 14441.2
+    },
+    {
+      "index": 6,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "Did Charles seem himself lately?",
+      "npc_reply": "I'm afraid not, officer; he did seem somewhat distracted at dinner. Sarah mentioned earlier that week she thought he might be worried about something,\n\nbut I didn't pry further - it's so difficult to know what people are really going through sometimes! He was still quite friendly though during the evening...",
+      "fsm_state": "Calm",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "warm",
+        "conscience": false,
+        "probing": true,
+        "topic": "corridor",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": "drop_failed:corridor",
+      "latency_ms": 40583.1,
+      "real_latency_ms": 40583.1,
+      "simulated_latency_ms": 0.0,
+      "classifier_latency_ms": 11214.5,
+      "generation_latency_ms": 29368.6
+    },
+    {
+      "index": 7,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "Good evening. Can you tell me about the party?",
+      "npc_reply": "I'd love to, officer; we had such a lovely time until everything went wrong.\n\nWe started with drinks in the drawing room at eight - mostly sherry and red wine for those who wanted it. Dinner was served promptly at half past eight,\n\nand after that we moved back upstairs where people were chatting about art appreciation techniques. Charles left to take an important phone call around quarter to ten...",
+      "fsm_state": "Calm",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 28261.0,
+      "real_latency_ms": 28261.0,
+      "simulated_latency_ms": 0.0,
+      "classifier_latency_ms": 10809.7,
+      "generation_latency_ms": 17451.3
+    },
+    {
+      "index": 8,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "How exactly was Charles killed?",
+      "npc_reply": "I'm not sure of the details, officer; Daniel found him in his study and called out immediately.\n\nHe must have been struck by something - a letter opener maybe? I can't be certain though. When you close your eyes I keep seeing it... that thing in his neck...\n\nIt's all so confusing! Do you think we should talk to Sarah next, or would she prefer if I spoke with her first instead of going through an investigator like this?",
+      "fsm_state": "Defensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": true,
+        "topic": "wound",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [
+        "wound"
+      ],
+      "nuggets_confronted": [],
+      "nugget_event": "drop:wound",
+      "latency_ms": 31074.4,
+      "real_latency_ms": 31074.4,
+      "simulated_latency_ms": 0.0,
+      "classifier_latency_ms": 11048.7,
+      "generation_latency_ms": 20025.7
+    },
+    {
+      "index": 9,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "When did you last see Charles that evening?",
+      "npc_reply": "I saw him at a quarter past nine when dinner ended - he was standing in the doorway between the dining room and drawing room, speaking to Sarah.\n\nWe exchanged smiles as I went past; then later around 20:45 or so (quarter to ten) I saw him again. He had gone into his study for an important phone call,\n\nstanding right there at the entrance holding a telephone receiver up to one ear while waving me away with his free hand...",
+      "fsm_state": "Defensive",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": true,
+        "topic": "corridor",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [
+        "corridor",
+        "wound"
+      ],
+      "nuggets_confronted": [],
+      "nugget_event": "drop:corridor",
+      "latency_ms": 31441.7,
+      "real_latency_ms": 31441.7,
+      "simulated_latency_ms": 0.0,
+      "classifier_latency_ms": 11082.1,
+      "generation_latency_ms": 20359.6
+    },
+    {
+      "index": 10,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "We found your fingerprints on the weapon. You killed him.",
+      "npc_reply": "No! That's not possible, officer; I've never been in that study before.\n\nI swear it - when I saw Charles at quarter to ten he was alive and well talking into a telephone receiver... oh god please tell me this isn't happening...\n\nMy fingerprints? How could they possibly be on the weapon if what you're saying is true?!",
+      "fsm_state": "Defensive",
+      "signal": {
+        "evidence": "strong",
+        "accusation": "direct",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [
+        "corridor",
+        "wound"
+      ],
+      "nuggets_confronted": [],
+      "nugget_event": null,
+      "latency_ms": 27042.1,
+      "real_latency_ms": 27042.1,
+      "simulated_latency_ms": 0.0,
+      "classifier_latency_ms": 10820.2,
+      "generation_latency_ms": 16221.9
+    },
+    {
+      "index": 11,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "Nobody was told where he was stabbed, and you never saw the body. How do you know it was his neck?",
+      "npc_reply": "I - I don't really... It's just that Daniel mentioned something about a wound when we were all gathered in the drawing room after,\n\nand then later at dinner people kept talking about how someone had been stabbed to death and I guess my mind sort of jumped to conclusions without meaning to. Please, officer...\n\nthis has got to be some kind of misunderstanding!",
+      "fsm_state": "Guilty",
+      "signal": {
+        "evidence": "strong",
+        "accusation": "implied",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": true,
+        "topic": "none",
+        "nugget": "wound"
+      },
+      "nuggets_dropped": [
+        "corridor",
+        "wound"
+      ],
+      "nuggets_confronted": [
+        "wound"
+      ],
+      "nugget_event": "confront:wound",
+      "latency_ms": 27955.1,
+      "real_latency_ms": 27955.1,
+      "simulated_latency_ms": 0.0,
+      "classifier_latency_ms": 11174.9,
+      "generation_latency_ms": 16780.2
+    },
+    {
+      "index": 12,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "You said you never went down the east corridor -- yet you saw him in the study doorway at a quarter to ten.",
+      "npc_reply": "I - oh god I don't know how that happened... It must have been when Sarah and I were talking earlier,\n\nand she mentioned something about seeing Charles there with his phone call, or maybe it was Daniel who told me he'd seen him on the way back from using the bathroom? Everything's so blurry now...\n\nI'm sorry officer but this is all too much for one person to take in at once!",
+      "fsm_state": "Remorseful",
+      "signal": {
+        "evidence": "strong",
+        "accusation": "implied",
+        "aggression": "low",
+        "warmth": "neutral",
+        "conscience": false,
+        "probing": true,
+        "topic": "none",
+        "nugget": "corridor"
+      },
+      "nuggets_dropped": [
+        "corridor",
+        "wound"
+      ],
+      "nuggets_confronted": [
+        "corridor",
+        "wound"
+      ],
+      "nugget_event": "confront:corridor",
+      "latency_ms": 30212.5,
+      "real_latency_ms": 30212.5,
+      "simulated_latency_ms": 0.0,
+      "classifier_latency_ms": 11268.3,
+      "generation_latency_ms": 18944.2
+    },
+    {
+      "index": 13,
+      "condition": "dynamic",
+      "label_shown": "Detective A",
+      "player_input": "Thank you for finally being honest with me.",
+      "npc_reply": "You're welcome, officer - I just want everything sorted out as quickly and painlessly as possible.\n\nIt's been such a long night already... Is there anything else we need to discuss? Or should I speak directly with Sarah about what happened next in the drawing room after Daniel found him?",
+      "fsm_state": "Confessed",
+      "signal": {
+        "evidence": "none",
+        "accusation": "none",
+        "aggression": "low",
+        "warmth": "warm",
+        "conscience": false,
+        "probing": false,
+        "topic": "none",
+        "nugget": "none"
+      },
+      "nuggets_dropped": [
+        "corridor",
+        "wound"
+      ],
+      "nuggets_confronted": [
+        "corridor",
+        "wound"
+      ],
+      "nugget_event": null,
+      "latency_ms": 25473.9,
+      "real_latency_ms": 25473.9,
+      "simulated_latency_ms": 0.0,
+      "classifier_latency_ms": 11107.1,
+      "generation_latency_ms": 14366.8
+    }
+  ],
+  "verdicts": []
+}
