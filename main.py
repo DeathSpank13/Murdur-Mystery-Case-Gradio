@@ -12,14 +12,39 @@ Run:
 Then open the local URL Gradio prints (usually http://127.0.0.1:7860).
 """
 
+import threading
+
+import intent_classifier
 import llm_client
 import static_dialogue
+from fsm import SuspectFSM
 from ui import build_app, BRANCHING_CSS
+
+
+def _warm_up_model():
+    """Prime both server slots so the first real turn is not the slow one.
+
+    The first classifier call after a server start pays the full few-shot
+    prefix evaluation (plus lazy backend shader compilation), which showed up
+    as a 60s+ first turn in benchmarks. One dummy classifier call caches that
+    prefix in one slot; a one-token in-character call caches the Calm persona
+    in the other. Runs in a daemon thread so the UI comes up immediately --
+    the player's first message typically lands well after this finishes.
+    """
+    intent_classifier.classify("Good evening.", None)
+    llm_client.get_response(
+        SuspectFSM().get_system_prompt(),
+        [{"role": "user", "content": "Good evening."}],
+        max_tokens=1,
+    )
+    print("Model warm-up complete. First dynamic turn will be full speed.")
 
 
 def main():
     if llm_client.server_is_up():
         print("Local model server detected on port 8080. Dynamic mode is ready.")
+        print("Warming up the model in the background...")
+        threading.Thread(target=_warm_up_model, daemon=True).start()
     else:
         print(
             "Note: local model server not detected on port 8080.\n"
