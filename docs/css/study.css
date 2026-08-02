@@ -1,0 +1,147 @@
+/* study.css
+   Layout for the questionnaire hub at docs/study/. Loaded after style.css,
+   which supplies the palette (--panel, --accent, --border, ...) and the
+   820px body column. */
+
+.toolbar { display: flex; gap: 0.5rem; margin: 1.25rem 0 1rem; flex-wrap: wrap; }
+.toolbar button {
+  background: var(--panel-2);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.toolbar button:hover { border-color: var(--accent); }
+
+/* Part cards */
+.part-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  margin-bottom: 1rem;
+}
+.part-num {
+  display: inline-block;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.15rem;
+}
+.part-card h2 { margin: 0 0 0.4rem; font-size: 1.15rem; }
+.when { color: var(--muted); font-size: 0.88rem; margin: 0 0 0.9rem; }
+
+.form-btn {
+  display: inline-block;
+  border-radius: 8px;
+  padding: 0.55rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.form-btn:hover { filter: brightness(1.08); }
+.form-btn.unset {
+  background: none;
+  border: 1px dashed var(--border);
+  color: var(--muted);
+  font-weight: 400;
+  cursor: not-allowed;
+}
+
+/* Collapsible question list */
+.items { margin-top: 0.9rem; }
+.items > summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 0.88rem;
+  padding: 0.3rem 0;
+}
+.items > summary:hover { color: var(--ink); }
+.items h3 {
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 1.1rem 0 0.3rem;
+}
+.items blockquote {
+  margin: 0.8rem 0;
+  padding: 0.5rem 0.85rem;
+  border-left: 2px solid var(--border);
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+.items .lead { font-size: 0.9rem; color: var(--muted); margin: 0.9rem 0 0.3rem; }
+
+.qlist { list-style: none; margin: 0; padding: 0; }
+.qlist li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.92rem;
+}
+.qlist li:last-child { border-bottom: none; }
+.qid {
+  display: inline-block;
+  min-width: 2.8rem;
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 0.78rem;
+  color: var(--accent);
+}
+.badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.05rem 0.5rem;
+  margin-left: 0.35rem;
+  white-space: nowrap;
+}
+.choices { color: var(--muted); font-size: 0.82rem; }
+.choices code {
+  background: var(--panel-2);
+  border-radius: 4px;
+  padding: 0.05rem 0.35rem;
+}
+.qnote { display: block; color: var(--muted); font-size: 0.8rem; margin-left: 2.8rem; }
+
+/* For-researchers block */
+.researcher {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.7rem 1.1rem;
+  margin-top: 2rem;
+}
+.researcher > summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+.researcher > summary:hover { color: var(--ink); }
+.researcher h2 { font-size: 1rem; margin: 1.2rem 0 0.4rem; }
+.researcher li { margin-bottom: 0.35rem; }
+.researcher code {
+  background: var(--panel-2);
+  border-radius: 4px;
+  padding: 0.05rem 0.35rem;
+  font-size: 0.85em;
+}
+
+footer.page-foot {
+  margin-top: 2rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+  border-top: 1px solid var(--border);
+  padding-top: 0.8rem;
+}
+footer.page-foot a { color: var(--accent); }
+
+@media (max-width: 480px) {
+  .qid { min-width: 0; margin-right: 0.4rem; }
+  .qnote { margin-left: 0; }
+}

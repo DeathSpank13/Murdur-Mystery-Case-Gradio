@@ -1,0 +1,6 @@
+{
+  "_comment": "Live (published) Google Form URLs, printed by createAllParts() in create_google_form.gs. Paste them here, then run `python study/build_study_page.py` to regenerate docs/study/index.html. Empty strings render as a disabled 'link not set yet' button.",
+  "part1": "",
+  "part2": "",
+  "part3": ""
+}

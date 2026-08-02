@@ -49,6 +49,8 @@ away); see the design note below for what it demonstrates.
 | `test_retrieval.py` | Lightweight checks for the static retrieval (band routing, rotation, nugget-slip integrity, pacing calibration maths), plus an optional real-model sweep. |
 | `test_llm_stream.py` | Offline checks for the SSE streaming client: line parsing, the delta/done event protocol, and every failure mode collapsing to the blocking client's fallback strings. |
 | `docs/` | The static, browser-based demo published to GitHub Pages. Plain HTML/CSS/JS ports of the three modes; the AI suspect uses Qwen2.5-0.5B-Instruct via transformers.js. See [The web demo](#the-web-demo). |
+| `study/` | The pilot questionnaire: `questionnaire.md` (canonical text), `create_google_form.gs` (builds the three Google Forms), `form_links.json` (their live URLs), and `build_study_page.py` (regenerates the public page). See [The questionnaire](#the-questionnaire). |
+| `docs/study/` | Generated hub page for the questionnaire — the whole instrument readable without a Google account, plus a button per part. Never edit by hand; run `python study/build_study_page.py`. |
 
 ## Design notes (worth knowing before a demo or a question)
 
@@ -144,7 +146,7 @@ and is unit tested independently of the UI.
 
 | | Browser demo | Local Python app |
 |---|---|---|
-| **Where** | [GitHub Pages link](https://deathspank13.github.io/npc-interrogation/) | Your machine |
+| **Where** | [GitHub Pages link](https://deathspank13.github.io/Murdur-Mystery-Case-Gradio/) | Your machine |
 | **Install** | Nothing | Python + dependencies (below) |
 | **AI model** | Qwen2.5-0.5B-Instruct, in-browser | Wayfarer-12B, local llama.cpp server |
 | **Quality** | Lower (small model) | Full |
@@ -314,7 +316,8 @@ python -m http.server -d docs 8000
 
 Then open <http://localhost:8000>. To publish: push the repo to GitHub and set
 **Settings → Pages → Source = `main` branch, `/docs` folder**. The site appears
-at `https://deathspank13.github.io/npc-interrogation/`.
+at `https://deathspank13.github.io/Murdur-Mystery-Case-Gradio/`, and the
+questionnaire hub (below) at `.../Murdur-Mystery-Case-Gradio/study/`.
 
 ## Demo script
 
@@ -360,6 +363,41 @@ the raw material for the comparative analysis.
   until the very end so the first answer does not contaminate the second.
 - `SuspectFSM.history` and the per turn latencies give you transition counts and
   response time distributions straight out of the logs.
+
+## The questionnaire
+
+The pilot instrument lives in [study/questionnaire.md](study/questionnaire.md)
+and is split into **three parts**, one per moment in the session:
+
+| Part | When | Contents |
+|---|---|---|
+| 1 | before play | consent, Participant ID, background (A1-A8) |
+| 2 | after the first detective's verdict | Participant ID, B0, B1-B12 |
+| 3 | after the second detective's verdict | Participant ID, B0, B1-B12, comparison (C1-C5), final questions (D1-D5) |
+
+Splitting it keeps the Part 3 blind check ("one of these was AI") out of sight
+while the participant is still forming their Part 2 impressions. The same
+**Participant ID** in all three parts is the only thing joining the three
+response sheets to each other and to the session log.
+
+Setting it up, once:
+
+1. Paste `study/create_google_form.gs` into <https://script.google.com> and run
+   `createAllParts()`. It builds all three forms and logs an edit URL and a
+   live URL for each.
+2. Paste the three live URLs into `study/form_links.json`.
+3. Regenerate the public page and commit both files:
+
+```powershell
+python study\build_study_page.py
+```
+
+That writes `docs/study/index.html` — a hub listing every question, readable
+without a Google account, with a button per part. Published alongside the demo
+at `https://deathspank13.github.io/Murdur-Mystery-Case-Gradio/study/`. It is a
+generated file: edit `study/questionnaire.md` and re-run the script instead.
+`create_google_form.gs` is hand-synced against the same markdown, so change the
+markdown first, then mirror the edit there.
 
 ## Tests
 
