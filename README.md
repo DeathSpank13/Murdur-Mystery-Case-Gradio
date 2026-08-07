@@ -1,6 +1,10 @@
 # Adaptive NPC Dialogue: State Machines vs. Static Trees
 
 **▶ [Try it in your browser](https://deathspank13.github.io/Murdur-Mystery-Case-Gradio/)** — no install.
+**📋 [Study questionnaire](https://deathspank13.github.io/Murdur-Mystery-Case-Gradio/study/)** —
+the three-part pilot instrument, readable without a Google account (see
+[The questionnaire](#the-questionnaire)).
+
 The web demo runs all three modes, including a real AI suspect powered by
 **Qwen2.5-0.5B-Instruct** loaded entirely client-side via
 [transformers.js](https://huggingface.co/docs/transformers.js). It is a
