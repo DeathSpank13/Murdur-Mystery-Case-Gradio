@@ -1,0 +1,6 @@
+{
+  "_comment": "Live (published) Google Form URLs, printed by createAllParts() in create_google_form.gs. Paste them here, then run `python study/build_study_page.py` to regenerate docs/study/index.html. Empty strings render as a disabled 'link not set yet' button.",
+  "part1": "https://docs.google.com/forms/d/e/1FAIpQLSeAf2HX9qXIlGV8Gw_IBeIl6HvQvv2JUnZiQdys_RAP9AReOA/viewform",
+  "part2": "https://docs.google.com/forms/d/e/1FAIpQLSeMn4xrXTAt7D-6mqtwAnT20MgBpFG88PHX28JY4PweOdBLDg/viewform",
+  "part3": "https://docs.google.com/forms/d/e/1FAIpQLSdGl1IRYxX8fe8nCHtPG7h6_m1wIKq69IWLWQ05EqIFhz0cCQ/viewform"
+}

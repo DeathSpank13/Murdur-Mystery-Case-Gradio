@@ -580,10 +580,11 @@ def run_attached(args, out_dir, run_at):
 
 
 def run_sweep(args, out_dir, run_at):
-    exe = shutil.which("llama-server")
-    if not exe:
-        print("llama-server was not found on PATH. Install it first "
-              "(winget install llama.cpp) or add it to PATH.")
+    exe = args.server_exe or shutil.which("llama-server")
+    if not exe or not (os.path.exists(exe) or shutil.which(exe)):
+        print("llama-server was not found. Install it first "
+              "(winget install llama.cpp), add it to PATH, or point "
+              "--server-exe at a specific build.")
         return []
     if port_in_use(args.port):
         print(f"Something is already listening on port {args.port} -- most "
@@ -672,6 +673,10 @@ def main():
     parser.add_argument("--hf-tag", default=DEFAULT_HF_TAG)
     parser.add_argument("--out", default="benchmarks",
                         help="results directory (default benchmarks/)")
+    parser.add_argument("--server-exe",
+                        help="sweep mode: path to a specific llama-server "
+                             "binary (e.g. a CUDA build) instead of the one "
+                             "on PATH")
     args = parser.parse_args()
 
     os.makedirs(args.out, exist_ok=True)

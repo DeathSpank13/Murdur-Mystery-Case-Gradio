@@ -49,6 +49,8 @@ away); see the design note below for what it demonstrates.
 | `test_retrieval.py` | Lightweight checks for the static retrieval (band routing, rotation, nugget-slip integrity, pacing calibration maths), plus an optional real-model sweep. |
 | `test_llm_stream.py` | Offline checks for the SSE streaming client: line parsing, the delta/done event protocol, and every failure mode collapsing to the blocking client's fallback strings. |
 | `docs/` | The static, browser-based demo published to GitHub Pages. Plain HTML/CSS/JS ports of the three modes; the AI suspect uses Qwen2.5-0.5B-Instruct via transformers.js. See [The web demo](#the-web-demo). |
+| `study/` | The pilot questionnaire: `questionnaire.md` (canonical text), `create_google_form.gs` (builds the three Google Forms), `form_links.json` (their live URLs), and `build_study_page.py` (regenerates the public page). See [The questionnaire](#the-questionnaire). |
+| `docs/study/` | Generated hub page for the questionnaire — the whole instrument readable without a Google account, plus a button per part. Never edit by hand; run `python study/build_study_page.py`. |
 
 ## Design notes (worth knowing before a demo or a question)
 
@@ -144,7 +146,7 @@ and is unit tested independently of the UI.
 
 | | Browser demo | Local Python app |
 |---|---|---|
-| **Where** | [GitHub Pages link](https://deathspank13.github.io/npc-interrogation/) | Your machine |
+| **Where** | [GitHub Pages link](https://deathspank13.github.io/Murdur-Mystery-Case-Gradio/) | Your machine |
 | **Install** | Nothing | Python + dependencies (below) |
 | **AI model** | Qwen2.5-0.5B-Instruct, in-browser | Wayfarer-12B, local llama.cpp server |
 | **Quality** | Lower (small model) | Full |
@@ -173,18 +175,30 @@ real apparatus, with the full-size model and the study instrumentation.
    embedding model (all-MiniLM-L6-v2, ~80 MB) downloads once on first run;
    `main.py` warms it up at startup so the first study turn isn't slow.
 
-3. Install and start the local model server (in a separate terminal):
+3. Install and start the local model server (in a separate terminal). On an
+   NVIDIA GPU use the CUDA build of llama.cpp — the winget package is
+   Vulkan-only and measured ~29% slower per turn (see below). Download the two
+   matching zips for one release tag from
+   https://github.com/ggml-org/llama.cpp/releases
+   (`llama-bXXXX-bin-win-cuda-12.4-x64.zip` **and**
+   `cudart-llama-bin-win-cuda-12.4-x64.zip`), extract both into one folder
+   (e.g. `C:\llama-cuda\`, cudart DLLs beside `llama-server.exe`), then:
+
+   ```powershell
+   C:\llama-cuda\llama-server.exe -hf bartowski/Wayfarer-12B-GGUF:Q4_K_M -c 8192 -np 2 -ngl 34 -fa on -ctk q8_0 -ctv q8_0
+   ```
+
+   Fallback without the CUDA download (winget's Vulkan build):
 
    ```powershell
    winget install llama.cpp
-   llama-server -hf bartowski/Wayfarer-12B-GGUF:Q4_K_M -c 8192 -np 2 -ngl 28 -fa on -ctk q8_0 -ctv q8_0
+   llama-server -hf bartowski/Wayfarer-12B-GGUF:Q4_K_M -c 8192 -np 2 -ngl 99 -fa on -ctk q8_0 -ctv q8_0 -ot "blk\.(2[7-9]|3[0-9])\.ffn_.*=CPU"
    ```
 
    The server listens on port 8080 by default, which is what `llm_client.py`
    expects. The flags matter — see [Performance tuning and
    benchmarking](#performance-tuning-and-benchmarking) for what each one does
-   and how they were chosen (a bare `llama-server -hf ...` launch was measured
-   ~45% slower per turn on the study machine).
+   and how they were chosen.
 
 ## Run
 
@@ -202,24 +216,38 @@ local embedding model, not the server); dynamic mode needs the server up.
 
 A dynamic turn costs two model calls: the intent classifier (a fixed ~2.4K-token
 few-shot prompt, tiny JSON answer) and the in-character reply. On the study
-machine (RTX 4070 Laptop, 8GB VRAM) the bare `llama-server -hf ...` launch
-averaged ~28s per turn; the recommended flags bring the median to ~19s, with
-late-conversation replies down from ~15s to ~7.5s. What each flag does:
+machine (RTX 4070 Laptop, 8GB VRAM; benchmarked 2026-07-25 on AC power, driver
+610.74, llama.cpp b8683) the CUDA build at `-ngl 34` runs the benchmark
+workload at a ~7.5s median turn, 16.4 t/s generation — vs ~10.6s / 12.5 t/s
+for the same flags on winget's Vulkan build at its `-ngl 28` sweet spot.
+Numbers are power-state sensitive: the identical Vulkan config measured ~19s
+median in July on the same laptop, so benchmark plugged in, and expect battery
+play to be slower. What each flag does:
 
-- `-ngl 28` — how many of the model's 41 layers live on the GPU, and the single
-  biggest lever. Counterintuitively, *more is not better on 8GB*: at `-ngl 30`+
-  (including the build's auto default of 32, and `-ngl all`) the weights only
-  "fit" via the NVIDIA driver silently spilling VRAM into system RAM, and
-  generation drops from ~6 t/s to ~4 t/s. 28 is the measured sweet spot for
-  this GPU; re-benchmark on other hardware.
+- **backend** — winget's llama.cpp ships only the Vulkan backend. The CUDA
+  build is faster per-layer *and* frees enough VRAM behavior-wise that the old
+  "more layers = silent driver spill = 4 t/s collapse" cliff does not appear
+  through `-ngl 35`; scaling stayed monotonic in the sweep.
+- `-ngl 34` (CUDA) — 34 of the model's 41 layers on the GPU, using ~7.2 of
+  8 GB with ~1 GB headroom (llama.cpp's own safety target) for the browser and
+  desktop. `-ngl 35` measured ~8% faster still (~7.0s median, 17.3 t/s) but
+  leaves <800 MB free — fine benchmarking alone, risky during real play where
+  a silent spill would poison a session. On the Vulkan build the cliff is
+  real: `-ngl 30`+ collapses generation; use `-ngl 28` there, or better the
+  tensor-override fallback launch above (full offload with the top FFN
+  tensors on CPU, ~8.9s median — Vulkan's best measured config).
 - `-fa on -ctk q8_0 -ctv q8_0` — flash attention plus 8-bit KV cache, halving
   the cache's VRAM footprint (`-ctv` requires `-fa on`). No classifier output
-  drift was observed under quantised KV, but re-run `eval_classifier.py` if you
-  change these.
+  drift was observed under quantised KV. Switching Vulkan→CUDA shifts exactly
+  one held-out eval case (14/26 vs 15/26 exact, per-axis parity, stable across
+  re-runs) — backend float numerics on a borderline line, re-confirm with
+  `eval_classifier.py` after any backend change.
 - `-c 8192 -np 2` — two server slots so the classifier's fixed prompt and the
   conversation each keep their own KV cache instead of evicting one another.
   `-c` is the *total* context, split across slots (8192/2 = 4096 each). Always
   set `-c` explicitly: this build's default is model-dependent.
+- Threads: the build's auto default (8) measured best; `-t 6` was ~17% slower,
+  `-t 12` and `--cache-reuse 256` were within noise of default.
 
 On the app side, `ui.py` sends the reply model only the last
 `LLM_HISTORY_MAX_TURNS` (6) question/answer pairs, so the prompt and KV cache
@@ -235,7 +263,12 @@ To re-tune for different hardware (close the Gradio app first):
 python benchmark_llm.py --mode sweep              # curated config matrix
 python benchmark_llm.py --mode sweep --full       # extended matrix
 python benchmark_llm.py --mode attached           # measure a server you started
+python benchmark_llm.py --mode sweep --config-file benchmarks\my_configs.json --server-exe C:\llama-cuda\llama-server.exe
 ```
+
+`--config-file` takes a JSON list of `{name, args, trim_turns}`; `--server-exe`
+points the sweep at a specific build (e.g. the CUDA one) instead of whatever
+`llama-server` is on PATH.
 
 Results land in `benchmarks/` (JSON + CSV) with a comparison table per run. The
 workload replays a fixed interrogation with deterministic FSM state so configs
@@ -283,7 +316,8 @@ python -m http.server -d docs 8000
 
 Then open <http://localhost:8000>. To publish: push the repo to GitHub and set
 **Settings → Pages → Source = `main` branch, `/docs` folder**. The site appears
-at `https://deathspank13.github.io/npc-interrogation/`.
+at `https://deathspank13.github.io/Murdur-Mystery-Case-Gradio/`, and the
+questionnaire hub (below) at `.../Murdur-Mystery-Case-Gradio/study/`.
 
 ## Demo script
 
@@ -329,6 +363,41 @@ the raw material for the comparative analysis.
   until the very end so the first answer does not contaminate the second.
 - `SuspectFSM.history` and the per turn latencies give you transition counts and
   response time distributions straight out of the logs.
+
+## The questionnaire
+
+The pilot instrument lives in [study/questionnaire.md](study/questionnaire.md)
+and is split into **three parts**, one per moment in the session:
+
+| Part | When | Contents |
+|---|---|---|
+| 1 | before play | consent, Participant ID, background (A1-A8) |
+| 2 | after the first detective's verdict | Participant ID, B0, B1-B12 |
+| 3 | after the second detective's verdict | Participant ID, B0, B1-B12, comparison (C1-C5), final questions (D1-D5) |
+
+Splitting it keeps the Part 3 blind check ("one of these was AI") out of sight
+while the participant is still forming their Part 2 impressions. The same
+**Participant ID** in all three parts is the only thing joining the three
+response sheets to each other and to the session log.
+
+Setting it up, once:
+
+1. Paste `study/create_google_form.gs` into <https://script.google.com> and run
+   `createAllParts()`. It builds all three forms and logs an edit URL and a
+   live URL for each.
+2. Paste the three live URLs into `study/form_links.json`.
+3. Regenerate the public page and commit both files:
+
+```powershell
+python study\build_study_page.py
+```
+
+That writes `docs/study/index.html` — a hub listing every question, readable
+without a Google account, with a button per part. Published alongside the demo
+at `https://deathspank13.github.io/Murdur-Mystery-Case-Gradio/study/`. It is a
+generated file: edit `study/questionnaire.md` and re-run the script instead.
+`create_google_form.gs` is hand-synced against the same markdown, so change the
+markdown first, then mirror the edit there.
 
 ## Tests
 
